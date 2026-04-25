@@ -1,22 +1,18 @@
 package com.auction.shared.model;
-import java.util.UUID;
+
 
 public abstract class Entity {
-    protected String id;
 
+    protected static Integer id;
     public Entity() {
-        this.id = UUID.randomUUID().toString();
+        id= id +1;
     }
 
-    public Entity(String id) {
-        this.id = id;
-    }
-
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
+    public void setId(Integer id1) {
+        id = id1;
     }
 }

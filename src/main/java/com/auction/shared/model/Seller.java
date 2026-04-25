@@ -1,12 +1,19 @@
 package com.auction.shared.model;
 
+import java.time.LocalDateTime;
+
+//sau này xây dựng lớp item rôi làm thêm các chức năng
+//  1. Tạo cuộc đấu giá (đưa 1 vật phẩm mới và return 1 cuộc đấu giá)
+//  2. Cập nhất vật phẩm
+//  3. Xóa vật phẩm
+//  4. Coi lại các cuộc giao dịch
+
 public class Seller extends User {
 
-    public Seller(String username, String password) {
-        super(username, password);
+    public Seller( String username, String password, String fullName, double balance, LocalDateTime createdAt) {
+        super( username, password, fullName, Role.SELLER, balance, createdAt);
     }
 
-    public Auction createAuction(Item item) {
-        return new Auction(item, this);
-    }
+
+
 }

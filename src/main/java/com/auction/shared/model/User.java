@@ -1,24 +1,36 @@
 package com.auction.shared.model;
 
-public abstract class User extends Entity {
+import java.time.LocalDateTime;
+
+enum Role {
+    ADMIN,
+    SELLER,
+    BIDDER
+}
+
+public abstract class User extends Entity{
     protected String username;
     protected String password;
+    protected String fullName;
+    protected Role role;
+    protected double balance;
+    protected LocalDateTime createdAt;
 
-    public User(String username, String password) {
+    public User( String username, String password,
+                String fullName, Role role,
+                double balance, LocalDateTime createdAt) {
         super();
         this.username = username;
         this.password = password;
+        this.fullName = fullName;
+        this.role = role;
+        this.balance = balance;
+        this.createdAt = createdAt;
     }
 
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
+    // Getter
+    public String getUsername() { return username; }
+    public String getFullName() { return fullName; }
+    public Role getRole() { return role; }
+    public double getBalance() { return balance; }
 }
