@@ -1,0 +1,12 @@
+package com.auction.shared.model;
+
+public class Admin extends User {
+
+    public Admin(String username, String password) {
+        super(username, password);
+    }
+
+    public void cancelAuction(Auction auction) {
+        auction.cancel();
+    }
+}
