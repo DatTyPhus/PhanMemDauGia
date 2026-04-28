@@ -1,0 +1,12 @@
+{
+  "java.project.referencedLibraries": [
+    "C:/javafx-sdk-26.0.1/lib/**/*.jar"
+  ],
+
+  "java.configuration.runtimes": [
+    {
+      "name": "JavaSE-25",
+      "path": "C:/Program Files/Eclipse Adoptium/jdk-25.0.2.10-hotspot"
+    }
+  ]
+}
