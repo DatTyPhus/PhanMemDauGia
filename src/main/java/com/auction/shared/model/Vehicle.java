@@ -1,10 +1,16 @@
+package com.auction.shared.model;
+
+import com.auction.shared.model.Item;
+
+import java.math.BigDecimal;
+
 public class Vehicle extends Item {
     private String brand; //thương hiệu
 
     public Vehicle(int itemId, int sellerId, String itemName, String description,
-                   BigDecimal startPrice, String imageUrl,String model) {
+                   BigDecimal startPrice, String imageUrl, String brand) {
         super(itemId, sellerId, itemName, description, "Vehicle", startPrice, imageUrl);
-        this.model = model;
+        this.brand = brand;
     }
 
     @Override

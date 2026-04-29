@@ -1,3 +1,7 @@
+package com.auction.shared.model;
+
+import com.auction.shared.model.Entity;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
