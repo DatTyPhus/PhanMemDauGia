@@ -1,3 +1,5 @@
+package com.auction.shared.model;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 //BidTransaction: lịch sử giao dịch
