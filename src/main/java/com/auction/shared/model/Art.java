@@ -1,5 +1,6 @@
 package com.auction.shared.model;
 
+import com.auction.shared.model.Item;
 
 import java.math.BigDecimal;
 public class Art extends Item {
