@@ -8,7 +8,7 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
         Scene scene = new Scene(loader.load());
-
+//o
         stage.setTitle("FXML Demo");
         stage.setScene(scene);
         stage.show();
