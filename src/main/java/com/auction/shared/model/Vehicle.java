@@ -7,14 +7,14 @@ public class Vehicle extends Item {
     private String model;
     private String brand; //thương hiệu
 
-    public Vehicle(int itemId, int sellerId, String itemName, String description,
+    public Vehicle(int sellerId, String itemName, String description,
                    BigDecimal startPrice, String imageUrl, String brand) {
-        super(itemId, sellerId, itemName, description, "Vehicle", startPrice, imageUrl);
+        super(sellerId, itemName, description, "Vehicle", startPrice, imageUrl);
         this.brand = brand;
     }
 
     @Override
     public void printInfo() {
-        System.out.println("Vehicle: " + itemName + " | Brand: " + brand);
+        System.out.println("Vehicle: " + itemName + " | Brand: " + brand + " | itemId:" + getId());
     }
 }

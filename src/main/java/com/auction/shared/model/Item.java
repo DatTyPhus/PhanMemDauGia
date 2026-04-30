@@ -12,9 +12,9 @@ public abstract class Item extends Entity {
     protected String imageUrl;
     protected LocalDateTime createdAt;
 
-    public Item(int itemId, int sellerId, String itemName, String description,
+    public Item(int sellerId, String itemName, String description,
                 String category, BigDecimal startPrice, String imageUrl) {
-        this.id = itemId;
+        super();
         this.sellerId = sellerId;
         this.itemName = itemName;
         this.description = description;
