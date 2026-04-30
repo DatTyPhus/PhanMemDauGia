@@ -15,6 +15,6 @@ public class Vehicle extends Item {
 
     @Override
     public void printInfo() {
-        System.out.println("Vehicle: " + itemName + " | Brand: " + brand);
+        System.out.println("Vehicle: " + itemName + " | Brand: " + brand + " | itemId:" + getId());
     }
 }

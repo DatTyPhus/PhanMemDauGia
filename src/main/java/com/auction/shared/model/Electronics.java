@@ -17,6 +17,6 @@ public class Electronics extends Item {
 
     @Override
     public void printInfo() {
-        System.out.println("Electronic Item: " + itemName + " | Brand: " + brand);
+        System.out.println("Electronic Item: " + itemName + " | Brand: " + brand + " | itemId:" + getId());
     }
 }

@@ -4,7 +4,7 @@ package com.auction.shared.model;
 public abstract class Entity {
 
     protected static Integer id;
-    public Entity() {
+    public synchronized Entity() {
         id= id +1;
     }
 
