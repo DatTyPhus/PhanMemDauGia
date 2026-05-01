@@ -84,4 +84,9 @@ public Auction(int auctionId, int itemId, BigDecimal currentPrice,
     public void setStatus(Status status) { this.status = status; }
 
     public Integer getId() {return id;} 
+    public int getAuctionId() { return auctionId; }
+    public int getItemId() { return itemId; }
+    public LocalDateTime getStartTime() { return startTime; }
+    public LocalDateTime getEndTime() { return endTime; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
 }

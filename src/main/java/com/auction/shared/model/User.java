@@ -33,4 +33,6 @@ public abstract class User extends Entity{
     public String getFullName() { return fullName; }
     public Role getRole() { return role; }
     public double getBalance() { return balance; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public String getPassword() { return password; }
 }

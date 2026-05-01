@@ -9,8 +9,7 @@ public class BidTransaction extends Entity {
     private BigDecimal bidAmount;
     private LocalDateTime bidTime;
 
-    public BidTransaction(int id, int auctionId, int bidderId, BigDecimal bidAmount, LocalDateTime bidTime) {
-        this.id = id;
+    public BidTransaction( int auctionId, int bidderId, BigDecimal bidAmount, LocalDateTime bidTime) {
         this.auctionId = auctionId;
         this.bidderId = bidderId;
         this.bidAmount = bidAmount;

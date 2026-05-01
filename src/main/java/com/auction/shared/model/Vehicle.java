@@ -1,7 +1,6 @@
 package com.auction.shared.model;
 
 import java.math.BigDecimal;
-import com.auction.shared.model.Item;
 
 public class Vehicle extends Item {
     private String model;
