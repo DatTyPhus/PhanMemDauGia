@@ -15,7 +15,7 @@ public abstract class User extends Entity{
     protected Role role;
     protected double balance;
     protected LocalDateTime createdAt;
-
+    protected int userId;
     public User( String username, String password,
                 String fullName, Role role,
                 double balance, LocalDateTime createdAt) {
@@ -26,6 +26,7 @@ public abstract class User extends Entity{
         this.role = role;
         this.balance = balance;
         this.createdAt = createdAt;
+        this.userId = getId();                   //mỗi người co một id, lưu id vào userId
     }
 
     // Getter

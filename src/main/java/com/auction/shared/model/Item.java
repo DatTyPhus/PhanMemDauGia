@@ -13,6 +13,7 @@ public abstract class Item extends Entity {
 
     public Item(int sellerId, String itemName, String description,
                 String category, BigDecimal startPrice, String imageUrl) {
+        super();
         this.sellerId = sellerId;
         this.itemName = itemName;
         this.description = description;
