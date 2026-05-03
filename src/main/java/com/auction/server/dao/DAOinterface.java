@@ -1,4 +1,4 @@
-package com.auction.sever.dao;
+package com.auction.server.dao;
 
 public interface DAOinterface <T> {
     void create(T obj);
