@@ -1,13 +1,13 @@
 package com.auction.shared.model;
 
+import java.time.LocalDateTime;
 
-//
 public class Admin extends User {
 
-    public Admin(String id, String username, String password,
+    public Admin( String username, String password,
                  String fullName,
                  LocalDateTime createdAt) {
-        super(id, username, password, fullName,
+        super( username, password, fullName,
               Role.ADMIN, 0, createdAt);
     }
 

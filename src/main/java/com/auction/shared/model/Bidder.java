@@ -22,5 +22,5 @@ public class Bidder extends User {
         return;
     }
     this.balance += amount;
-}
+    }
 }

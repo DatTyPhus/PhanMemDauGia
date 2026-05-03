@@ -15,7 +15,7 @@
          <children>
             <ImageView fitHeight="160.0" fitWidth="300.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@../ảnh%20htdg/background.png" />
+                  <Image url="@../image/background.png" />
                </image></ImageView>
             <Pane prefHeight="200.0" prefWidth="200.0" style="-fx-background-color: linear-gradient(to bottom, transparent, rgba(0,0,0,0.4));">
                <children>
