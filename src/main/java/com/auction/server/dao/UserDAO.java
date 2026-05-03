@@ -1,4 +1,4 @@
-package com.auction.sever.dao;
+package com.auction.server.dao;
 
 import com.auction.shared.model.User;
 
