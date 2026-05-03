@@ -25,6 +25,6 @@
             <artifactId>javafx-fxml</artifactId>
             <version>27-ea+14</version>
             <scope>compile</scope>
-        </dependency>
+        </dependency>     
     </dependencies>
 </project>
