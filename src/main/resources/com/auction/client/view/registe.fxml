@@ -12,14 +12,14 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1200.0" style="-fx-background-color: linear-gradient(to bottom right, #e6ecf5, #c9d6e8);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1400.0" style="-fx-background-color: linear-gradient(to bottom right, #e6ecf5, #c9d6e8);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
    <children>
-      <ImageView fitHeight="800.0" fitWidth="1200.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../image/background.jpg" />
+            <Image url="@../image/background.png" />
          </image>
       </ImageView>
-      <VBox layoutX="735.0" layoutY="228.0" prefHeight="500.0" prefWidth="370.0" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-spacing: 12; -fx-alignment: centrer;">
+      <VBox layoutX="835.0" layoutY="240.0" prefHeight="500.0" prefWidth="370.0" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-spacing: 12; -fx-alignment: centrer;">
          <children>
             <Label style="-fx-background-color: #1976D2; -fx-alignment: center; -fx-font-size: 32; -fx-text-fill: white; -fx-background-radius: 50; -fx-pref-height: 60; -fx-pref-width: 60;" text="👤">
                <VBox.margin>
