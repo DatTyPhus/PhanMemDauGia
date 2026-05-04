@@ -28,7 +28,7 @@
             <Button mnemonicParsing="false" style="-fx-font-size: 22;" text="✉" />
             <ImageView id="imgAvatar" fitHeight="40.0" fitWidth="40.0" pickOnBounds="true" preserveRatio="true">
                <image>
-                  <Image url="@ảnh%20htdg/avatar.jpg" />
+                  <Image url="@../image/avatar.jpg" />
                </image>
             </ImageView>
             <Label id="txtName" style="-fx-font-size: 14; -fx-font-weight: bold;" text="Nguyễn Văn A" />
