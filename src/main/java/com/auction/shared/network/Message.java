@@ -8,7 +8,6 @@ public class Message {
     private String action;  // Dùng để mô tả hành động như LOGIN,updateProduct......
     private Object payload; // Dùng Object để chứa bất kỳ dữ liệu gì (User, Product, Bid...)
 
-
     public Message(String action, Object payload) {
         this.action = action;
         this.payload = payload;
@@ -28,4 +27,3 @@ public class Message {
         return new Gson().fromJson(json,Message.class);
     }
 }
-

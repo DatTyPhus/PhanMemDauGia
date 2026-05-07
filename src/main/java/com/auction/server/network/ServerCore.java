@@ -3,6 +3,8 @@ package com.auction.server.network;
 import java.net.ServerSocket;
 import java.net.Socket;
 
+// Dùng để tạo Socket ở server nhận tín hiệu từ client.
+
 public class ServerCore {
 
     // Khai báo hằng số cho cổng kết nối
