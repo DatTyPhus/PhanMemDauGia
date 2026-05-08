@@ -19,23 +19,35 @@ public class ClientHandler implements Runnable {
 
     @Override
     public void run() {
-        // Bước 4 (Phía Server): Thiết lập ống Đọc dữ liệu (InputStream)
+
+        // Thiết lập luồng Đọc dữ liệu (InputStream)
+
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             String jsonReceived;
 
             while ((jsonReceived = in.readLine()) != null) {
-                // Dùng Gson bóc hộp ngay lập tức
-                Message msg = Message.fromJson(jsonReceived);
+
+                Message msg = Message.fromJson(jsonReceived);            //Mã hoá JSON về Message.
 
                 // Điều phối công việc dựa trên nhãn dán "action"
                 switch (msg.getAction()) {
                     case "LOGIN":
                         System.out.println("Nhận lệnh LOGIN với dữ liệu: " + msg.getPayload());
                         break;
-                    case "BID":
-                        // Xử lý đặt giá...
-                        break;
+                    case "REGISTER":
+                        // Xử lý đăng ký.
+                    case "ADD_ITEM":
+                        // Xử lý thêm sản phẩm....
+                    case "CREATE_AUCTION":
+                        // Xử lý tạo cuộc đấu giá. payload vd : {"itemId": 15, "endTime": "2026-05-01 10:00:00"}.
+                    case "GET_ACTIVE_AUCTIONS":
+                        // Yêu cầu server trả về danh sách các phiên đấu giá đang mở. payload : null.
+                    case "GET_MY_ITEMS":
+                        // Xử lý khi Seller muốn xem kho đồ của mình. payload : null.
+                    case "PLACE_BID":
+                        // Xử lý khi bidder bấm nút đặt giá. payload vd : {"auctionId": 1, "bidAmount": 500000}
+
                     default:
                         System.out.println("Không hiểu lệnh này!");
                     }
