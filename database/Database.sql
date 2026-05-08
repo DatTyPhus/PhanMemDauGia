@@ -28,9 +28,8 @@ CREATE TABLE `auctions` (
   `current_price` decimal(15,2) NOT NULL DEFAULT '0.00',
   `highest_bidder_id` int DEFAULT NULL,
   `start_time` datetime NOT NULL,
-  `end_time` datetime NOT NULL,
+  `durationMinutes` int DEFAULT NULL,
   `status` enum('OPEN','RUNNING','FINISHED','PAID','CANCELED') DEFAULT 'OPEN',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`auction_id`),
   KEY `fk_auctions_items` (`item_id`),
   KEY `fk_auctions_bidder` (`highest_bidder_id`),
@@ -155,7 +154,7 @@ CREATE TABLE `users` (
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -164,7 +163,7 @@ CREATE TABLE `users` (
 
 LOCK TABLES `users` WRITE;
 /*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'seller_01','pass123','Nguyen Van Ban','SELLER',0.00,'2026-04-22 05:15:56'),(2,'bidder_01','pass456','Tran Van Mua','BIDDER',5000.00,'2026-04-21 03:12:02'),(3,'Admin_01','pass123','Tran Thi ADMIN','ADMIN',0.00,'2026-04-22 05:15:41'),(4,'seller_02','pass123','Nguyen Van An','SELLER',0.00,'2026-04-22 05:50:37'),(5,'seller_03','pass123','Nguyen Van Cu','SELLER',0.00,'2026-04-23 08:16:44');
+INSERT INTO `users` VALUES (1,'seller_01','pass123','Nguyen Van Ban','SELLER',0.00,'2026-04-22 05:15:56'),(2,'bidder_01','pass456','Tran Van Mua','BIDDER',5000.00,'2026-04-21 03:12:02'),(3,'Admin_01','pass123','Tran Thi ADMIN','ADMIN',0.00,'2026-04-22 05:15:41'),(4,'seller_02','pass123','Nguyen Van An','SELLER',0.00,'2026-04-22 05:50:37'),(5,'seller_03','pass123','Nguyen Van Cu','SELLER',0.00,'2026-04-23 08:16:44'),(6,'bidder_02','pass0519','Doan Minh Huy','BIDDER',519.00,'2026-05-31 17:00:00'),(50,'bidder_04','pass0519','Nguyen Minh Huy','BIDDER',519.00,'2026-05-31 17:00:00'),(100,'bidder_03','pass0519','Doan Minh Hoe','BIDDER',519.00,'2026-05-31 17:00:00');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -177,4 +176,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-04-24 15:32:42
+-- Dump completed on 2026-05-06 14:54:05

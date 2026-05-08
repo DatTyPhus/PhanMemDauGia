@@ -2,7 +2,6 @@ package com.auction.shared.model;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
-//sau này xây dựng thêm tính năng đặt cuọc tự động
 
 public class Bidder extends User {
 
