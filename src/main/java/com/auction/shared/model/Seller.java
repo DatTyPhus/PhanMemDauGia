@@ -1,6 +1,7 @@
 package com.auction.shared.model;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 //sau này xây dựng lớp item rôi làm thêm các chức năng
 //  1. Tạo cuộc đấu giá (đưa 1 vật phẩm mới và return 1 cuộc đấu giá)
@@ -10,7 +11,7 @@ import java.time.LocalDateTime;
 
 public class Seller extends User {
 
-    public Seller( String username, String password, String fullName, double balance, LocalDateTime createdAt) {
+    public Seller( String username, String password, String fullName, BigDecimal balance, LocalDateTime createdAt) {
         super( username, password, fullName, Role.SELLER, balance, createdAt);
     }
 
