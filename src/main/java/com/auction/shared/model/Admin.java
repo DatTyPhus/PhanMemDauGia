@@ -1,6 +1,7 @@
 package com.auction.shared.model;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 
 public class Admin extends User {
 
@@ -8,7 +9,7 @@ public class Admin extends User {
                  String fullName,
                  LocalDateTime createdAt) {
         super( username, password, fullName,
-              Role.ADMIN, 0, createdAt);
+              Role.ADMIN, BigDecimal.ZERO, createdAt);
     }
 
     public void cancelAuction(Auction auction) {
