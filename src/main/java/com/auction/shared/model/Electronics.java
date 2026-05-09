@@ -14,6 +14,9 @@ public class Electronics extends Item {
         this.warrantyMonths = warrantyMonths;
         this.itemId = getId();                       //mỗi item có một id, lưu vào biến itemId
     }
+    public Electronics(){
+        super();
+    }
 
     @Override
     public void printInfo() {

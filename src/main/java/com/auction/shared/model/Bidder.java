@@ -9,10 +9,15 @@ public class Bidder extends User {
                   String fullName, BigDecimal balance,
                   LocalDateTime createdAt) {
         super(username, password, fullName,
-              Role.BIDDER, balance, createdAt);
+              "BIDDER", balance, createdAt);
     }
 
     public Bidder() {
+        super();
+    }
+
+    public Bidder(String username, String password, String fullName) {
+        super(username, password, fullName);
     }
 
     public void deposit(BigDecimal amount) {

@@ -12,9 +12,14 @@ import java.math.BigDecimal;
 public class Seller extends User {
 
     public Seller( String username, String password, String fullName, BigDecimal balance, LocalDateTime createdAt) {
-        super( username, password, fullName, Role.SELLER, balance, createdAt);
+        super( username, password, fullName, "SELLER", balance, createdAt);
     }
 
+    public Seller() {
+        super();
+    }
 
-
+    public Seller(String username, String password, String fullName) {
+        super(username, password, fullName);
+    }
 }

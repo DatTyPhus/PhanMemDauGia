@@ -6,20 +6,21 @@ không để xảy ra tình trạng 1 món đồ bán cho 2 người.
 package com.auction.server.controller;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import com.auction.server.dao.BidderDAO;
 import com.auction.server.dao.ItemDAO;
-import com.auction.server.dao.UserDAO;
+import com.auction.server.dao.SellerDAO;
 import com.auction.shared.model.Auction;
-import com.auction.shared.model.User;
+import com.auction.shared.model.Bidder;
 import com.auction.shared.network.Message;;
 
 public class AuctionService {
   private final Map<Integer, Auction> activeAuctions = new ConcurrentHashMap<>();
   private final ItemDAO itemDAO = new ItemDAO();
-  private final UserDAO userDAO = new UserDAO();
+  private final BidderDAO bidderDAO = new BidderDAO();
+  private final SellerDAO sellerDAO = new SellerDAO();
 
   //đao tạo đấu giá mới
   public void createAuction(int itemId, BigDecimal startingPrice, int durationMinutes) {
@@ -28,7 +29,7 @@ public class AuctionService {
   }
 
     //đặ bit giá cho một đấu giá cụ thể
-  public Message processBid(int id, int auctionId, BigDecimal bidAmount) {
+  public Message processBid(int id, int auctionId, BigDecimal bidAmount ) {
         Auction auction = activeAuctions.get(auctionId);
         if (auction == null) {
             return new Message("BID_FAIL", "Đấu giá không tồn tại.");
@@ -38,7 +39,7 @@ public class AuctionService {
           if (bidAmount.compareTo(auction.getCurrentPrice()) <= 0) {
                 return new Message("BID_FAIL", "Giá đặt phải cao hơn giá hiện tại (" + auction.getCurrentPrice() + ").");
           }
-          User bidder = userDAO.getUserByUserid(id); 
+          Bidder bidder = bidderDAO.getUserByUserid(id); 
           if (bidder.getBalance().compareTo(bidAmount) < 0) {
             return new Message("BID_FAIL", "Số dư không đủ.");
           }
@@ -48,16 +49,5 @@ public class AuctionService {
         } finally {
             auction.unlock();
         }
-    }
-  
-    public Message login (String username, String password) {
-      User user = userDAO.selectByUsername(username);
-      if (user == null) {
-        return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu."); 
-      }
-      if (!user.getPassword().equals(password)) {
-        return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
-      }
-      return new Message("LOGIN_SUCCESS", user );
     }
 }

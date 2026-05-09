@@ -4,4 +4,4 @@
 
     - payload (Object) : Đối tượng chứa  bất kì dữ liệu gì (User,Product,Seller...)
 
-    - Khi xác định được yêu cầu thì sẽ chuyển Object về khu vực xử lý , và thực hiện các tác vụ từ những dữ liệu của Object đưa về.
+## + Dùng để chuỗi hoá ngược lại JSON ra Object.

@@ -12,7 +12,9 @@ public class Vehicle extends Item {
         this.brand = brand;
         this.itemId=getId();                         //mỗi item có một id, lưu vào biến itemId
     }
-
+    public Vehicle(){
+        super();
+    }
     @Override
     public void printInfo() {
         System.out.println("Vehicle: " + itemName + " | Brand: " + brand + " | itemId:" + itemId);

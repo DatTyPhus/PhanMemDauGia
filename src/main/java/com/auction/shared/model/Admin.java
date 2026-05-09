@@ -9,7 +9,7 @@ public class Admin extends User {
                  String fullName,
                  LocalDateTime createdAt) {
         super( username, password, fullName,
-              Role.ADMIN, BigDecimal.ZERO, createdAt);
+              "ADMIN", BigDecimal.ZERO, createdAt);
     }
 
     public void cancelAuction(Auction auction) {

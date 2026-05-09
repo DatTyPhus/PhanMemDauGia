@@ -4,10 +4,6 @@ package com.auction.shared.model;
 public abstract class Entity {
 
     protected int id=0;
-    public Entity() {
-        id= id +1;
-    }
-
     public int getId() {
         return id;
     }

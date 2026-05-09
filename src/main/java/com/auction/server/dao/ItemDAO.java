@@ -37,6 +37,8 @@ public class ItemDAO implements DAOinterface<Item> {
             e.printStackTrace();
     }
   }
+
+  
   @Override
   public void update(Item obj) {
       String sql = "UPDATE items SET seller_id = '" + obj.getSellerId() + "', "
