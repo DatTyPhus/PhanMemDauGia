@@ -7,54 +7,64 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-//Class dùng để đọc file JSON trên client gửi xuống , vừa kiểm tra nhãn dán rồi ném đến controller.
+//
 
 public class ClientHandler implements Runnable {
     private Socket socket;
+    private BufferedReader in;
+    private PrintWriter out; // BỔ SUNG: Ống gửi dữ liệu xuống Client
 
-    // Đưa Socket của Client vào qua Constructor
     public ClientHandler(Socket socket) {
         this.socket = socket;
     }
 
     @Override
     public void run() {
-
-        // Thiết lập luồng Đọc dữ liệu (InputStream)
-
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // Khởi tạo cả ống nghe (in) và ống nói (out)
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            // autoFlush = true để đẩy dữ liệu đi ngay lập tức
+            out = new PrintWriter(socket.getOutputStream(), true);
+
             String jsonReceived;
 
             while ((jsonReceived = in.readLine()) != null) {
+                Message msg = Message.fromJson(jsonReceived);
 
-                Message msg = Message.fromJson(jsonReceived);            //Mã hoá JSON về Message.
-
-                // Điều phối công việc dựa trên nhãn dán "action"
                 switch (msg.getAction()) {
                     case "LOGIN":
-                        System.out.println("Nhận lệnh LOGIN với dữ liệu: " + msg.getPayload());
+                        System.out.println("Nhận lệnh LOGIN: " + msg.getPayload());
                         break;
+
                     case "REGISTER":
-                        // Xử lý đăng ký.
-                    case "ADD_ITEM":
-                        // Xử lý thêm sản phẩm....
-                    case "CREATE_AUCTION":
-                        // Xử lý tạo cuộc đấu giá. payload vd : {"itemId": 15, "endTime": "2026-05-01 10:00:00"}.
-                    case "GET_ACTIVE_AUCTIONS":
-                        // Yêu cầu server trả về danh sách các phiên đấu giá đang mở. payload : null.
-                    case "GET_MY_ITEMS":
-                        // Xử lý khi Seller muốn xem kho đồ của mình. payload : null.
+                        // Xử lý đăng ký
+                        break;
+
                     case "PLACE_BID":
-                        // Xử lý khi bidder bấm nút đặt giá. payload vd : {"auctionId": 1, "bidAmount": 500000}
+                        System.out.println("Có người đặt giá: " + msg.getPayload());
+                        break;
 
                     default:
-                        System.out.println("Không hiểu lệnh này!");
-                    }
+                        System.out.println("Không hiểu lệnh này: " + msg.getAction());
                 }
+            }
+        } catch (IOException e) {
+            System.out.println("Client " + socket.getInetAddress() + " đã ngắt kết nối.");
+        } finally {
+            // Khi Client thoát app (đứt ống), phải báo ServerCore xoá khỏi danh sách
+            ServerCore.removeClient(this);
+            try {
+                if (socket != null) socket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-        catch(IOException e){
-            System.out.println("Client " + socket.getInetAddress() + " đã ngắt kết nối đột ngột.");
+    }
+
+    // Hàm để ServerCore hoặc Controller gọi khi muốn gửi tin nhắn lại cho riêng Client này
+    public void sendMessage(Message msg) {
+        if (out != null) {
+            out.println(msg.toJson());
         }
     }
 }
