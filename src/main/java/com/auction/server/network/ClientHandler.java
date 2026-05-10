@@ -1,5 +1,7 @@
 package com.auction.server.network;
 
+import com.auction.server.controller.AccountService;
+import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -33,9 +35,10 @@ public class ClientHandler implements Runnable {
 
                 switch (msg.getAction()) {
                     case "LOGIN":
-                        System.out.println("Nhận lệnh LOGIN: " + msg.getPayload());
-                        break;
-
+                        AccountService accountService = new AccountService();
+                        User user = (User) msg.getPayload();
+                        Message message = accountService.login(user.getUsername(), user.getPassword());
+                        out.println(message.toJson());
                     case "REGISTER":
                         // Xử lý đăng ký
                         break;
@@ -67,4 +70,7 @@ public class ClientHandler implements Runnable {
             out.println(msg.toJson());
         }
     }
+
+
+    
 }

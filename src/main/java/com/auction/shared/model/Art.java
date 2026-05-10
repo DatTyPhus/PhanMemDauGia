@@ -12,6 +12,9 @@ public class Art extends Item {
         this.itemId = getId();         //mỗi item có một id, lưu vào biến itemId
     }
 
+    public Art(){
+        super();
+    }    
     @Override
     public void printInfo() {
         System.out.println("Art Work: " + itemName + " | Artist: " + artist + " | itemId:" + itemId);

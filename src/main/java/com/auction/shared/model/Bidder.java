@@ -2,7 +2,6 @@ package com.auction.shared.model;
 
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
-//sau này xây dựng thêm tính năng đặt cuọc tự động
 
 public class Bidder extends User {
 
@@ -10,10 +9,15 @@ public class Bidder extends User {
                   String fullName, BigDecimal balance,
                   LocalDateTime createdAt) {
         super(username, password, fullName,
-              Role.BIDDER, balance, createdAt);
+              "BIDDER", balance, createdAt);
     }
 
     public Bidder() {
+        super();
+    }
+
+    public Bidder(String username, String password, String fullName) {
+        super(username, password, fullName);
     }
 
     public void deposit(BigDecimal amount) {

@@ -3,23 +3,16 @@ package com.auction.shared.model;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
-enum Role {
-    ADMIN,
-    SELLER,
-    BIDDER
-}
-
-public class User extends Entity{
+public abstract class User extends Entity{
     protected String username;
     protected String password;
     protected String fullName;
-    protected Role role;
+    protected String role;
     protected BigDecimal balance;
     protected LocalDateTime createdAt;
     public User( String username, String password,
-                String fullName,Role role,
+                String fullName,String role,
                 BigDecimal balance, LocalDateTime createdAt) {
-        super();
         this.username = username;
         this.password = password;
         this.fullName = fullName;
@@ -29,19 +22,23 @@ public class User extends Entity{
     }
 
     public User (String username, String password) {
-        super();
         this.username = username;
         this.password = password;
  }
 
     public User(){
-        super();
+    }
+
+    public User(String username, String password, String fullName) {
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
     }
 
     // Getter
     public String getUsername() { return username; }
     public String getFullName() { return fullName; }
-    public Role getRole() { return role; }
+    public String getRole() { return role; }
     public BigDecimal getBalance() { return balance; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public String getPassword() { return password; }
@@ -49,7 +46,7 @@ public class User extends Entity{
     public void setUsername(String username) { this.username = username; }
     public void setPassword(String password) { this.password = password; }
     public void setFullName(String fullName) { this.fullName = fullName; }
-    public void setRole(Role role) { this.role = role; }
+    public void setRole(String role) { this.role = role; }
     public void setBalance(BigDecimal balance) { this.balance = balance; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }
