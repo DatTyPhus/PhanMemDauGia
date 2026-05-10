@@ -23,12 +23,17 @@ public abstract class Item extends Entity {
         this.createdAt = LocalDateTime.now();
     }
     public abstract void printInfo();
-    // Getters and Setters
+    // Getters
     public int getSellerId() {return sellerId;}
     public String getName() {return itemName;}
     public String getDescription() {return description;}
     public String getCategory() {return category;}
     public BigDecimal getStartingPrice() {return startPrice;}
     public String getImageUrl() {return imageUrl;}
-    public LocalDateTime getCreatedAt() {return createdAt;}    
+    public LocalDateTime getCreatedAt() {return createdAt;}
+    //Setters
+    public void setItemName(String name) {this.itemName = name;}
+    public void setItemDescription(String description) {this.description = description;}
+    public void setItemStartPrice(BigDecimal startPrice) {this.startPrice = startPrice;}
+
 }
