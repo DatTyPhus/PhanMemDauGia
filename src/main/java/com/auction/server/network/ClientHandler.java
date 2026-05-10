@@ -40,9 +40,18 @@ public class ClientHandler implements Runnable {
                         Message message = accountService.login(user.getUsername(), user.getPassword());
                         out.println(message.toJson());
                     case "REGISTER":
-                        // Xử lý đăng ký
-                        break;
-
+                        AccountService accountService1 = new AccountService();
+                        User user1 = (User) msg.getPayload();
+                        Message message1 = accountService1.register(user1.getUsername(), user1.getPassword(), user1.getFullName(), user1.getRole());
+                        out.println(message1.toJson());
+                    case "ADD_ITEM":
+                        // Xử lý thêm sản phẩm....
+                    case "CREATE_AUCTION":      
+                        // Xử lý tạo cuộc đấu giá. payload vd : {"itemId": 15, "endTime": "2026-05-01 10:00:00"}.
+                    case "GET_ACTIVE_AUCTIONS":
+                        // Yêu cầu server trả về danh sách các phiên đấu giá đang mở. payload : null.
+                    case "GET_MY_ITEMS":
+                        // Xử lý khi Seller muốn xem kho đồ của mình. payload : null.
                     case "PLACE_BID":
                         System.out.println("Có người đặt giá: " + msg.getPayload());
                         break;

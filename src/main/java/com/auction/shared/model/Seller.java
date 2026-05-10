@@ -22,4 +22,8 @@ public class Seller extends User {
     public Seller(String username, String password, String fullName) {
         super(username, password, fullName);
     }
+
+    public Seller(String username, String password, String fullName, String role) {
+        super(username, password, fullName, role);
+    }
 }

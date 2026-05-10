@@ -20,6 +20,10 @@ public class Bidder extends User {
         super(username, password, fullName);
     }
 
+    public Bidder(String username, String password, String fullName, String role) {
+        super(username, password, fullName, role);
+    }
+
     public void deposit(BigDecimal amount) {
     if (amount.compareTo(BigDecimal.ZERO) <= 0) {
         System.out.println("Invalid amount!");
@@ -27,4 +31,7 @@ public class Bidder extends User {
     }
     this.balance = this.balance.add(amount);
     }
+
+
+    
 }
