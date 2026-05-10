@@ -33,11 +33,11 @@
                </VBox.margin>
             </Label>
             <Label prefHeight="35.0" prefWidth="300.0" text="Tạo tài khoản mới để tiếp tục" />
-            <TextField id="txtName" prefHeight="35.0" prefWidth="300.0" promptText="Nhập họ và tên" />
-            <TextField id="txtUser" prefHeight="35.0" prefWidth="300.0" promptText="Nhập tên đăng nhập" />
-            <TextField id="txtEmail" prefHeight="35.0" prefWidth="300.0" promptText="Nhập email của bạn" />
-            <PasswordField id="txtPass" prefHeight="35.0" prefWidth="300.0" promptText="Mật khẩu" />
-            <PasswordField id="txtRePass" prefHeight="35.0" prefWidth="300.0" promptText="Nhập lại mật khẩu" />
+            <TextField id="fullName" prefHeight="35.0" prefWidth="300.0" promptText="Nhập họ và tên" />
+            <TextField id="userName" prefHeight="35.0" prefWidth="300.0" promptText="Nhập tên đăng nhập" />
+            <TextField id="email" prefHeight="35.0" prefWidth="300.0" promptText="Nhập email của bạn" />
+            <PasswordField id="password" prefHeight="35.0" prefWidth="300.0" promptText="Mật khẩu" />
+            <PasswordField id="re_password" prefHeight="35.0" prefWidth="300.0" promptText="Nhập lại mật khẩu" />
             <Label text="Bạn muốn trở thành ?">
                <VBox.margin>
                   <Insets left="7.0" />
@@ -45,7 +45,7 @@
             </Label>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Circle fill="DODGERBLUE" radius="10.0" stroke="BLACK" strokeType="INSIDE" style="-fx-fill: white;">
+                  <Circle id="role_bidder" fill="DODGERBLUE" radius="10.0" stroke="BLACK" strokeType="INSIDE" style="-fx-fill: white;">
                      <HBox.margin>
                         <Insets left="8.0" />
                      </HBox.margin>
@@ -55,19 +55,19 @@
                         <Insets left="6.0" />
                      </HBox.margin>
                   </Label>
-                  <Circle fill="DODGERBLUE" radius="10.0" stroke="BLACK" strokeType="INSIDE" style="-fx-fill: white;">
+                  <Circle id="role_seller" fill="DODGERBLUE" radius="10.0" stroke="BLACK" strokeType="INSIDE" style="-fx-fill: white;">
                      <HBox.margin>
                         <Insets left="72.0" />
                      </HBox.margin>
                   </Circle>
-                  <Label text="seller">
+                  <Label text="Seller">
                      <HBox.margin>
                         <Insets left="9.0" />
                      </HBox.margin>
                   </Label>
                </children>
             </HBox>
-            <Button mnemonicParsing="false" style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 10;" text="Tạo tài khoản">
+            <Button id="tao_tai_khoan" mnemonicParsing="false" style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 10;" text="Tạo tài khoản">
                <VBox.margin>
                   <Insets left="120.0" />
                </VBox.margin>
@@ -79,7 +79,7 @@
                         <Insets left="80.0" top="3.0" />
                      </HBox.margin>
                   </Label>
-                  <Hyperlink style="-fx-text-fill: #1976D2; -fx-underline: false;" text="Quay lại đăng nhập">
+                  <Hyperlink id="quay_lai_login" style="-fx-text-fill: #1976D2; -fx-underline: false;" text="Quay lại đăng nhập">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>

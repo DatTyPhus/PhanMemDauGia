@@ -20,7 +20,7 @@
             <Image url="@../image/background.png" />
          </image>
       </ImageView>
-      <VBox layoutX="831.0" layoutY="268.0" prefHeight="407.0" prefWidth="332.0" style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 30; -fx-padding: 30; -fx-spacing: 15; -fx-alignment: center; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25),20,0,0,8);">
+      <VBox layoutX="741.0" layoutY="273.0" prefHeight="407.0" prefWidth="332.0" style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 30; -fx-padding: 30; -fx-spacing: 15; -fx-alignment: center; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25),20,0,0,8);">
          <children>
             <Label style="-fx-font-size: 32; -fx-background-color: #1976D2; -fx-alignment: center; -fx-text-fill: white; -fx-background-radius: 50; -fx-pref-width: 60; -fx-pref-height: 60;" text="👤" />
             <Label style="-fx-font-weight: bold; -fx-font-size: 24;" text="ĐĂNG NHẬP">
@@ -28,9 +28,9 @@
                   <Font size="24.0" />
                </font>
             </Label>
-            <TextField prefWidth="280.0" promptText="Tên đăng nhập" />
-            <PasswordField prefWidth="280.0" promptText="Mật khẩu" />
-            <Button mnemonicParsing="false" prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: #1976d2; -fx-text-fill: while; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 10;" text="ĐĂNG NHẬP" />
+            <TextField id="ten_dang_nhap" prefWidth="280.0" promptText="Tên đăng nhập" />
+            <PasswordField id="mat_khau" prefWidth="280.0" promptText="Mật khẩu" />
+            <Button id="dang_nhap" mnemonicParsing="false" prefHeight="40.0" prefWidth="230.0" style="-fx-background-color: #1976d2; -fx-text-fill: while; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 10;" text="ĐĂNG NHẬP" />
             <HBox prefHeight="85.0" prefWidth="161.0">
                <children>
                   <Label style="-fx-background-image: url(&quot;../image/background.png&quot;);" text="Chưa có tài khoản ?">
@@ -38,7 +38,7 @@
                         <Insets left="36.0" top="3.0" />
                      </HBox.margin>
                   </Label>
-                  <Hyperlink text="Đăng ký">
+                  <Hyperlink id="dang_ky" text="Đăng ký">
                      <HBox.margin>
                         <Insets />
                      </HBox.margin>
