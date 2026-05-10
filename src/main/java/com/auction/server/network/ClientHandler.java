@@ -41,7 +41,10 @@ public class ClientHandler implements Runnable {
                         Message message = accountService.login(user.getUsername(), user.getPassword());
                         out.println(message.toJson());
                     case "REGISTER":
-                        // Xử lý đăng ký.
+                        AccountService accountService1 = new AccountService();
+                        User user1 = (User) msg.getPayload();
+                        Message message1 = accountService1.register(user1.getUsername(), user1.getPassword(), user1.getFullName(), user1.getRole());
+                        out.println(message1.toJson());
                     case "ADD_ITEM":
                         // Xử lý thêm sản phẩm....
                     case "CREATE_AUCTION":
