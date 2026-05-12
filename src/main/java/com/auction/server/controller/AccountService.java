@@ -35,14 +35,14 @@ public class AccountService {
       if (bidderDAO.selectByUsername(username) != null) {
         return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
       }
-      Bidder newUser = new Bidder(username, password, fullName);
+      Bidder newUser = new Bidder(username, password, fullName , role);
       bidderDAO.create(newUser);
       return new Message("REGISTER_SUCCESS", newUser);
     } 
     if (sellerDAO.selectByUsername(username) != null) {
         return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
     }
-    Seller newUser = new Seller(username, password, fullName);
+    Seller newUser = new Seller(username, password, fullName, role);
     sellerDAO.create(newUser);
     return new Message("REGISTER_SUCCESS", newUser);
     } 

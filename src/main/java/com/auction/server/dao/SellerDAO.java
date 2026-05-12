@@ -16,13 +16,11 @@ public class SellerDAO {
     
     public void create(User obj) {
 
-      String sql = "INSERT INTO sellers (user_id, username, password, full_name, role, balance, created_at) VALUES ('"
-                + obj.getId() + "', '"
+      String sql = "INSERT INTO sellers (username, password, full_name, role, created_at) VALUES ('"
                 + obj.getUsername() + "', '"
                 + obj.getPassword() + "', '"
                 + obj.getFullName() + "', '"
                 + obj.getRole() + "', "
-                + obj.getBalance() + ", '"
                 + obj.getCreatedAt().toString() + "')";
       Connection connection = null;
       try{

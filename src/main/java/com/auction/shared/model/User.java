@@ -35,6 +35,12 @@ public abstract class User extends Entity{
         this.fullName = fullName;
     }
 
+    public User(String username, String password, String fullName, String role) {
+        this.username = username;
+        this.password = password;
+        this.fullName = fullName;
+        this.role = role;
+    }
     // Getter
     public String getUsername() { return username; }
     public String getFullName() { return fullName; }

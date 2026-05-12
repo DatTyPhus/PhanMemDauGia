@@ -70,13 +70,11 @@ public class BidderDAO {
 }
 public void create(User obj) {
 
-      String sql = "INSERT INTO bidders (user_id, username, password, full_name, role, balance, created_at) VALUES ('"
-                + obj.getId() + "', '"
+      String sql = "INSERT INTO bidders (username, password, full_name, role, created_at) VALUES ('"
                 + obj.getUsername() + "', '"
                 + obj.getPassword() + "', '"
                 + obj.getFullName() + "', '"
                 + obj.getRole() + "', "
-                + obj.getBalance() + ", '"
                 + obj.getCreatedAt().toString() + "')";
       Connection connection = null;
       try{
