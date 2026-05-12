@@ -1,19 +1,19 @@
 package com.auction.shared.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Auction extends Entity {
-    protected static Integer id;
     private int auctionId;
     private int itemId;
-    private BigDecimal StartingPrice;
-    private BigDecimal currentPrice;
-    private Integer highestBidderId;
-    private LocalDateTime startTime = LocalDateTime.now();
+    private BigDecimal StartingPrice = BigDecimal.ZERO;
+    private BigDecimal currentPrice = BigDecimal.ZERO;
+    private Integer highestBidderId = null;
+    private String startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
     private int durationMinutes;
-    private Status status;
+    private Status status = Status.OPEN;
     private final ReentrantLock lock = new ReentrantLock();
 
     public enum Status {
@@ -23,8 +23,8 @@ public class Auction extends Entity {
         CANCELED
     }
 
-    public Auction(int itemId, BigDecimal startingPrice, int durationMinutes) {
-        super();
+    public Auction( int id, int itemId, BigDecimal startingPrice, int durationMinutes) {
+        this.id =id;
         this.itemId = itemId;
         this.StartingPrice = startingPrice;
         this.durationMinutes = durationMinutes;
@@ -53,6 +53,6 @@ public class Auction extends Entity {
     public int getId() {return id;} 
     public int getAuctionId() { return auctionId; }
     public int getItemId() { return itemId; }
-    public LocalDateTime getStartTime() { return startTime; }
+    public String getStartTime() { return startTime; }
     public int getDurationMinutes() { return durationMinutes; }
 }

@@ -1,15 +1,13 @@
 package com.auction.shared.model;
 
-import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
 public class Bidder extends User {
 
     public Bidder( String username, String password,
-                  String fullName, BigDecimal balance,
-                  LocalDateTime createdAt) {
+                  String fullName, BigDecimal balance) {
         super(username, password, fullName,
-              "BIDDER", balance, createdAt);
+              "BIDDER", balance);
     }
 
     public Bidder() {
