@@ -16,12 +16,11 @@ public class SellerDAO {
     
     public void create(User obj) {
 
-      String sql = "INSERT INTO sellers (username, password, full_name, role, created_at) VALUES ('"
+      String sql = "INSERT INTO sellers (username, password, full_name, role) VALUES ('"
                 + obj.getUsername() + "', '"
                 + obj.getPassword() + "', '"
                 + obj.getFullName() + "', '"
-                + obj.getRole() + "', "
-                + obj.getCreatedAt().toString() + "')";
+                + obj.getRole() + "') ";
       Connection connection = null;
       try{
           connection = JDBCUtil.getConnection();
@@ -55,7 +54,6 @@ public class SellerDAO {
                 user.setPassword(rs.getString("password"));
                 user.setFullName(rs.getString("fullName"));
                 user.setBalance(rs.getBigDecimal("balance"));
-                user.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());
                 return user;
             }
         } catch (SQLException e) {
@@ -80,11 +78,6 @@ public class SellerDAO {
             user.setPassword(rs.getString("password"));
             user.setFullName(rs.getString("full_name")); // Khớp với DB của bạn là full_name
             user.setBalance(rs.getBigDecimal("balance"));
-            
-            // Chuyển đổi timestamp sang LocalDateTime
-            if (rs.getTimestamp("created_at") != null) {
-                user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-            }
             
             return user;
         }

@@ -9,23 +9,25 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import com.auction.server.dao.BidderDAO;
-import com.auction.server.dao.ItemDAO;
-import com.auction.server.dao.SellerDAO;
-import com.auction.shared.model.Auction;
-import com.auction.shared.model.Bidder;
+import com.auction.server.dao.*;
+import com.auction.shared.model.*;
 import com.auction.shared.network.Message;;
 
 public class AuctionService {
   private final Map<Integer, Auction> activeAuctions = new ConcurrentHashMap<>();
+  private static int auctionIdCounter = 0; 
   private final ItemDAO itemDAO = new ItemDAO();
   private final BidderDAO bidderDAO = new BidderDAO();
   private final SellerDAO sellerDAO = new SellerDAO();
 
+  private final AuctionDAO auctionDAO = new AuctionDAO();
+
   //đao tạo đấu giá mới
-  public void createAuction(int itemId, BigDecimal startingPrice, int durationMinutes) {
-    Auction auction = new Auction(itemId, startingPrice, durationMinutes);
-    activeAuctions.put(auction.getAuctionId(), auction);
+  public void createAuction(int  auctionid,  int itemId, BigDecimal startingPrice, int durationMinutes) {
+    auctionIdCounter++;    
+    Auction auction = new Auction(auctionid, itemId, startingPrice, durationMinutes);
+    auctionDAO.create(auction);
+    activeAuctions.put(auctionid, auction);
   }
 
     //đặ bit giá cho một đấu giá cụ thể

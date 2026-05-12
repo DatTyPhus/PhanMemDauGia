@@ -16,16 +16,16 @@ public class AccountService {
   private final SellerDAO sellerDAO = new SellerDAO();
   
   public Message login (String username, String password) {
-    Bidder user = bidderDAO.selectByUsername(username);
+    Bidder bidder = bidderDAO.selectByUsername(username);
     Seller seller = sellerDAO.selectByUsername(username);
-    if (user == null && seller == null) {
+    if (bidder == null && seller == null) {
       return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
     }
-    if (!user.getPassword().equals(password) && !seller.getPassword().equals(password)) {
+    if (!bidder.getPassword().equals(password) && !seller.getPassword().equals(password)) {
       return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
     }
-    if (user != null) {
-      return new Message("LOGIN_SUCCESS", user);
+    if (bidder != null) {
+      return new Message("LOGIN_SUCCESS", bidder );
     }
     return new Message("LOGIN_SUCCESS", seller);
   }

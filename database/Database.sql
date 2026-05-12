@@ -58,7 +58,7 @@ CREATE TABLE `auctions` (
   `item_id` int NOT NULL,
   `current_price` decimal(15,2) NOT NULL DEFAULT '0.00',
   `highest_bidder_id` int DEFAULT NULL,
-  `start_time` datetime NOT NULL,
+  `start_time` varchar(255) DEFAULT NULL,
   `durationMinutes` int DEFAULT NULL,
   `status` enum('OPEN','RUNNING','FINISHED','PAID','CANCELED') DEFAULT 'OPEN',
   PRIMARY KEY (`auction_id`),
@@ -91,7 +91,6 @@ CREATE TABLE `bidders` (
   `full_name` varchar(100) DEFAULT NULL,
   `role` enum('BIDDER','SELLER','ADMIN') NOT NULL DEFAULT 'BIDDER',
   `balance` decimal(15,2) DEFAULT '0.00',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -151,7 +150,6 @@ CREATE TABLE `sellers` (
   `full_name` varchar(100) DEFAULT NULL,
   `role` enum('BIDDER','SELLER','ADMIN') NOT NULL DEFAULT 'BIDDER',
   `balance` decimal(15,2) DEFAULT '0.00',
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -206,4 +204,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-08 19:50:55
+-- Dump completed on 2026-05-12 22:46:43
