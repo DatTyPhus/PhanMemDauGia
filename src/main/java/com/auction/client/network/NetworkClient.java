@@ -20,6 +20,8 @@ public class NetworkClient {
         this.socket = new Socket("localhost", 8080);
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         this.out = new PrintWriter(socket.getOutputStream(), true);
+
+        this.startListening(); //Gọi hàm để nghe từ server
     }
 
     public static NetworkClient getInstance() throws IOException {
@@ -55,7 +57,7 @@ public class NetworkClient {
                     if (currentListener != null) {
                         currentListener.onMessageReceived(msg);
                     } else {
-                        switch (msg.getAction()){                            // Thử khi
+                        switch (msg.getAction()){
                             case "LOGIN_SUCCESS":
                                 System.out.println("Đăng nhập thành công");
                                 break;
@@ -70,7 +72,7 @@ public class NetworkClient {
                                 break;
                         }
                     }
-                } // Đã fix lỗi thiếu dấu ngoặc nhọn đóng while ở đây
+                }
             } catch (IOException e) {
                 System.out.println("Đứt kết nối mạng: " + e.getMessage());
             }
