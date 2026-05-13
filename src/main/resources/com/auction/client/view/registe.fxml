@@ -21,7 +21,7 @@
             <Image url="@../image/background.png" />
          </image>
       </ImageView>
-      <VBox layoutX="835.0" layoutY="240.0" prefHeight="500.0" prefWidth="370.0" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-spacing: 12; -fx-alignment: centrer;">
+      <VBox layoutX="835.0" layoutY="240.0" prefHeight="500.0" prefWidth="370.0" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-spacing: 12; -fx-alignment: center;">
          <children>
             <Label style="-fx-background-color: #1976D2; -fx-alignment: center; -fx-font-size: 32; -fx-text-fill: white; -fx-background-radius: 50; -fx-pref-height: 60; -fx-pref-width: 60;" text="👤">
                <VBox.margin>

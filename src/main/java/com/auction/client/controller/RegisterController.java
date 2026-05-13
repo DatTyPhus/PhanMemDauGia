@@ -152,19 +152,19 @@ public class RegisterController {
     }
 
     // 6. CHUYỂN VỀ MÀN HÌNH ĐĂNG NHẬP
+    // 6. CHUYỂN VỀ MÀN HÌNH ĐĂNG NHẬP
     @FXML
     public void onBackToLoginClick() {
         try {
-            // Tải bản vẽ màn hình Đăng nhập (sample.fxml)
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/sample.fxml"));
             Parent root = loader.load();
 
-            // Lấy cái khung cửa sổ hiện tại (dựa vào 1 thành phần bất kỳ, ví dụ userName)
-            Stage currentStage = (Stage) userName.getScene().getWindow();
+            // SỬ DỤNG SET_ROOT ĐỂ KHÔNG BỊ GIẬT MÀN HÌNH
+            userName.getScene().setRoot(root);
 
-            // Lắp bức tranh Đăng nhập vào khung
-            currentStage.setScene(new Scene(root, 1400, 800));
-            currentStage.centerOnScreen();
+            // Sửa lại tiêu đề cho đúng
+            Stage currentStage = (Stage) userName.getScene().getWindow();
+            currentStage.setTitle("Đăng nhập hệ thống");
 
         } catch (IOException e) {
             e.printStackTrace();

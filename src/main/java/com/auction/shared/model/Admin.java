@@ -1,15 +1,13 @@
 package com.auction.shared.model;
 
-import java.time.LocalDateTime;
 import java.math.BigDecimal;
 
 public class Admin extends User {
 
     public Admin( String username, String password,
-                 String fullName,
-                 LocalDateTime createdAt) {
+                 String fullName) {
         super( username, password, fullName,
-              "ADMIN", BigDecimal.ZERO, createdAt);
+              "ADMIN", BigDecimal.ZERO);
     }
 
     public void cancelAuction(Auction auction) {

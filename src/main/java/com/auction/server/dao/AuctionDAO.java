@@ -12,14 +12,11 @@ public class AuctionDAO implements DAOinterface<Auction> {
 
     @Override
     public void create(Auction obj) {
-      String sql = "INSERT INTO auctions (auction_id, item_id, current_price, highest_bidder_id, start_time, durationMinutes, status) VALUES ('"
-                + obj.getId() + "', '"
+      String sql = "INSERT INTO auctions ( auction_id, item_id, current_price, durationMinutes) VALUES ('"
+                + obj.getId() + "', "
                 + obj.getItemId() + "', "
                 + obj.getCurrentPrice() + ", "
-                + obj.getHighestBidderId() + ", '"
-                + obj.getStartTime() + "', '"
-                + obj.getDurationMinutes() + "', '"
-                + obj.getStatus() + "', '";
+                + obj.getDurationMinutes() + ")";
       Connection connection = null;
       try{
           connection = JDBCUtil.getConnection();
@@ -36,11 +33,7 @@ public class AuctionDAO implements DAOinterface<Auction> {
         e.printStackTrace();
       }
     }
-    @Override
-    public Auction read(Integer id) {
-        return null;
-    }
-
+    
     // có thể phải sửa lại để update được giá và người thắng
     @Override
     public void update(Auction obj) {
@@ -83,4 +76,9 @@ public class AuctionDAO implements DAOinterface<Auction> {
             e.printStackTrace();
         }
     }
+    @Override
+    public Auction read(Integer id) {
+        return null;
+    }
+    
 }

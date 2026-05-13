@@ -62,7 +62,7 @@ public class LoginController {
 
             // Lấy cửa sổ hiện tại và thay thế bằng giao diện Đăng ký
             Stage currentStage = (Stage) ten_dang_nhap.getScene().getWindow();
-            currentStage.setScene(new Scene(root, 1400, 800));
+            ten_dang_nhap.getScene().setRoot(root);
             currentStage.setTitle("Đăng ký tài khoản");
 
         } catch (IOException e) {
@@ -73,7 +73,23 @@ public class LoginController {
 
     private void handleServerResponse(Message msg) {
         if (msg.getAction().equals("LOGIN_SUCCESS")) {
-            // Logic chuyển sang home.fxml khi đăng nhập thành công
+            try {
+                // 1. Tải file giao diện màn hình chính (home.fxml)
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
+                Parent root = loader.load();
+
+                // 2. Lấy cửa sổ (Stage) hiện tại đang hiển thị
+                Stage currentStage = (Stage) ten_dang_nhap.getScene().getWindow();
+
+                // 3. Đổi giao diện sang màn hình chính với kích thước 1200x700
+                currentStage.setScene(new Scene(root, 1200, 700));
+                currentStage.setTitle("Trang chủ Đấu Giá");
+                currentStage.centerOnScreen(); // Căn giữa màn hình cho đẹp
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                lblMessage.setText("Lỗi không tìm thấy file home.fxml!");
+            }
         } else if (msg.getAction().equals("LOGIN_FAIL")) {
             lblMessage.setText(msg.getPayload().toString());
         }

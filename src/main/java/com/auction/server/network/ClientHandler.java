@@ -24,10 +24,8 @@ public class ClientHandler implements Runnable {
     public void run() {
         try {
             // Khởi tạo cả ống nghe (in) và ống nói (out)
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            // autoFlush = true để đẩy dữ liệu đi ngay lập tức
-            out = new PrintWriter(socket.getOutputStream(), true);
-
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream(), java.nio.charset.StandardCharsets.UTF_8));            // autoFlush = true để đẩy dữ liệu đi ngay lập tức
+            out = new PrintWriter(new java.io.OutputStreamWriter(socket.getOutputStream(), java.nio.charset.StandardCharsets.UTF_8), true);
             String jsonReceived;
 
             while ((jsonReceived = in.readLine()) != null) {

@@ -15,7 +15,7 @@ public class BidderDAO {
     }
   
     public Bidder getUserByUserid(int id) {
-        String sql = "SELECT id, username, balance FROM users WHERE id = ?";
+        String sql = "SELECT user_id, username, balance FROM bidders WHERE user_id = ?";
         
         try (Connection conn = JDBCUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -30,7 +30,6 @@ public class BidderDAO {
                 user.setPassword(rs.getString("password"));
                 user.setFullName(rs.getString("fullName"));
                 user.setBalance(rs.getBigDecimal("balance"));
-                user.setCreatedAt(rs.getTimestamp("createdAt").toLocalDateTime());
                 return user;
             }
         } catch (SQLException e) {
@@ -38,10 +37,10 @@ public class BidderDAO {
         }
         return null; // Trả về null nếu không tìm thấy người dùng
       }
-    
+
     public Bidder selectByUsername(String username) {
-    String sql = "SELECT * FROM users WHERE username = ?";
-    
+        // PHẢI ĐỔI users THÀNH bidders
+        String sql = "SELECT * FROM bidders WHERE username = ?";
     try (Connection conn = JDBCUtil.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql)) {
         
@@ -56,11 +55,6 @@ public class BidderDAO {
             user.setFullName(rs.getString("full_name")); // Khớp với DB của bạn là full_name
             user.setBalance(rs.getBigDecimal("balance"));
             
-            // Chuyển đổi timestamp sang LocalDateTime
-            if (rs.getTimestamp("created_at") != null) {
-                user.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
-            }
-            
             return user;
         }
     } catch (SQLException e) {
@@ -70,12 +64,11 @@ public class BidderDAO {
 }
 public void create(User obj) {
 
-      String sql = "INSERT INTO bidders (username, password, full_name, role, created_at) VALUES ('"
+      String sql = "INSERT INTO bidders (username, password, full_name, role) VALUES ('"
                 + obj.getUsername() + "', '"
                 + obj.getPassword() + "', '"
                 + obj.getFullName() + "', '"
-                + obj.getRole() + "', "
-                + obj.getCreatedAt().toString() + "')";
+                + obj.getRole() + "')";
       Connection connection = null;
       try{
           connection = JDBCUtil.getConnection();

@@ -18,8 +18,8 @@ public class NetworkClient {
 
     private NetworkClient() throws IOException {
         this.socket = new Socket("localhost", 8080);
-        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        this.out = new PrintWriter(socket.getOutputStream(), true);
+        this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), java.nio.charset.StandardCharsets.UTF_8));
+        this.out = new PrintWriter(new java.io.OutputStreamWriter(socket.getOutputStream(), java.nio.charset.StandardCharsets.UTF_8), true);
 
         this.startListening(); //Gọi hàm để nghe từ server
     }
