@@ -15,7 +15,7 @@ public class BidderDAO {
     }
   
     public Bidder getUserByUserid(int id) {
-        String sql = "SELECT id, username, balance FROM users WHERE id = ?";
+        String sql = "SELECT id, username, balance FROM bidders WHERE id = ?";
         
         try (Connection conn = JDBCUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -39,7 +39,7 @@ public class BidderDAO {
       }
     
     public Bidder selectByUsername(String username) {
-    String sql = "SELECT * FROM users WHERE username = ?";
+    String sql = "SELECT * FROM bidders WHERE username = ?";
     
     try (Connection conn = JDBCUtil.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql)) {
