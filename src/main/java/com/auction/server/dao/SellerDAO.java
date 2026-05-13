@@ -39,7 +39,7 @@ public class SellerDAO {
     }
 
     public Seller getItemByUserid(int id) {
-        String sql = "SELECT id, username, balance FROM sellers WHERE id = ?";
+        String sql = "SELECT user_id, username, balance FROM sellers WHERE user_id = ?";
         
         try (Connection conn = JDBCUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

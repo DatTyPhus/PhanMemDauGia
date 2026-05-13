@@ -8,7 +8,7 @@ public class JDBCUtil {
         Connection c=null;
         String url = "jdbc:mysql://localhost:3306/quan_li_giao_dich";
         String user = "root";
-        String password = "huyhoang1109"; 
+        String password = ""; // XAMPP mặc định để trống mật khẩu
 
         try {
             DriverManager.registerDriver(new com.mysql.jdbc.Driver());
