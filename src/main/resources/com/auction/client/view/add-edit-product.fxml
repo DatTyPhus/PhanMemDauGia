@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="800.0" prefWidth="1280.0" style="-fx-background-color:#f1f5f9;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/26">
+<BorderPane prefHeight="800.0" prefWidth="1280.0" style="-fx-background-color:#f1f5f9;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
     <left>
       <VBox prefHeight="323.0" prefWidth="196.0" style="-fx-background-color: #0B1F3A;" BorderPane.alignment="CENTER">
          <children>
@@ -48,15 +48,15 @@
                   <Insets bottom="-24.0" />
                </VBox.margin>
             </HBox>
-            <Label style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="ĐẤU GIÁ" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Tổng quan" />
+            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ">
+               <VBox.margin>
+                  <Insets top="30.0" />
+               </VBox.margin></Button>
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Phiên đấu giá" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hồ sơ của tôi" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Tài sản đấu giá" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Lịch sử tham gia" />
+            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Lịch sử đấu giá" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Thông báo" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hướng dẫn " />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hỗ trợ" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt" />
          </children>
          <BorderPane.margin>
@@ -69,11 +69,13 @@
             <padding>
                 <Insets bottom="15" left="15" right="15" top="15" />
             </padding>
-
-            <Label style="-fx-text-fill:white; -fx-font-size:18; -fx-font-weight:bold;" text="THÊM / SỬA SẢN PHẨM" />
          <BorderPane.margin>
             <Insets left="195.0" />
          </BorderPane.margin>
+         <children>
+   
+                  <Label style="-fx-text-fill:white; -fx-font-size:18; -fx-font-weight:bold;" text="THÊM / SỬA SẢN PHẨM" />
+         </children>
         </HBox>
     </top>
 
@@ -97,6 +99,9 @@
                 </StackPane>
 
                 <Button maxWidth="Infinity" text="Chọn ảnh" />
+            <HBox.margin>
+               <Insets />
+            </HBox.margin>
 
             </VBox>
 
@@ -137,6 +142,9 @@
                 </HBox>
 
             </VBox>
+         <BorderPane.margin>
+            <Insets top="-2.0" />
+         </BorderPane.margin>
 
         </HBox>
     </center>
