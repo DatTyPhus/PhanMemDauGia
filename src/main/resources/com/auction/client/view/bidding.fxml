@@ -9,6 +9,7 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -24,13 +25,13 @@
                <children>
                   <Label style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;" text="🔨">
                      <HBox.margin>
-                        <Insets left="17.0" top="56.0" />
+                        <Insets left="17.0" top="-24.0" />
                      </HBox.margin></Label>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Label style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;" text="ĐẤU GIÁ">
                            <VBox.margin>
-                              <Insets left="-22.0" top="45.0" />
+                              <Insets left="-22.0" top="-34.0" />
                            </VBox.margin>
                         </Label>
                         <Label style="-fx-text-fill: white; -fx-background-color: transparent; -fx-font-size: 14;" text="TRỰC TUYẾN">
@@ -40,7 +41,7 @@
                         </Label>
                      </children>
                      <HBox.margin>
-                        <Insets bottom="40.0" left="35.0" />
+                        <Insets bottom="27.0" left="35.0" />
                      </HBox.margin>
                      <padding>
                         <Insets left="9.0" />
@@ -50,19 +51,19 @@
                <VBox.margin>
                   <Insets bottom="-34.0" />
                </VBox.margin>
+               <padding>
+                  <Insets top="92.0" />
+               </padding>
             </HBox>
-            <Label style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="ĐẤU GIÁ">
+            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Tổng quan">
                <VBox.margin>
-                  <Insets top="35.0" />
-               </VBox.margin></Label>
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Tổng quan" />
+                  <Insets top="39.0" />
+               </VBox.margin></Button>
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Phiên đấu giá" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hồ sơ của tôi" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Tài sản đấu giá" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Lịch sử tham gia" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Thông báo" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hướng dẫn " />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hỗ trợ" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt" />
          </children>
          <BorderPane.margin>
@@ -121,7 +122,10 @@
                 <Insets bottom="15" left="15" right="15" top="15" />
             </padding>
 
-            <Label text="Thời gian còn lại" />
+            <Label text="Thời gian còn lại">
+            <VBox.margin>
+               <Insets top="27.0" />
+            </VBox.margin></Label>
             <Label fx:id="timeLabel" style="-fx-text-fill:red; -fx-font-size:18;" text="00:02:15" />
 
             <Label text="Giá hiện tại" />

@@ -16,12 +16,12 @@
 
     <!-- ===== HEADER ===== -->
     <top>
-        <HBox style="-fx-background-color:#1e293b;">
+        <HBox>
             <padding>
                 <Insets bottom="15" left="20" right="20" top="15" />
             </padding>
 
-            <Label style="-fx-text-fill:white; -fx-font-size:18; -fx-font-weight:bold;" text="THÔNG TIN CÁ NHÂN" />
+            <Label style="-fx-font-size: 18; -fx-font-weight: bold;" text="THÔNG TIN CÁ NHÂN" />
          <BorderPane.margin>
             <Insets left="196.0" />
          </BorderPane.margin>
@@ -61,18 +61,15 @@
                   <Insets bottom="-34.0" />
                </VBox.margin>
             </HBox>
-            <Label style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="ĐẤU GIÁ">
+            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ">
                <VBox.margin>
-                  <Insets top="35.0" />
-               </VBox.margin></Label>
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Tổng quan" />
+                  <Insets top="28.0" />
+               </VBox.margin></Button>
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Phiên đấu giá" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hồ sơ của tôi" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Tài sản đấu giá" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Lịch sử tham gia" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Thông báo" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hướng dẫn " />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hỗ trợ" />
+            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hồ sơ của tôi" />
             <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt" />
          </children>
          <BorderPane.margin>
