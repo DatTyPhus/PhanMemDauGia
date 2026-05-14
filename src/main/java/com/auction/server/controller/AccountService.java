@@ -14,20 +14,31 @@ import com.auction.shared.network.Message;;
 public class AccountService {
   private final BidderDAO bidderDAO = new BidderDAO();
   private final SellerDAO sellerDAO = new SellerDAO();
-  
-  public Message login (String username, String password) {
+
+  public Message login(String username, String password) {
     Bidder bidder = bidderDAO.selectByUsername(username);
     Seller seller = sellerDAO.selectByUsername(username);
-    if (bidder == null && seller == null) {
-      return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
-    }
-    if (!bidder.getPassword().equals(password) && !seller.getPassword().equals(password)) {
-      return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
-    }
+
+    // 1. Nếu tìm thấy trong bảng Bidder
     if (bidder != null) {
-      return new Message("LOGIN_SUCCESS", bidder );
+      if (bidder.getPassword().equals(password)) {
+        return new Message("LOGIN_SUCCESS", bidder);
+      } else {
+        return new Message("LOGIN_FAIL", "Sai mật khẩu Bidder.");
+      }
     }
-    return new Message("LOGIN_SUCCESS", seller);
+    // 2. Nếu tìm thấy trong bảng Seller
+    else if (seller != null) {
+      if (seller.getPassword().equals(password)) {
+        return new Message("LOGIN_SUCCESS", seller);
+      } else {
+        return new Message("LOGIN_FAIL", "Sai mật khẩu Seller.");
+      }
+    }
+    // 3. Nếu không tìm thấy ở cả 2 bảng
+    else {
+      return new Message("LOGIN_FAIL", "Tài khoản không tồn tại.");
+    }
   }
 
   public Message register(String username, String password, String fullName , String role) {

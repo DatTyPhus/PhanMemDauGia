@@ -82,7 +82,7 @@ public class LoginController {
                 Stage currentStage = (Stage) ten_dang_nhap.getScene().getWindow();
 
                 // 3. Đổi giao diện sang màn hình chính với kích thước 1200x700
-                currentStage.setScene(new Scene(root, 1200, 700));
+                ten_dang_nhap.getScene().setRoot(root);
                 currentStage.setTitle("Trang chủ Đấu Giá");
                 currentStage.centerOnScreen(); // Căn giữa màn hình cho đẹp
 
