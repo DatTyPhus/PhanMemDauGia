@@ -19,100 +19,71 @@
 
     <!-- SIDEBAR -->
     <!-- ===== TOP ===== -->
- <top>
-        <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: white; -fx-border-color: #E5EAF2; -fx-border-width: 0 0 1 0;">
-            
+    <top>
+        <HBox alignment="CENTER_LEFT" prefHeight="75.0" minHeight="75.0" spacing="15" style="-fx-background-color: white; -fx-border-color: #E5EAF2; -fx-border-width: 0 0 1 0;">
             <padding>
-                <Insets bottom="10" left="20" right="20" top="10" />
+                <Insets left="30" right="30" />
             </padding>
-         <TextField prefWidth="350.0" promptText="Tìm kiếm tài sản, phiên đấu giá..." style="-fx-border-color: #DDE3EC; -fx-padding: 8 15; -fx-background-radius: 8; -fx-border-radius: 8;" />
+            <TextField prefHeight="38.0" prefWidth="350.0" promptText="Tìm kiếm tài sản, phiên đấu giá..." style="-fx-border-color: #DDE3EC; -fx-padding: 8 15; -fx-background-radius: 8; -fx-border-radius: 8;" />
 
-            <Button style="-fx-font-size: 18;" text="🔔">
-            <HBox.margin>
-               <Insets left="200.0" />
-            </HBox.margin></Button>
-            <Button style="-fx-font-size: 18;" text="✉" />
-         <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@../image/avatar.jpg" />
-            </image>
-         </ImageView>
-         <VBox prefHeight="50.0" prefWidth="100.0">
-            <children>
-      
-                  <Label style="-fx-font-weight: bold;" text="Nguyễn Văn A">
-                  <VBox.margin>
-                     <Insets top="6.0" />
-                  </VBox.margin>
-               </Label>
-               <Label text="Bidder">
-                  <VBox.margin>
-                     <Insets left="20.0" />
-                  </VBox.margin>
-               </Label>
-            </children>
-         </VBox>
-            <Button text="⌄">
-            <HBox.margin>
-               <Insets />
-            </HBox.margin></Button>
-         <BorderPane.margin>
-            <Insets left="200.0" top="3.0" />
-         </BorderPane.margin>
+            <Region HBox.hgrow="ALWAYS" />
 
+            <Button style="-fx-font-size: 18; -fx-background-color: transparent; -fx-cursor: hand;" text="🔔" />
+            <Button onAction="#onNotificationClick" style="-fx-font-size: 18; -fx-background-color: transparent; -fx-cursor: hand;" text="✉" />
+            <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@../image/avatar.jpg" />
+                </image>
+            </ImageView>
+            <VBox alignment="CENTER_LEFT" prefWidth="100.0" prefHeight="75.0">
+                <Label style="-fx-font-weight: bold; -fx-font-size: 14;" text="Nguyễn Văn A" />
+                <Label style="-fx-text-fill: gray; -fx-font-size: 12;" text="Bidder" />
+            </VBox>
+            <Button style="-fx-background-color: transparent; -fx-font-size: 14; -fx-cursor: hand;" text="⌄" />
+
+            <BorderPane.margin>
+                <Insets left="196.0" /> </BorderPane.margin>
         </HBox>
     </top>
-<left>
-      <VBox prefHeight="323.0" prefWidth="196.0" style="-fx-background-color: #0B1F3A;" BorderPane.alignment="CENTER">
-         <children>
-            <HBox prefHeight="100.0" prefWidth="200.0">
-               <children>
-                  <Label style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;" text="🔨">
-                     <HBox.margin>
-                        <Insets left="17.0" top="62.0" />
-                     </HBox.margin></Label>
-                  <VBox prefHeight="200.0" prefWidth="100.0">
-                     <children>
-                        <Label style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;" text="ĐẤU GIÁ">
-                           <VBox.margin>
-                              <Insets left="-22.0" top="19.0" />
-                           </VBox.margin>
+    <left>
+        <VBox prefHeight="700.0" prefWidth="196.0" style="-fx-background-color: #0B1F3A;" BorderPane.alignment="CENTER">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="196.0">
+                    <children>
+                        <Label style="-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold;" text="🔨">
+                            <HBox.margin>
+                                <Insets left="15.0" />
+                            </HBox.margin>
                         </Label>
-                        <Label style="-fx-text-fill: white; -fx-background-color: transparent; -fx-font-size: 14;" text="TRỰC TUYẾN">
-                           <VBox.margin>
-                              <Insets left="-24.0" top="2.0" />
-                           </VBox.margin>
-                        </Label>
-                     </children>
-                     <HBox.margin>
-                        <Insets bottom="44.0" left="35.0" top="32.0" />
-                     </HBox.margin>
-                     <padding>
-                        <Insets left="9.0" />
-                     </padding>
-                  </VBox>
-               </children>
-               <VBox.margin>
-                  <Insets bottom="-34.0" />
-               </VBox.margin>
-            </HBox>
-             <Button onAction="#onBackToHomeClick" styleClass="sidebar-btn" text="Trang chủ">
-                 <VBox.margin><Insets top="26.0" /></VBox.margin>
-             </Button>
-             <Button styleClass="sidebar-btn" text="Phiên đấu giá" />
-             <Button styleClass="sidebar-btn" text="Hồ sơ của tôi" />
-             <Button styleClass="sidebar-btn" text="Tài sản đấu giá" />
-             <Button styleClass="sidebar-btn" text="Lịch sử tham gia" />
+                        <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="120.0">
+                            <children>
+                                <Label style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;" text="ĐẤU GIÁ" />
+                                <Label style="-fx-text-fill: white; -fx-font-size: 14;" text="TRỰC TUYẾN" />
+                            </children>
+                            <HBox.margin>
+                                <Insets left="10.0" />
+                            </HBox.margin>
+                        </VBox>
+                    </children>
+                    <VBox.margin>
+                        <Insets top="15.0" bottom="20.0"/>
+                    </VBox.margin>
+                </HBox>
 
-             <Button styleClass="sidebar-btn-active" text="Thông báo" />
+                <Button onAction="#onBackToHomeClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ" />
+                <Button onAction="#onAuctionSessionClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Phiên đấu giá" />
+                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Tài sản đấu giá" />
+                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Lịch sử tham gia" />
+                <Button onAction="#onNotificationClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Thông báo" />
+                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hồ sơ của tôi" />
+                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt" />
+            </children>
 
-             <Button styleClass="sidebar-btn" text="Cài đặt" />
-         </children>
-         <BorderPane.margin>
-            <Insets top="-114.0" />
-         </BorderPane.margin>
-      </VBox>
-   </left>
+            <BorderPane.margin>
+                <Insets top="-75.0" />
+            </BorderPane.margin>
+        </VBox>
+    </left>
 
     <!-- MAIN -->
     <center>
@@ -163,8 +134,5 @@
 
         </VBox>
     </center>
-   <padding>
-      <Insets top="7.0" />
-   </padding>
 
 </BorderPane>
