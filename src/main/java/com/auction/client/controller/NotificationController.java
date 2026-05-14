@@ -1,4 +1,6 @@
 package com.auction.client.controller;
+import com.auction.client.session.UserSession;
+import com.auction.shared.model.User;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -8,8 +10,27 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import java.io.IOException;
+import javafx.scene.control.Label;
+
+
 
 public class NotificationController {
+    // 1. Khai báo biến để điều khiển Label trên giao diện
+    @FXML private Label lblUserName;
+    @FXML private Label lblUserRole;
+
+    // 2. Hàm này sẽ tự động chạy ngay khi trang Thông báo được load lên
+    @FXML
+    public void initialize() {
+        // Lấy thông tin người dùng đã lưu trong ví
+        User currentUser = UserSession.getInstance().getLoginUser();
+
+        // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
+        if (currentUser != null && lblUserName != null) {
+            lblUserName.setText(currentUser.getFullName());
+            lblUserRole.setText(currentUser.getRole());
+        }
+    }
 
     @FXML
     public void onBackToHomeClick(ActionEvent event) {

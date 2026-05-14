@@ -24,7 +24,7 @@ public class AccountService {
       if (bidder.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", bidder);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu Bidder.");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu");
       }
     }
     // 2. Nếu tìm thấy trong bảng Seller
@@ -32,7 +32,7 @@ public class AccountService {
       if (seller.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", seller);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu Seller.");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu");
       }
     }
     // 3. Nếu không tìm thấy ở cả 2 bảng

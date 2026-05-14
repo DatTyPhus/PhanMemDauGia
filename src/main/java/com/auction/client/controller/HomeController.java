@@ -4,14 +4,28 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Label;
 
 public class HomeController {
 
+    @FXML private Label lblUserName;
+    @FXML private Label lblUserRole;
+
+    // 2. Hàm tự động chạy khi lật sang màn hình này
     @FXML
     public void initialize() {
-        // Hàm này sẽ tự động chạy khi giao diện home.fxml được mở lên
-        System.out.println("Giao diện Home đã được load thành công!");
+        // Mở ví ra lấy đối tượng User
+        com.auction.shared.model.User currentUser = com.auction.client.session.UserSession.getInstance().getLoginUser();
+
+        // Nếu lấy thành công (không bị rỗng)
+        if (currentUser != null && lblUserName != null) {
+            // Thay đổi chữ trên màn hình thành dữ liệu thật
+            // (Lưu ý: Bạn sửa .getFullName() và .getRole() cho khớp với tên hàm trong class User của bạn nhé)
+            lblUserName.setText(currentUser.getFullName());
+            lblUserRole.setText(currentUser.getRole());
+        }
     }
+
 
     // Các hàm trống này để chống lỗi khi bạn bấm vào các nút Filter trên giao diện
     @FXML

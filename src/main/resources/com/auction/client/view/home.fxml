@@ -33,9 +33,10 @@
                     <Image url="@../image/avatar.jpg" />
                 </image>
             </ImageView>
-            <VBox alignment="CENTER_LEFT" prefWidth="100.0" prefHeight="75.0">
-                <Label style="-fx-font-weight: bold; -fx-font-size: 14;" text="Nguyễn Văn A" />
-                <Label style="-fx-text-fill: gray; -fx-font-size: 12;" text="Bidder" />
+            <VBox alignment="CENTER_LEFT" prefHeight="75.0">
+                <Label fx:id="lblUserName" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Nguyễn Văn A" />
+
+                <Label fx:id="lblUserRole" style="-fx-text-fill: gray; -fx-font-size: 12;" text="Bidder" />
             </VBox>
             <Button style="-fx-background-color: transparent; -fx-font-size: 14; -fx-cursor: hand;" text="⌄" />
 

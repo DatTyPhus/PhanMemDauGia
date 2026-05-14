@@ -78,7 +78,8 @@ public class SellerDAO {
             user.setPassword(rs.getString("password"));
             user.setFullName(rs.getString("full_name")); // Khớp với DB của bạn là full_name
             user.setBalance(rs.getBigDecimal("balance"));
-            
+            user.setRole("Seller");
+
             return user;
         }
     } catch (SQLException e) {
