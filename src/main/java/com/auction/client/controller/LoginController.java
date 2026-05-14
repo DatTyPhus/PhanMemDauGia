@@ -74,17 +74,53 @@ public class LoginController {
     private void handleServerResponse(Message msg) {
         if (msg.getAction().equals("LOGIN_SUCCESS")) {
             try {
-                // 1. Tải file giao diện màn hình chính (home.fxml)
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
-                Parent root = loader.load();
+                // 1. LẤY MÓN QUÀ TỪ SERVER (Lúc này đang bị biến dạng)
+                Object payload = msg.getPayload();
 
-                // 2. Lấy cửa sổ (Stage) hiện tại đang hiển thị
-                Stage currentStage = (Stage) ten_dang_nhap.getScene().getWindow();
+                // 1. Chuyển thành chuỗi JSON
+                com.google.gson.Gson gson = new com.google.gson.Gson();
+                String jsonString = gson.toJson(payload);
 
-                // 3. Đổi giao diện sang màn hình chính với kích thước 1200x700
-                ten_dang_nhap.getScene().setRoot(root);
-                currentStage.setTitle("Trang chủ Đấu Giá");
-                currentStage.centerOnScreen(); // Căn giữa màn hình cho đẹp
+                // 🌟 TUYỆT CHIÊU: In thẳng gói hàng ra màn hình để soi xem Server gửi biến gì
+                System.out.println("GÓI HÀNG SERVER GỬI VỀ LÀ: " + jsonString);
+
+                // 2. "Đọc trộm" JSON để xem chức vụ là gì
+                com.google.gson.JsonObject jsonObject = com.google.gson.JsonParser.parseString(jsonString).getAsJsonObject();
+
+                String role = "";
+                // Kiểm tra an toàn: Xem có chữ "role" in thường không
+                if (jsonObject.has("role")) {
+                    role = jsonObject.get("role").getAsString();
+                }
+                // Kiểm tra an toàn: Xem có chữ "Role" in hoa không
+                else if (jsonObject.has("Role")) {
+                    role = jsonObject.get("Role").getAsString();
+                }
+                // Nếu vẫn không có, in ra báo động đỏ
+                else {
+                    System.err.println("CẢNH BÁO: Không tìm thấy chữ 'role' hay 'Role' trong gói hàng!");
+                }
+
+                // 3. Dựa vào chức vụ để nặn ra đúng Class con
+                com.auction.shared.model.User loggedInUser = null;
+                if ("Bidder".equalsIgnoreCase(role)) {
+                    loggedInUser = gson.fromJson(jsonString, com.auction.shared.model.Bidder.class);
+                } else if ("Seller".equalsIgnoreCase(role)) {
+                    loggedInUser = gson.fromJson(jsonString, com.auction.shared.model.Seller.class);
+                }
+
+                // 4. Lưu vào Session và chuyển trang (chỉ làm nếu nặn thành công)
+                if (loggedInUser != null) {
+                    com.auction.client.session.UserSession.getInstance().setLoginUser(loggedInUser);
+
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
+                    Parent root = loader.load();
+                    Stage currentStage = (Stage) ten_dang_nhap.getScene().getWindow();
+                    ten_dang_nhap.getScene().setRoot(root);
+                    currentStage.setTitle("Trang chủ Đấu Giá");
+                } else {
+                    System.err.println("Lỗi: Không nặn được User vì không xác định được Role là gì.");
+                }
 
             } catch (IOException e) {
                 e.printStackTrace();
