@@ -31,19 +31,34 @@ public class AccountService {
   }
 
   public Message register(String username, String password, String fullName , String role) {
-    if (role == "BIDDER") {
+    System.out.println("\n=== SERVER ĐANG XỬ LÝ ĐĂNG KÝ ===");
+    System.out.println("Role nhận được từ Client: [" + role + "]");
+
+    if (role == null) {
+      return new Message("REGISTER_FAIL", "Lỗi: Role gửi lên bị trống!");
+    }
+
+    // Xóa khoảng trắng thừa và không phân biệt hoa thường
+    if (role.trim().equalsIgnoreCase("BIDDER")) {
+      System.out.println("-> Đang nhảy vào luồng BIDDER...");
       if (bidderDAO.selectByUsername(username) != null) {
         return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
       }
-      Bidder newUser = new Bidder(username, password, fullName , role);
+      Bidder newUser = new Bidder(username, password, fullName, "BIDDER");
       bidderDAO.create(newUser);
       return new Message("REGISTER_SUCCESS", newUser);
-    } 
-    if (sellerDAO.selectByUsername(username) != null) {
+
+    } else if (role.trim().equalsIgnoreCase("SELLER")) {
+      System.out.println("-> Đang nhảy vào luồng SELLER...");
+      if (sellerDAO.selectByUsername(username) != null) {
         return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
+      }
+      Seller newUser = new Seller(username, password, fullName, "SELLER");
+      sellerDAO.create(newUser);
+      return new Message("REGISTER_SUCCESS", newUser);
+
+    } else {
+      return new Message("REGISTER_FAIL", "Lỗi gửi sai vai trò: " + role);
     }
-    Seller newUser = new Seller(username, password, fullName, role);
-    sellerDAO.create(newUser);
-    return new Message("REGISTER_SUCCESS", newUser);
-    } 
   }
+}

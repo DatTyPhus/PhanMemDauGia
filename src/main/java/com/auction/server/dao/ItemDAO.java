@@ -1,16 +1,18 @@
 package com.auction.server.dao;
 
-import com.auction.shared.model.Item;
+import com.auction.shared.model.*;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 
-public class ItemDAO implements DAOinterface<Item> {
+public class ItemDAO  {
     public static ItemDAO instance() {
         return new ItemDAO();
     }
 
-    @Override
     public void create(Item obj) {
         String sql = "INSERT INTO items (item_id, seller_id, item_name, description, category, starting_price, image_url, created_at) VALUES ('"
                 + obj.getId() + "', '"
@@ -39,7 +41,6 @@ public class ItemDAO implements DAOinterface<Item> {
   }
 
   
-  @Override
   public void update(Item obj) {
       String sql = "UPDATE items SET seller_id = '" + obj.getSellerId() + "', "
               + "item_name = '" + obj.getName() + "', "
@@ -66,11 +67,7 @@ public class ItemDAO implements DAOinterface<Item> {
       }
   }
 
-    @Override
-    public Item read(Integer id) {
-        return null;
-    }
-    @Override
+    
     public void delete(Integer id) {
         String sql = "DELETE FROM items WHERE item_id = " + id;
         Connection connection = null;
@@ -90,4 +87,38 @@ public class ItemDAO implements DAOinterface<Item> {
         } 
 
       }
+
+
+
+
+
+    public Item selectByName(String name) {
+    String sql = "SELECT * FROM items WHERE item_name = ?";
+    
+    try (Connection conn = JDBCUtil.getConnection();
+         PreparedStatement stmt = conn.prepareStatement(sql)) {
+        
+        stmt.setString(1, name); // Gán giá trị name vào dấu chấm hỏi
+        ResultSet rs = stmt.executeQuery();
+
+        if (rs.next()) {
+            Item item=null;
+            String type= rs.getString("item_type");
+            if (type.equals("ARTS")){ item = new Art(); }
+            else if (type.equals("ELECTRONICS")) { item = new Electronics(); }
+            else if (type.equals("VEHICLES")) { item = new Vehicle(); }
+            
+            item.setId(rs.getInt("item_id"));
+            item.setSellerId(rs.getInt("seller_id"));
+            item.setName(rs.getString("item_name"));
+            item.setDescription(rs.getString("description"));
+            item.setCategory(rs.getString("category"));
+            item.setStartingPrice(rs.getBigDecimal("starting_price"));
+            return item;
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return null; // Trả về null nếu không tìm thấy người dùng
+}
 }

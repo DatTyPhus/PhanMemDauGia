@@ -37,7 +37,7 @@ public class BidderDAO {
         }
         return null; // Trả về null nếu không tìm thấy người dùng
       }
-    
+
     public Bidder selectByUsername(String username) {
     String sql = "SELECT * FROM bidders WHERE username = ?";
     
