@@ -84,7 +84,7 @@
                   <Insets bottom="-34.0" />
                </VBox.margin>
             </HBox>
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ">
+             <Button onAction="#onBackToHomeClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ">
                   <VBox.margin>
                      <Insets top="26.0" />
                   </VBox.margin></Button>

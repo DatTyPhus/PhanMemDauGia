@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="700" prefWidth="1200" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.AuctionController">
+<BorderPane prefHeight="700" prefWidth="1200" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.HomeController">
 
     <!-- SIDEBAR -->
     <!-- ===== TOP ===== -->
@@ -96,16 +96,17 @@
                   <Insets bottom="-34.0" />
                </VBox.margin>
             </HBox>
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ">
-               <VBox.margin>
-                  <Insets top="20.0" />
-               </VBox.margin></Button>
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Phiên đấu giá" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Tài sản đấu giá" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Lịch sử tham gia" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Thông báo" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hồ sơ của tôi" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt" />
+             <Button onAction="#onBackToHomeClick" styleClass="sidebar-btn" text="Trang chủ">
+                 <VBox.margin><Insets top="26.0" /></VBox.margin>
+             </Button>
+             <Button styleClass="sidebar-btn" text="Phiên đấu giá" />
+             <Button styleClass="sidebar-btn" text="Hồ sơ của tôi" />
+             <Button styleClass="sidebar-btn" text="Tài sản đấu giá" />
+             <Button styleClass="sidebar-btn" text="Lịch sử tham gia" />
+
+             <Button styleClass="sidebar-btn-active" text="Thông báo" />
+
+             <Button styleClass="sidebar-btn" text="Cài đặt" />
          </children>
          <BorderPane.margin>
             <Insets top="-114.0" />

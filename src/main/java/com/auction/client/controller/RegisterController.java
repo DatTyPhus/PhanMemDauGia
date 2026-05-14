@@ -119,21 +119,18 @@ public class RegisterController {
                 // 1. Thông báo cho người dùng
                 System.out.println("Đăng ký thành công!");
 
-                // 2. Logic chuyển màn hình: Quay lại Đăng nhập
-                // Vì việc chuyển màn hình tác động đến UI, ta phải dùng Platform.runLater
                 Platform.runLater(() -> {
                     try {
-                        // Tải file fxml của màn hình đăng nhập
                         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/sample.fxml"));
                         Parent root = loader.load();
 
-                        // Lấy Stage (cửa sổ) hiện tại từ bất kỳ component nào (ví dụ: userName)
-                        Stage currentStage = (Stage) userName.getScene().getWindow();
+                        // CHỈ DÙNG SET_ROOT ĐỂ GIỮ NGUYÊN KÍCH THƯỚC CỬA SỔ
+                        userName.getScene().setRoot(root);
 
-                        // Thay thế cảnh (Scene) hiện tại bằng cảnh Đăng nhập
-                        currentStage.setScene(new Scene(root, 1400, 800));
+                        // Đổi lại tiêu đề
+                        Stage currentStage = (Stage) userName.getScene().getWindow();
                         currentStage.setTitle("Đăng nhập hệ thống");
-                        currentStage.centerOnScreen();
+
 
                     } catch (IOException e) {
                         System.err.println("Không thể chuyển màn hình: " + e.getMessage());
@@ -151,7 +148,6 @@ public class RegisterController {
         }
     }
 
-    // 6. CHUYỂN VỀ MÀN HÌNH ĐĂNG NHẬP
     // 6. CHUYỂN VỀ MÀN HÌNH ĐĂNG NHẬP
     @FXML
     public void onBackToLoginClick() {
