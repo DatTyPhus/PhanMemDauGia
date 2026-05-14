@@ -1,7 +1,6 @@
 package com.auction.server.network;
 
 import com.auction.server.controller.AccountService;
-import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -79,7 +78,7 @@ public class ClientHandler implements Runnable {
                     case "PLACE_BID":
                         System.out.println("Có người đặt giá: " + msg.getPayload());
                         break;
-
+                    
                     default:
                         System.out.println("Không hiểu lệnh này: " + msg.getAction());
                 }

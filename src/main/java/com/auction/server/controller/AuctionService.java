@@ -7,32 +7,30 @@ package com.auction.server.controller;
 
 import java.math.BigDecimal;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import com.auction.server.dao.*;
 import com.auction.shared.model.*;
 import com.auction.shared.network.Message;;
 
 public class AuctionService {
-  private final Map<Integer, Auction> activeAuctions = new ConcurrentHashMap<>();
   private static int auctionIdCounter = 0; 
   private final ItemDAO itemDAO = new ItemDAO();
   private final BidderDAO bidderDAO = new BidderDAO();
   private final SellerDAO sellerDAO = new SellerDAO();
-
   private final AuctionDAO auctionDAO = new AuctionDAO();
+  public static Map<Integer, Auction> waitingAuctions; // Giả sử có một map để quản lý các đấu giá đang chờ xử lý
 
   //đao tạo đấu giá mới
-  public void createAuction(int  auctionid,  int itemId, BigDecimal startingPrice, int durationMinutes) {
-    auctionIdCounter++;    
-    Auction auction = new Auction(auctionid, itemId, startingPrice, durationMinutes);
-    auctionDAO.create(auction);
-    activeAuctions.put(auctionid, auction);
+  public Message createAuction(String itemName, BigDecimal startingPrice, int durationMinutes) {
+    Item item = itemDAO.selectByName(itemName);
+    Auction auction = new Auction(item.getId(), itemName, startingPrice, durationMinutes);
+    waitingAuctions.put(auction.getId(), auction);
+    return new Message("ADD_ITEM_REQUEST", item);
   }
 
     //đặ bit giá cho một đấu giá cụ thể
-  public Message processBid(int id, int auctionId, BigDecimal bidAmount ) {
-        Auction auction = activeAuctions.get(auctionId);
+  public Message processBid(String bidder_name, String item_name, BigDecimal bidAmount ) {
+        Auction auction =  auctionDAO.selectByItemName(item_name);
         if (auction == null) {
             return new Message("BID_FAIL", "Đấu giá không tồn tại.");
         }
@@ -41,12 +39,12 @@ public class AuctionService {
           if (bidAmount.compareTo(auction.getCurrentPrice()) <= 0) {
                 return new Message("BID_FAIL", "Giá đặt phải cao hơn giá hiện tại (" + auction.getCurrentPrice() + ").");
           }
-          Bidder bidder = bidderDAO.getUserByUserid(id); 
+          Bidder bidder = bidderDAO.selectByUsername(bidder_name);
           if (bidder.getBalance().compareTo(bidAmount) < 0) {
             return new Message("BID_FAIL", "Số dư không đủ.");
           }
           auction.setCurrentPrice(bidAmount);
-          auction.setHighestBidderId(id);
+          auction.setHighestBidderId(auction.getId());
           return new Message("BID_SUCCESS", "Đặt giá thành công.");
         } finally {
             auction.unlock();
