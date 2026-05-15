@@ -6,6 +6,8 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 
+/// class HomeController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình ,và xử lý các yêu cầu từ server.
+
 public class HomeController {
 
     @FXML private Label lblUserName;
@@ -27,7 +29,7 @@ public class HomeController {
     }
 
 
-    // Các hàm trống này để chống lỗi khi bạn bấm vào các nút Filter trên giao diện
+    /// Các hàm trống này để chống lỗi khi bạn bấm vào các nút Filter trên giao diện
     @FXML
     public void filterAll(ActionEvent event) { }
 
@@ -40,28 +42,20 @@ public class HomeController {
     @FXML
     public void filterFinished(ActionEvent event) { }
 
-    //Method này dùng để xử lý khi click vào "Thông báo"
+    /// Method này thực hiện khi thao tác click vào nút chuyển sang màn notification.fxml.
     @FXML
     public void onNotificationClick(javafx.event.ActionEvent event) {
         try {
-            // 1. TÌM VÀ NẠP BẢN VẼ: Chỉ đường cho Java đi lấy file thông báo
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/notification.fxml"));
 
-            // Ép bản vẽ thành một khối giao diện thực tế (gọi là root)
-            Parent root = loader.load();
-
-            // 2. TÌM CỬA SỔ HIỆN TẠI:
-            // "event.getSource()" chính là cái nút ✉️ mà bạn vừa bấm vào.
-            // Từ cái nút đó, ta suy ngược ra cái Scene (khung cảnh) chứa nó.
+            Parent root = loader.load();                ///Thay đổi màn home thành màn notification.
             javafx.scene.Node source = (javafx.scene.Node) event.getSource();
             javafx.scene.Scene currentScene = source.getScene();
-
-            // 3. THAY RUỘT: Giữ nguyên vỏ cửa sổ, lột ruột Home ra, nhét ruột Notification vào
             currentScene.setRoot(root);
 
-            // 4. (Tùy chọn) Đổi tiêu đề cửa sổ ở góc trên cùng bên trái
             javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow();
-            currentStage.setTitle("Thông báo - Hệ thống đấu giá");
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
@@ -69,27 +63,20 @@ public class HomeController {
         }
     }
 
-    //Method này có chức năng xử lý khi click vào nút "Phiên đấu giá"
+    /// Method này thực hiện khi thao tác click vào Phiên đấu giá
     @FXML
     public void onAuctionSessionClick(javafx.event.ActionEvent event) {
         try {
-            // 1. TÌM VÀ NẠP BẢN VẼ: Chỉ đường cho JavaFX đi tìm file giao diện "Phiên đấu giá"
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/phiendaugia.fxml"));
-            Parent root = loader.load(); // Lệnh load() biến file text fxml thành các hình khối thật trong bộ nhớ
 
-            // 2. LẤY CỬA SỔ HIỆN TẠI:
-            // event.getSource() chính là lấy ra cái nút "Phiên đấu giá" mà người dùng vừa bấm vào
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-            // Từ cái nút đó, ta lấy ra được Scene (khung cảnh) chứa nó
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/phiendaugia.fxml")); //Tải file phiendaugia.fxml
+            Parent root = loader.load();
+
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
             javafx.scene.Scene currentScene = source.getScene();
-
-            // 3. THAY RUỘT CỬA SỔ:
-            // Giữ nguyên cái vỏ, lột ruột Home cũ ra, nhét ruột Phiên Đấu Giá mới (root) vào
             currentScene.setRoot(root);
 
-            // 4. (Tùy chọn) Đổi lại tiêu đề của cửa sổ cho chuẩn
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow();
-            currentStage.setTitle("Phiên đấu giá - Hệ thống");
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
@@ -97,19 +84,18 @@ public class HomeController {
         }
     }
 
-    // Hàm xử lý khi bấm nút "Trang chủ" từ màn hình Phiên Đấu Giá
+    /// Method này thực hiện khi thao tác click vào Trang chủ
     @FXML
     public void onBackToHomeClick(javafx.event.ActionEvent event) {
         try {
-            // 1. Tìm bản vẽ home.fxml
+
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
             Parent root = loader.load();
 
-            // 2. Lấy Scene hiện tại và thay "ruột"
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn hình phiendaugia thành màn home.
             source.getScene().setRoot(root);
 
-            // 3. Đổi lại tiêu đề cửa sổ
+            //Đặt lại tiêu đề cho window.
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
             currentStage.setTitle("Trang chủ Đấu Giá");
 
