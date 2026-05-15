@@ -1,14 +1,18 @@
 package com.auction.client.controller;
 
+import com.auction.client.session.UserSession;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
+import javafx.stage.Stage;
 
-/// class HomeController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình ,và xử lý các yêu cầu từ server.
+import java.io.IOException;
 
-public class HomeController {
+public class SettingController {
 
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
@@ -27,20 +31,6 @@ public class HomeController {
             lblUserRole.setText(currentUser.getRole());
         }
     }
-
-
-    /// Các hàm trống này để chống lỗi khi bạn bấm vào các nút Filter trên giao diện
-    @FXML
-    public void filterAll(ActionEvent event) { }
-
-    @FXML
-    public void filterRunning(ActionEvent event) { }
-
-    @FXML
-    public void filterUpcoming(ActionEvent event) { }
-
-    @FXML
-    public void filterFinished(ActionEvent event) { }
 
     /// Method này thực hiện khi thao tác click vào nút chuyển sang màn notification.fxml.
     @FXML
@@ -105,6 +95,36 @@ public class HomeController {
         }
     }
 
+    // Hàm xử lý khi bấm nút Đăng xuất
+    @FXML
+    public void onLogoutClick(ActionEvent event) {
+        // 1. XÓA SẠCH VÍ SESSION: Gọi hàm clean mà bạn đã viết sẵn trong UserSession
+        UserSession.getInstance().cleanloginUser();
+
+        // 2. CHUYỂN VỀ MÀN HÌNH ĐĂNG NHẬP
+        try {
+            // LƯU Ý QUAN TRỌNG:
+            // Nhìn vào cây thư mục của bạn, mình đoán màn hình đăng nhập là file "sample.fxml" hoặc "login.fxml".
+            // Hãy sửa lại tên file ở dòng dưới cho chuẩn với dự án của bạn nhé!
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/sample.fxml"));
+            Parent root = loader.load();
+
+            // Lấy cửa sổ hiện tại
+            Node source = (Node) event.getSource();
+            Stage currentStage = (Stage) source.getScene().getWindow();
+
+            // Thay ruột thành màn hình đăng nhập
+            currentStage.getScene().setRoot(root);
+
+            // Đổi lại tiêu đề cửa sổ
+            currentStage.setTitle("Đăng nhập - Hệ thống đấu giá");
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi: Không tìm thấy file màn hình đăng nhập!");
+        }
+    }
+
     @FXML
     public void onProductManagementClick(javafx.event.ActionEvent event) {
         // 1. Lấy thông tin người dùng hiện tại từ Session
@@ -136,24 +156,4 @@ public class HomeController {
         }
     }
 
-    @FXML
-    public void onSettingClick(javafx.event.ActionEvent event) {
-        try {
-            // 1. Tìm bản vẽ setting.fxml
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/setting.fxml"));
-            Parent root = loader.load();
-
-            // 2. Lấy Scene hiện tại và thay "ruột" bằng trang Cài đặt
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-            source.getScene().setRoot(root);
-
-            // 3. Đổi tiêu đề cửa sổ
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-            currentStage.setTitle("Cài đặt - Hệ thống đấu giá");
-
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-            System.err.println("Lỗi: Không tìm thấy file setting.fxml!");
-        }
-    }
 }

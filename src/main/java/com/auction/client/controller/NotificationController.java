@@ -74,4 +74,58 @@ public class NotificationController {
     public void onNotificationClick(javafx.event.ActionEvent event) {
         System.out.println("Bạn đang ở trang Thông báo rồi!");
     }
+
+    @FXML
+    public void onSettingClick(javafx.event.ActionEvent event) {
+        try {
+            // 1. Tìm bản vẽ setting.fxml
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/setting.fxml"));
+            Parent root = loader.load();
+
+            // 2. Lấy Scene hiện tại và thay "ruột" bằng trang Cài đặt
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+            source.getScene().setRoot(root);
+
+            // 3. Đổi tiêu đề cửa sổ
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
+            currentStage.setTitle("Cài đặt - Hệ thống đấu giá");
+
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi: Không tìm thấy file setting.fxml!");
+        }
+    }
+
+    @FXML
+    public void onProductManagementClick(javafx.event.ActionEvent event) {
+        // 1. Lấy thông tin người dùng hiện tại từ Session
+        com.auction.shared.model.User currentUser = com.auction.client.session.UserSession.getInstance().getLoginUser();
+
+        // 2. KIỂM TRA QUYỀN (Chỉ cho phép Seller)
+        if (currentUser != null && "Seller".equalsIgnoreCase(currentUser.getRole())) {
+            // Đủ điều kiện -> Cho phép chuyển sang trang Quản lý sản phẩm
+            try {
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/product_management.fxml"));
+                Parent root = loader.load();
+
+                javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+                source.getScene().setRoot(root);
+
+                javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
+                currentStage.setTitle("Quản lý sản phẩm - Hệ thống đấu giá");
+            } catch (java.io.IOException e) {
+                e.printStackTrace();
+                System.err.println("Lỗi: Không tìm thấy file product_management.fxml!");
+            }
+        } else {
+            // Nếu là Bidder (hoặc role khác) -> Bật thông báo từ chối
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+            alert.setTitle("Từ chối truy cập");
+            alert.setHeaderText(null);
+            alert.setContentText("Xin lỗi, tính năng Quản lý sản phẩm chỉ dành riêng cho Người Bán (Seller)!");
+            alert.showAndWait();
+        }
+    }
+
+
 }
