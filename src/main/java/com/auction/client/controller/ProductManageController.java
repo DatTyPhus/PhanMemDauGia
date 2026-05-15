@@ -8,10 +8,12 @@ import javafx.scene.control.Label;
 
 /// class HomeController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình ,và xử lý các yêu cầu từ server.
 
-public class HomeController {
+public class ProductManageController {
 
-    @FXML private Label lblUserName;
-    @FXML private Label lblUserRole;
+    @FXML
+    private Label lblUserName;
+    @FXML
+    private Label lblUserRole;
 
     //  Hàm tự động chạy khi lật sang màn hình này
     @FXML
@@ -27,20 +29,6 @@ public class HomeController {
             lblUserRole.setText(currentUser.getRole());
         }
     }
-
-
-    /// Các hàm trống này để chống lỗi khi bạn bấm vào các nút Filter trên giao diện
-    @FXML
-    public void filterAll(ActionEvent event) { }
-
-    @FXML
-    public void filterRunning(ActionEvent event) { }
-
-    @FXML
-    public void filterUpcoming(ActionEvent event) { }
-
-    @FXML
-    public void filterFinished(ActionEvent event) { }
 
     /// Method này thực hiện khi thao tác click vào nút chuyển sang màn notification.fxml.
     @FXML
@@ -106,37 +94,6 @@ public class HomeController {
     }
 
     @FXML
-    public void onProductManagementClick(javafx.event.ActionEvent event) {
-        // 1. Lấy thông tin người dùng hiện tại từ Session
-        com.auction.shared.model.User currentUser = com.auction.client.session.UserSession.getInstance().getLoginUser();
-
-        // 2. KIỂM TRA QUYỀN (Chỉ cho phép Seller)
-        if (currentUser != null && "Seller".equalsIgnoreCase(currentUser.getRole())) {
-            // Đủ điều kiện -> Cho phép chuyển sang trang Quản lý sản phẩm
-            try {
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/product_management.fxml"));
-                Parent root = loader.load();
-
-                javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-                source.getScene().setRoot(root);
-
-                javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-                currentStage.setTitle("Quản lý sản phẩm - Hệ thống đấu giá");
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-                System.err.println("Lỗi: Không tìm thấy file product_management.fxml!");
-            }
-        } else {
-            // Nếu là Bidder (hoặc role khác) -> Bật thông báo từ chối
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
-            alert.setTitle("Từ chối truy cập");
-            alert.setHeaderText(null);
-            alert.setContentText("Xin lỗi, tính năng Quản lý sản phẩm chỉ dành riêng cho Người Bán (Seller)!");
-            alert.showAndWait();
-        }
-    }
-
-    @FXML
     public void onSettingClick(javafx.event.ActionEvent event) {
         try {
             // 1. Tìm bản vẽ setting.fxml
@@ -155,5 +112,12 @@ public class HomeController {
             e.printStackTrace();
             System.err.println("Lỗi: Không tìm thấy file setting.fxml!");
         }
+    }
+
+    // Hàm này dùng để hứng sự kiện khi bấm nút "+ Thêm sản phẩm"
+    @FXML
+    public void handleAdd(javafx.event.ActionEvent event) {
+        System.out.println("Nút Thêm sản phẩm vừa được bấm! Code xử lý sẽ viết ở đây sau.");
+        // (Sau này bạn sẽ viết code mở cửa sổ thêm sản phẩm mới vào đây)
     }
 }
