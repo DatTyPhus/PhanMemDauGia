@@ -6,13 +6,13 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-
 import java.io.IOException;
+
+/// Class LoginController này dùng để thực hiện các yêu cầu của người dùng qua các thao tác trên màn hình ,và xử lý các phản hồi từ server.
 
 public class LoginController {
 
@@ -21,7 +21,7 @@ public class LoginController {
     @FXML private Label lblMessage;
 
     @FXML
-    public void initialize() {
+    public void initialize() {          /// Khởi tạo,chạy ngay khi chuyển qua màn Login
         try {
             // Lắng nghe phản hồi đăng nhập từ Server
             NetworkClient.getInstance().setListener(msg -> {
@@ -32,7 +32,7 @@ public class LoginController {
         }
     }
 
-    // Logic Đăng nhập (Gửi dữ liệu lên Server)
+    /// Hàm này thực hiện khi người dùng click vào nút "Đăng nhập" ->Kiểm tra về việc nhập thông tin,và gửi yêu cầu muốn đăng nhập vào hệ thống xuống server xử lý.
     @FXML
     public void onLoginClick() {
         String user = ten_dang_nhap.getText();
@@ -43,8 +43,7 @@ public class LoginController {
             return;
         }
 
-        // Tạm thời đóng gói payload đơn giản để test luồng
-        Message loginMsg = new Message("LOGIN", user + "," + pass);
+        Message loginMsg = new Message("LOGIN", user + "," + pass);  // Đóng gói Message chứa thông tin về username,password đẩy xuống server để xử lý.
         try {
             NetworkClient.getInstance().send(loginMsg);
         } catch (Exception e) {
@@ -52,18 +51,17 @@ public class LoginController {
         }
     }
 
-    // ĐÂY LÀ ĐOẠN QUAN TRỌNG NHẤT: Link sang RegisterController
+    /// Hàm này thực hiện khi người dùng click vào nút Đăng ký.
     @FXML
     public void onRegisterLinkClick() {
         try {
-            // Chỉ đường cho JavaFX tìm đến file registe.fxml của Bảo
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/registe.fxml"));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/registe.fxml"));  // Tải file registe.fxml để chuyển màn.
             Parent root = loader.load();
 
-            // Lấy cửa sổ hiện tại và thay thế bằng giao diện Đăng ký
+            //Thay thế màn hình đăng nhập sang màn hình đăng ký.
             Stage currentStage = (Stage) ten_dang_nhap.getScene().getWindow();
             ten_dang_nhap.getScene().setRoot(root);
-            currentStage.setTitle("Đăng ký tài khoản");
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -71,20 +69,20 @@ public class LoginController {
         }
     }
 
+
     private void handleServerResponse(Message msg) {
         if (msg.getAction().equals("LOGIN_SUCCESS")) {
             try {
-                // 1. LẤY MÓN QUÀ TỪ SERVER (Lúc này đang bị biến dạng)
-                Object payload = msg.getPayload();
+
+                Object payload = msg.getPayload();    // Lấy thông tin từ phản hồi từ server.
 
                 // 1. Chuyển thành chuỗi JSON
                 com.google.gson.Gson gson = new com.google.gson.Gson();
                 String jsonString = gson.toJson(payload);
 
-                // 🌟 TUYỆT CHIÊU: In thẳng gói hàng ra màn hình để soi xem Server gửi biến gì
-                System.out.println("GÓI HÀNG SERVER GỬI VỀ LÀ: " + jsonString);
+                System.out.println("THÔNG TIN SERVER GỬI VỀ LÀ: " + jsonString);
 
-                // 2. "Đọc trộm" JSON để xem chức vụ là gì
+                // Đọc xem thông tin từ JSON
                 com.google.gson.JsonObject jsonObject = com.google.gson.JsonParser.parseString(jsonString).getAsJsonObject();
 
                 String role = "";
@@ -101,7 +99,7 @@ public class LoginController {
                     System.err.println("CẢNH BÁO: Không tìm thấy chữ 'role' hay 'Role' trong gói hàng!");
                 }
 
-                // 3. Dựa vào chức vụ để nặn ra đúng Class con
+                // Dựa vào role để tạo ra class con chuẩn.
                 com.auction.shared.model.User loggedInUser = null;
                 if ("Bidder".equalsIgnoreCase(role)) {
                     loggedInUser = gson.fromJson(jsonString, com.auction.shared.model.Bidder.class);
@@ -109,7 +107,7 @@ public class LoginController {
                     loggedInUser = gson.fromJson(jsonString, com.auction.shared.model.Seller.class);
                 }
 
-                // 4. Lưu vào Session và chuyển trang (chỉ làm nếu nặn thành công)
+                // Nếu tạo thành công thì lưu đối tượng vào kho (UserSession).
                 if (loggedInUser != null) {
                     com.auction.client.session.UserSession.getInstance().setLoginUser(loggedInUser);
 
@@ -117,7 +115,7 @@ public class LoginController {
                     Parent root = loader.load();
                     Stage currentStage = (Stage) ten_dang_nhap.getScene().getWindow();
                     ten_dang_nhap.getScene().setRoot(root);
-                    currentStage.setTitle("Trang chủ Đấu Giá");
+                    currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
                 } else {
                     System.err.println("Lỗi: Không nặn được User vì không xác định được Role là gì.");
                 }
