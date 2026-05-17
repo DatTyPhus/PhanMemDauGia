@@ -1,5 +1,7 @@
 package com.auction.client.controller;
 
+import com.auction.client.session.UserSession;
+import com.auction.shared.model.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,19 +12,18 @@ import javafx.scene.control.Label;
 
 public class HomeController {
 
+    // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
 
-    //  Hàm tự động chạy khi lật sang màn hình này
+    /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
     @FXML
     public void initialize() {
-        // Mở ví ra lấy đối tượng User
-        com.auction.shared.model.User currentUser = com.auction.client.session.UserSession.getInstance().getLoginUser();
 
-        // Nếu lấy thành công (không bị rỗng)
-        if (currentUser != null && lblUserName != null) {
-            // Thay đổi chữ trên màn hình thành dữ liệu thật
-            // (Lưu ý: Bạn sửa .getFullName() và .getRole() cho khớp với tên hàm trong class User của bạn nhé)
+        User currentUser = UserSession.getInstance().getLoginUser();  /// Lấy thông tin người dùng hiện tại đang thao tác lưu vào kho để khi chuyển màn không bị mất thông tin.
+
+        // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
+        if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
             lblUserName.setText(currentUser.getFullName());
             lblUserRole.setText(currentUser.getRole());
         }
@@ -84,6 +85,27 @@ public class HomeController {
         }
     }
 
+    /// Method này thực hiện khi người dùng click vào nút LỊCH SỬ ĐẤU GIÁ.
+    @FXML
+    public void onHistoryClick(javafx.event.ActionEvent event) {
+        try {
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/history.fxml")); //Tải file phiendaugia.fxml
+            Parent root = loader.load();
+
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
+            javafx.scene.Scene currentScene = source.getScene();
+            currentScene.setRoot(root);
+
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
+
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi: Không tìm thấy file history.fxml! Hãy kiểm tra lại đường dẫn.");
+        }
+    }
+
     /// Method này thực hiện khi thao tác click vào Trang chủ
     @FXML
     public void onBackToHomeClick(javafx.event.ActionEvent event) {
@@ -97,7 +119,7 @@ public class HomeController {
 
             //Đặt lại tiêu đề cho window.
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-            currentStage.setTitle("Trang chủ Đấu Giá");
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
@@ -105,6 +127,7 @@ public class HomeController {
         }
     }
 
+    ///  Method này thực hiên khi người click vào nút TÀI SẢN ĐẤU GIÁ.
     @FXML
     public void onProductManagementClick(javafx.event.ActionEvent event) {
         // 1. Lấy thông tin người dùng hiện tại từ Session
@@ -121,7 +144,7 @@ public class HomeController {
                 source.getScene().setRoot(root);
 
                 javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-                currentStage.setTitle("Quản lý sản phẩm - Hệ thống đấu giá");
+                currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
             } catch (java.io.IOException e) {
                 e.printStackTrace();
                 System.err.println("Lỗi: Không tìm thấy file product_management.fxml!");
@@ -131,11 +154,34 @@ public class HomeController {
             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
             alert.setTitle("Từ chối truy cập");
             alert.setHeaderText(null);
-            alert.setContentText("Xin lỗi, tính năng Quản lý sản phẩm chỉ dành riêng cho Người Bán (Seller)!");
+            alert.setContentText("Xin lỗi, tính năng TÀI SẢN ĐẤU GIÁ chỉ dành riêng cho Người Bán (Seller)!");
             alert.showAndWait();
         }
     }
 
+    /// Method này thực hiện khi nguười dùng click vào nút HỒ SƠ CỦA TÔI.
+    @FXML
+    public void onProfileClick(javafx.event.ActionEvent event) {
+        try {
+            // Tìm file profile.fxml
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/profile.fxml"));
+            Parent root = loader.load();
+
+            // Thay cửa sổ sang màn Profile
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+            source.getScene().setRoot(root);
+
+            // Đặt tiêu đề cửa sổ
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
+
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi: Không tìm thấy file profile.fxml!");
+        }
+    }
+
+    /// Method này thực hiện khi click vào nút CÀI ĐẶT
     @FXML
     public void onSettingClick(javafx.event.ActionEvent event) {
         try {
@@ -149,7 +195,7 @@ public class HomeController {
 
             // 3. Đổi tiêu đề cửa sổ
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-            currentStage.setTitle("Cài đặt - Hệ thống đấu giá");
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
