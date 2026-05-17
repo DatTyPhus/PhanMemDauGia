@@ -2,18 +2,15 @@ package com.auction.client.controller;
 
 import com.auction.client.session.UserSession;
 import com.auction.shared.model.User;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.stage.Stage;
-import java.io.IOException;
 import javafx.scene.control.Label;
 
-/// Class NotificationController này dùng để xử lý các yêu cầu của người dùng qua thao tác,và nhận tín hiệu phản hồi từ server để hiển thị lên màn hình.
+/// class AuctionController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình PHIÊN ĐẤU GIÁ.
 
-public class NotificationController {
+public class AuctionController {
+
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
@@ -31,51 +28,49 @@ public class NotificationController {
         }
     }
 
-    /// Hàm này thực hiện khi thao tác quay về trang chủ(home.fxml)
+    /// Method này thực hiện khi thao tác click vào Trang chủ
     @FXML
-    public void onBackToHomeClick(ActionEvent event) {
+    public void onBackToHomeClick(javafx.event.ActionEvent event) {
         try {
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml")); //Tải lên file home.fxml
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
             Parent root = loader.load();
 
-            // Thay đổi cửa sổ thành giao diện home.
-            Node source = (Node) event.getSource();
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn hình phiendaugia thành màn home.
             source.getScene().setRoot(root);
 
-            Stage currentStage = (Stage) source.getScene().getWindow();
-            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /// Hàm này thực hiện khi thao tác chuyển sang trang phiên đấu giá "phiendaugia.fxml"
-    @FXML
-    public void onAuctionSessionClick(javafx.event.ActionEvent event) {
-        try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/phiendaugia.fxml"));
-            Parent root = loader.load();
-
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay màn notification.fxml thành màn phiendaugia.fxml
-            source.getScene().setRoot(root);
-
+            //Đặt lại tiêu đề cho window.
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
+            System.err.println("Lỗi: Không thể tải trang chủ!");
         }
     }
 
-    /// Hàm này thực hiện khi click vào ô hộp thư ở góc phải màn
+    /// Method này thực hiện khi thao tác click vào nút chuyển sang màn notification.fxml.
     @FXML
     public void onNotificationClick(javafx.event.ActionEvent event) {
-        System.out.println("Bạn đang ở trang Thông báo rồi!");
+        try {
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/notification.fxml"));
+
+            Parent root = loader.load();                ///Thay đổi màn home thành màn notification.
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+            javafx.scene.Scene currentScene = source.getScene();
+            currentScene.setRoot(root);
+
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow();
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
+
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi: Không tìm thấy file notification.fxml");
+        }
     }
 
-
+    ///  Method này thực hiên khi người click vào nút TÀI SẢN ĐẤU GIÁ.
     @FXML
     public void onProductManagementClick(javafx.event.ActionEvent event) {
         // 1. Lấy thông tin người dùng hiện tại từ Session
@@ -92,7 +87,7 @@ public class NotificationController {
                 source.getScene().setRoot(root);
 
                 javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-                currentStage.setTitle("Quản lý sản phẩm - Hệ thống đấu giá");
+                currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
             } catch (java.io.IOException e) {
                 e.printStackTrace();
                 System.err.println("Lỗi: Không tìm thấy file product_management.fxml!");
@@ -102,7 +97,7 @@ public class NotificationController {
             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
             alert.setTitle("Từ chối truy cập");
             alert.setHeaderText(null);
-            alert.setContentText("Xin lỗi, tính năng Quản lý sản phẩm chỉ dành riêng cho Người Bán (Seller)!");
+            alert.setContentText("Xin lỗi, tính năng TÀI SẢN ĐẤU GIÁ chỉ dành riêng cho Người Bán (Seller)!");
             alert.showAndWait();
         }
     }
@@ -171,5 +166,5 @@ public class NotificationController {
             System.err.println("Lỗi: Không tìm thấy file setting.fxml!");
         }
     }
-
 }
+
