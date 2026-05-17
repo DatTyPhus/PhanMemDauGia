@@ -29,7 +29,7 @@
             <Button onAction="#onNotificationClick" style="-fx-font-size: 18; -fx-background-color: transparent; -fx-cursor: hand;" text="✉" />
          <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
             <image>
-               <Image url="@../avatar.jpg" />
+               <Image url="@../../image/avatar.jpg" />
             </image>
          </ImageView>
             <VBox alignment="CENTER_LEFT" prefHeight="75.0">
