@@ -1,7 +1,9 @@
 package com.auction.client.controller;
 
+import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
 import com.auction.shared.model.User;
+import com.auction.shared.network.Message;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -12,7 +14,7 @@ import javafx.stage.Stage;
 
 import java.io.IOException;
 
-public class SettingController {
+public class SettingController implements NetworkClient.MessageListener {
 
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
@@ -21,13 +23,17 @@ public class SettingController {
     /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
     @FXML
     public void initialize() {
+        try{
+            NetworkClient.getInstance().addListener(this);
+            User currentUser = UserSession.getInstance().getLoginUser();  /// Lấy thông tin người dùng hiện tại đang thao tác lưu vào kho để khi chuyển màn không bị mất thông tin.
 
-        User currentUser = UserSession.getInstance().getLoginUser();  /// Lấy thông tin người dùng hiện tại đang thao tác lưu vào kho để khi chuyển màn không bị mất thông tin.
-
-        // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
-        if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
-            lblUserName.setText(currentUser.getFullName());
-            lblUserRole.setText(currentUser.getRole());
+            // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
+            if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
+                lblUserName.setText(currentUser.getFullName());
+                lblUserRole.setText(currentUser.getRole());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -35,6 +41,7 @@ public class SettingController {
     @FXML
     public void onNotificationClick(javafx.event.ActionEvent event) {
         try {
+            NetworkClient.getInstance().removeListener(this);
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/notification.fxml"));
 
@@ -56,6 +63,7 @@ public class SettingController {
     @FXML
     public void onAuctionSessionClick(javafx.event.ActionEvent event) {
         try {
+            NetworkClient.getInstance().removeListener(this);
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/phiendaugia.fxml")); //Tải file phiendaugia.fxml
             Parent root = loader.load();
@@ -77,6 +85,7 @@ public class SettingController {
     @FXML
     public void onBackToHomeClick(javafx.event.ActionEvent event) {
         try {
+            NetworkClient.getInstance().removeListener(this);
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
             Parent root = loader.load();
@@ -102,6 +111,7 @@ public class SettingController {
 
         // Chuyển về maàn đăng nhập
         try {
+            NetworkClient.getInstance().removeListener(this);
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/sample.fxml"));  // Tải file màn hình
             Parent root = loader.load();
@@ -127,6 +137,8 @@ public class SettingController {
         // KIỂM TRA ROLE ĐỂ VÀO MÀN HÌNH
         if (currentUser != null && "Seller".equalsIgnoreCase(currentUser.getRole())) {         // Nếu đủ điều kiện thfi chuyển màn hiình sang màn quản lý tài sản.
             try {
+                NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
+
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/product_management.fxml"));
                 Parent root = loader.load();
 
@@ -152,6 +164,7 @@ public class SettingController {
     @FXML
     public void onHistoryClick(javafx.event.ActionEvent event) {
         try {
+            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/history.fxml")); //Tải file phiendaugia.fxml
             Parent root = loader.load();
@@ -173,6 +186,8 @@ public class SettingController {
     @FXML
     public void onProfileClick(javafx.event.ActionEvent event) {
         try {
+            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
+
             // Tìm file profile.fxml
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/profile.fxml"));
             Parent root = loader.load();
@@ -189,6 +204,42 @@ public class SettingController {
             e.printStackTrace();
             System.err.println("Lỗi: Không tìm thấy file profile.fxml!");
         }
+    }
+
+    // ================= PHẦN XỬ LÝ REALTIME =================
+    @Override
+    public void onMessageReceived(Message msg) {
+        // BẮT BUỘC: Phải đưa lệnh đổi giao diện vào Platform.runLater
+        // vì tin nhắn đến từ luồng mạng (Thread khác), nếu đổi trực tiếp sẽ làm sập JavaFX
+        javafx.application.Platform.runLater(() -> {
+
+            // Bộ lọc: Chỉ quan tâm đến tin nhắn báo "Cập nhật giá"
+            switch (msg.getAction()) {
+                case "UPDATE_BID":
+                    System.out.println("Màn hình Phiên đấu giá đã nhận được tín hiệu!");
+
+                    // 1. Bóc tách dữ liệu (Giả sử Huy gửi chuỗi: "Mã_SP,Giá_Mới,Tên_Người_Đặt")
+                    String payloadStr = msg.getPayload().toString();
+                    String[] data = payloadStr.split(",");
+
+                    if(data.length == 3) {
+                        String productId = data[0];
+                        String newPrice = data[1];
+                        String bidderName = data[2];
+
+                        System.out.println("Sản phẩm ID: " + productId + " | Giá mới nhảy lên: " + newPrice + " bởi " + bidderName);
+
+                        // 2. TẠI ĐÂY LÀ LOGIC ĐỔI GIAO DIỆN CỦA BẠN:
+                        // (Ví dụ: Bạn dùng vòng lặp tìm cái Card sản phẩm có ID khớp với productId,
+                        // sau đó gọi lệnh set text để cập nhật lại label giá tiền trên cái Card đó)
+                    }
+                    break;
+
+                // (Các thông báo như LOGIN_SUCCESS... nó sẽ rơi vào default và bị bỏ qua, không làm loạn màn hình này)
+                default:
+                    break;
+            }
+        });
     }
 
 }

@@ -24,7 +24,7 @@ public class LoginController {
     public void initialize() {          /// Khởi tạo,chạy ngay khi chuyển qua màn Login
         try {
             // Lắng nghe phản hồi đăng nhập từ Server
-            NetworkClient.getInstance().setListener(msg -> {
+            NetworkClient.getInstance().addListener(msg -> {
                 Platform.runLater(() -> handleServerResponse(msg));
             });
         } catch (IOException e) {
