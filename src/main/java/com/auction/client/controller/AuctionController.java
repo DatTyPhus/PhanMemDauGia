@@ -2,6 +2,7 @@ package com.auction.client.controller;
 
 import com.auction.client.session.UserSession;
 import com.auction.shared.model.User;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -27,6 +28,19 @@ public class AuctionController {
             lblUserRole.setText(currentUser.getRole());
         }
     }
+
+    /// Các hàm trống này để chống lỗi khi bạn bấm vào các nút Filter trên giao diện
+    @FXML
+    public void filterAll(ActionEvent event) { }
+
+    @FXML
+    public void filterRunning(ActionEvent event) { }
+
+    @FXML
+    public void filterUpcoming(ActionEvent event) { }
+
+    @FXML
+    public void filterFinished(ActionEvent event) { }
 
     /// Method này thực hiện khi thao tác click vào Trang chủ
     @FXML
@@ -70,15 +84,13 @@ public class AuctionController {
         }
     }
 
-    ///  Method này thực hiên khi người click vào nút TÀI SẢN ĐẤU GIÁ.
     @FXML
     public void onProductManagementClick(javafx.event.ActionEvent event) {
-        // 1. Lấy thông tin người dùng hiện tại từ Session
+        //  Lấy thông tin người dùng hiện tại từ Session
         com.auction.shared.model.User currentUser = com.auction.client.session.UserSession.getInstance().getLoginUser();
 
-        // 2. KIỂM TRA QUYỀN (Chỉ cho phép Seller)
-        if (currentUser != null && "Seller".equalsIgnoreCase(currentUser.getRole())) {
-            // Đủ điều kiện -> Cho phép chuyển sang trang Quản lý sản phẩm
+        // KIỂM TRA ROLE ĐỂ VÀO MÀN HÌNH
+        if (currentUser != null && "Seller".equalsIgnoreCase(currentUser.getRole())) {         // Nếu đủ điều kiện thfi chuyển màn hiình sang màn quản lý tài sản.
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/product_management.fxml"));
                 Parent root = loader.load();
@@ -93,8 +105,7 @@ public class AuctionController {
                 System.err.println("Lỗi: Không tìm thấy file product_management.fxml!");
             }
         } else {
-            // Nếu là Bidder (hoặc role khác) -> Bật thông báo từ chối
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);    //Nếu không đủ điều kiện , hiện lên thông báo để chuyển hướng.
             alert.setTitle("Từ chối truy cập");
             alert.setHeaderText(null);
             alert.setContentText("Xin lỗi, tính năng TÀI SẢN ĐẤU GIÁ chỉ dành riêng cho Người Bán (Seller)!");

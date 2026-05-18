@@ -7,7 +7,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 
@@ -87,7 +86,7 @@ public class SettingController {
 
             //Đặt lại tiêu đề cho window.
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-            currentStage.setTitle("Trang chủ Đấu Giá");
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
@@ -98,26 +97,21 @@ public class SettingController {
     /// Hàm thực hiện khi bấm nút Đăng xuất
     @FXML
     public void onLogoutClick(ActionEvent event) {
-        // 1. XÓA SẠCH VÍ SESSION: Gọi hàm clean mà bạn đã viết sẵn trong UserSession
-        UserSession.getInstance().cleanloginUser();
 
-        // 2. CHUYỂN VỀ MÀN HÌNH ĐĂNG NHẬP
+        UserSession.getInstance().cleanloginUser();   //Xoá đối tượng được lưu trong UserSession
+
+        // Chuyển về maàn đăng nhập
         try {
-            // LƯU Ý QUAN TRỌNG:
-            // Nhìn vào cây thư mục của bạn, mình đoán màn hình đăng nhập là file "sample.fxml" hoặc "login.fxml".
-            // Hãy sửa lại tên file ở dòng dưới cho chuẩn với dự án của bạn nhé!
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/sample.fxml"));
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/sample.fxml"));  // Tải file màn hình
             Parent root = loader.load();
 
-            // Lấy cửa sổ hiện tại
             Node source = (Node) event.getSource();
-            Stage currentStage = (Stage) source.getScene().getWindow();
+            Stage currentStage = (Stage) source.getScene().getWindow();     // Lấy cửa sổ hiện tại
 
-            // Thay ruột thành màn hình đăng nhập
-            currentStage.getScene().setRoot(root);
+            currentStage.getScene().setRoot(root);          // Thay của sổ thành màn đăng nhập
 
-            // Đổi lại tiêu đề cửa sổ
-            currentStage.setTitle("Đăng nhập - Hệ thống đấu giá");
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -127,12 +121,11 @@ public class SettingController {
 
     @FXML
     public void onProductManagementClick(javafx.event.ActionEvent event) {
-        // 1. Lấy thông tin người dùng hiện tại từ Session
+        //  Lấy thông tin người dùng hiện tại từ Session
         com.auction.shared.model.User currentUser = com.auction.client.session.UserSession.getInstance().getLoginUser();
 
-        // 2. KIỂM TRA QUYỀN (Chỉ cho phép Seller)
-        if (currentUser != null && "Seller".equalsIgnoreCase(currentUser.getRole())) {
-            // Đủ điều kiện -> Cho phép chuyển sang trang Quản lý sản phẩm
+        // KIỂM TRA ROLE ĐỂ VÀO MÀN HÌNH
+        if (currentUser != null && "Seller".equalsIgnoreCase(currentUser.getRole())) {         // Nếu đủ điều kiện thfi chuyển màn hiình sang màn quản lý tài sản.
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/product_management.fxml"));
                 Parent root = loader.load();
@@ -141,17 +134,16 @@ public class SettingController {
                 source.getScene().setRoot(root);
 
                 javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-                currentStage.setTitle("Quản lý sản phẩm - Hệ thống đấu giá");
+                currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
             } catch (java.io.IOException e) {
                 e.printStackTrace();
                 System.err.println("Lỗi: Không tìm thấy file product_management.fxml!");
             }
         } else {
-            // Nếu là Bidder (hoặc role khác) -> Bật thông báo từ chối
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);    //Nếu không đủ điều kiện , hiện lên thông báo để chuyển hướng.
             alert.setTitle("Từ chối truy cập");
             alert.setHeaderText(null);
-            alert.setContentText("Xin lỗi, tính năng Quản lý sản phẩm chỉ dành riêng cho Người Bán (Seller)!");
+            alert.setContentText("Xin lỗi, tính năng TÀI SẢN ĐẤU GIÁ chỉ dành riêng cho Người Bán (Seller)!");
             alert.showAndWait();
         }
     }
