@@ -42,7 +42,7 @@ public class ProductManageController {
 
             //Đặt lại tiêu đề cho window.
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-            currentStage.setTitle("Trang chủ Đấu Giá");
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
             e.printStackTrace();

@@ -105,13 +105,23 @@ public class LoginController {
                     loggedInUser = gson.fromJson(jsonString, com.auction.shared.model.Bidder.class);
                 } else if ("Seller".equalsIgnoreCase(role)) {
                     loggedInUser = gson.fromJson(jsonString, com.auction.shared.model.Seller.class);
+                } else if ("Admin".equalsIgnoreCase(role)) {
+                    loggedInUser = gson.fromJson(jsonString, com.auction.shared.model.Admin.class);
                 }
 
                 // Nếu tạo thành công thì lưu đối tượng vào kho (UserSession).
-                if (loggedInUser != null) {
+                if ("Bidder".equalsIgnoreCase(role) || "Seller".equalsIgnoreCase(role)) {
                     com.auction.client.session.UserSession.getInstance().setLoginUser(loggedInUser);
 
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
+                    Parent root = loader.load();
+                    Stage currentStage = (Stage) ten_dang_nhap.getScene().getWindow();
+                    ten_dang_nhap.getScene().setRoot(root);
+                    currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
+                } else if ("Admin".equalsIgnoreCase(role)) {
+                    com.auction.client.session.UserSession.getInstance().setLoginUser(loggedInUser);
+
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/admin/admin_home.fxml"));
                     Parent root = loader.load();
                     Stage currentStage = (Stage) ten_dang_nhap.getScene().getWindow();
                     ten_dang_nhap.getScene().setRoot(root);
