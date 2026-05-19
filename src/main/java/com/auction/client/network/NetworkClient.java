@@ -21,7 +21,7 @@ public class NetworkClient {
     private BufferedReader in;
     private PrintWriter out;
 
-    // NÂNG CẤP: Thay vì chỉ có 1 currentListener, ta dùng một Danh sách để nhiều màn hình cùng nghe được 1 lúc
+    // Dùng một Danh sách để nhiều màn hình cùng nghe được 1 lúc.
     private final List<MessageListener> listeners = new ArrayList<>();       /// Danh sách các đối tượng nghe dữ liệu được truyền từ server lên.
 
     private NetworkClient() throws IOException {
@@ -39,17 +39,16 @@ public class NetworkClient {
         return instance;
     }
 
-    // --- CÁC HÀM QUẢN LÝ NGƯỜI NGHE (OBSERVER PATTERN) ---
+    // --- CÁC HÀM QUẢN LÝ MÀN HÌNH ĐANG NGHE (OBSERVER PATTERN) ---
 
-    // Hàm thêm một màn hình vào danh sách lắng nghe (Đăng ký nghe)
-    public void addListener(MessageListener listener) {
+
+    public void addListener(MessageListener listener) {      // Hàm thêm một màn hình vào danh sách lắng nghe (Đăng ký nghe)
         if (!listeners.contains(listener)) {
             listeners.add(listener);
         }
     }
 
-    // Hàm xóa một màn hình khỏi danh sách (Khi chuyển sang trang khác thì hủy nghe)
-    public void removeListener(MessageListener listener) {
+    public void removeListener(MessageListener listener) {   // Hàm xóa một màn hình khỏi danh sách (Khi chuyển sang trang khác thì hủy nghe)
         listeners.remove(listener);
     }
 
