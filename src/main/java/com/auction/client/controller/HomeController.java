@@ -205,17 +205,15 @@ public class HomeController implements NetworkClient.MessageListener {
     // ================= PHẦN XỬ LÝ REALTIME =================
     @Override
     public void onMessageReceived(Message msg) {
-        // BẮT BUỘC: Phải đưa lệnh đổi giao diện vào Platform.runLater
-        // vì tin nhắn đến từ luồng mạng (Thread khác), nếu đổi trực tiếp sẽ làm sập JavaFX
+        ///Thực hiện các lệnh liên quan đến giao diện phải đi qua luồng của javafx, nếu đi bằng luồng mạng bình thường thif sẽ sập javavFX
         javafx.application.Platform.runLater(() -> {
 
-            // Bộ lọc: Chỉ quan tâm đến tin nhắn báo "Cập nhật giá"
-            switch (msg.getAction()) {
+
+            switch (msg.getAction()) {              // So sánh các nhãn dán (Action) được gửi lên,nếu có lệnh xử lý sẽ thực hiện thay đổi trong giao diện,nếu không có sẽ bỏ qua nhãn dán ấy.
                 case "UPDATE_BID":
                     System.out.println("Màn hình Phiên đấu giá đã nhận được tín hiệu!");
 
-                    // 1. Bóc tách dữ liệu (Giả sử Huy gửi chuỗi: "Mã_SP,Giá_Mới,Tên_Người_Đặt")
-                    String payloadStr = msg.getPayload().toString();
+                    String payloadStr = msg.getPayload().toString();      //Lấy nội dung từ nhãn dán để xử lý.
                     String[] data = payloadStr.split(",");
 
                     if(data.length == 3) {
@@ -231,8 +229,7 @@ public class HomeController implements NetworkClient.MessageListener {
                     }
                     break;
 
-                // (Các thông báo như LOGIN_SUCCESS... nó sẽ rơi vào default và bị bỏ qua, không làm loạn màn hình này)
-                default:
+                default:    // Các thông báo như LOGIN_SUCCESS... nó sẽ rơi vào default và bị bỏ qua, không làm loạn màn hình này
                     break;
             }
         });
