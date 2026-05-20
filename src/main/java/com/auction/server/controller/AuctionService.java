@@ -27,6 +27,20 @@ public class AuctionService {
     waitingAuctions.put(auction.getId(), auction);
     return new Message("ADD_ITEM_REQUEST", item);
   }
+// public void updateTimeLine (Auction auction) {
+//     LocalDateTime endTime = null;
+//     LocalDateTime startTime =null;
+//     if (timeline == null || LocalDateTime.now().isAfter(timeline)) {
+//         timeline = LocalDateTime.now().plusMinutes(auction.getDurationMinutes());
+//     }
+//     else{
+//         startTime = timeline;
+//         endTime = timeline.plusMinutes(auction.getDurationMinutes());
+//     } 
+//     String startTimeStr = auction.changeTimetoString(startTime);
+//     String endTimeStr = auction.changeTimetoString(endTime);
+//     auctionDAO.updateDateTime(auction, startTimeStr, endTimeStr);
+//   }
 
     //đặ bit giá cho một đấu giá cụ thể
   public Message processBid(String bidder_name, String item_name, BigDecimal bidAmount ) {

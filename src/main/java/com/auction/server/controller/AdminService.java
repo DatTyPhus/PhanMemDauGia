@@ -27,6 +27,8 @@ public class AdminService {
     // Thêm một phiên đấu giá mới vào hệ thống
     public void addAuction(Auction auction) {
         runningAuctions.put(auction.getId(), auction);
+        AuctionService.waitingAuctions.remove(auction.getId()); // Loại bỏ khỏi danh sách chờ nếu đã tồn tại
+        
     }
     
     // Kết thúc một phiên đấu giá và loại bỏ nó khỏi hệ thống

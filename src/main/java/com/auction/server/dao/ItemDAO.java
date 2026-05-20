@@ -104,10 +104,7 @@ public class ItemDAO  {
         if (rs.next()) {
             Item item=null;
             String type= rs.getString("item_type");
-            if (type.equals("ARTS")){ item = new Art(); }
-            else if (type.equals("ELECTRONICS")) { item = new Electronics(); }
-            else if (type.equals("VEHICLES")) { item = new Vehicle(); }
-            
+            item = Item.createFromType(type);
             item.setId(rs.getInt("item_id"));
             item.setSellerId(rs.getInt("seller_id"));
             item.setName(rs.getString("item_name"));

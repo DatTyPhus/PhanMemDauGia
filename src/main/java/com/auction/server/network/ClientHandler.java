@@ -1,11 +1,15 @@
 package com.auction.server.network;
 
 import com.auction.server.controller.AccountService;
+import com.auction.server.controller.AuctionSchedular;
+import com.auction.server.controller.AuctionService;
+import com.auction.shared.model.Auction;
 import com.auction.shared.network.Message;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.math.BigDecimal;
 import java.net.Socket;
 
 //
@@ -64,13 +68,29 @@ public class ClientHandler implements Runnable {
                         }
                         break;
                     case "ADD_ITEM":
-                        // Xử lý thêm sản phẩm....
+                        try {
+                            java.util.Map<String, Object> map = (java.util.Map<String, Object>) msg.getPayload();
+                            String itemName = (String) map.get("itemName");
+                            double startingPriceDouble = (double) map.get("startingPrice");
+                            int durationMinutes = (int) map.get("durationMinutes");
+
+                            AuctionService auctionService = new AuctionService();
+                            Message addItemResult = auctionService.createAuction(itemName, BigDecimal.valueOf(startingPriceDouble), durationMinutes);
+                            out.println(addItemResult.toJson());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            out.println(new Message("ADD_ITEM_FAIL", "Lỗi Server: " + e.getMessage()).toJson());
+                        }
                         break;
-                    case "CREATE_AUCTION":
-                        // Xử lý tạo cuộc đấu giá. payload vd : {"itemId": 15, "endTime": "2026-05-01 10:00:00"}.
-                        break;
-                    case "GET_ACTIVE_AUCTIONS":
-                        // Yêu cầu server trả về danh sách các phiên đấu giá đang mở. payload : null.
+                    case "ADD_ITEM_SUCCESS":
+                        AuctionSchedular auctionSchedular = new AuctionSchedular();
+                        Auction auction = (Auction) msg.getPayload();
+                        auctionSchedular.updateTimeLine(auction);
+                        auctionSchedular.start(auction);
+                        
+                        break; 
+                    case "ADD_ITEM_FAIL":
+                         
                         break;
                     case "GET_MY_ITEMS":
                         // Xử lý khi Seller muốn xem kho đồ của mình. payload : null.
