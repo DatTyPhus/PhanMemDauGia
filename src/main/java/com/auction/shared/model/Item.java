@@ -12,6 +12,15 @@ public abstract class Item extends Entity {
     protected LocalDateTime createdAt;
     protected String itemType;
 
+    public static Item createFromType(String type) {
+        return switch (type) {
+            case "ARTS"         -> new Art();
+            case "ELECTRONICS"  -> new Electronics();
+            case "VEHICLES"     -> new Vehicle();
+            default -> throw new IllegalArgumentException("Loại item không hợp lệ: " + type);
+        };
+    }
+
     public Item(int sellerId, String itemName, String description,
                 String category, BigDecimal startPrice, String imageUrl) {
         super();

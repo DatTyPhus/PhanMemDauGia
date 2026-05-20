@@ -5,21 +5,25 @@ không để xảy ra tình trạng 1 món đồ bán cho 2 người.
 */
 package com.auction.server.controller;
 
-import com.auction.server.dao.SellerDAO;
-import com.auction.server.dao.BidderDAO;
-import com.auction.shared.model.Bidder;
-import com.auction.shared.model.Seller;
+import com.auction.server.dao.*;
+import com.auction.shared.model.*;
 import com.auction.shared.network.Message;;
 
 public class AccountService {
   private final BidderDAO bidderDAO = new BidderDAO();
   private final SellerDAO sellerDAO = new SellerDAO();
-
-  public Message login(String username, String password) {
+  private final AdminDAO adminDAO = new AdminDAO();
+  
+  public Message login (String username, String password) {
     Bidder bidder = bidderDAO.selectByUsername(username);
     Seller seller = sellerDAO.selectByUsername(username);
-
-    // 1. Nếu tìm thấy trong bảng Bidder
+    Admin admin = adminDAO.selectByUsername(username);
+    if (bidder == null && seller == null && admin == null) {
+      return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
+    }
+    if (!bidder.getPassword().equals(password) && !seller.getPassword().equals(password) && !admin.getPassword().equals(password)) {
+      return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
+    }
     if (bidder != null) {
       if (bidder.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", bidder);
@@ -27,18 +31,10 @@ public class AccountService {
         return new Message("LOGIN_FAIL", "Sai mật khẩu");
       }
     }
-    // 2. Nếu tìm thấy trong bảng Seller
-    else if (seller != null) {
-      if (seller.getPassword().equals(password)) {
-        return new Message("LOGIN_SUCCESS", seller);
-      } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu");
-      }
+    if (seller != null) {
+      return new Message("LOGIN_SUCCESS", seller);
     }
-    // 3. Nếu không tìm thấy ở cả 2 bảng
-    else {
-      return new Message("LOGIN_FAIL", "Tài khoản không tồn tại.");
-    }
+    return new Message("LOGIN_SUCCESS", admin);
   }
 
   public Message register(String username, String password, String fullName , String role) {
