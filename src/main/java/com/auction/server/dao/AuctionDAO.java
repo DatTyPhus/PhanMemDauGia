@@ -131,7 +131,7 @@ public class AuctionDAO {
         pst.setInt(1, obj.getItemId());              // Giả định itemId là kiểu Int
         pst.setString(2, obj.getItemName());          // item_name (String)
         pst.setBigDecimal(3, obj.getCurrentPrice());      // current_price (Double/Float)
-        pst.setInt(4, obj.getHighestBidderId());      // highest_bidder_id (Int)
+        pst.setString(4, obj.getHighestBidderName());      // highest_bidder_name (String)
         pst.setString(5, obj.getStartTime());      // start_time (DateTime/Timestamp)
         pst.setString(6, obj.getEndTime());        // end_time (DateTime/Timestamp)
         pst.setInt(7, obj.getDurationMinutes());      // durationMinutes (Int)

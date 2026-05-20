@@ -58,7 +58,7 @@ public class AuctionService {
             return new Message("BID_FAIL", "Số dư không đủ.");
           }
           auction.setCurrentPrice(bidAmount);
-          auction.setHighestBidderId(auction.getId());
+          auction.setHighestBidderName(bidder_name);
           return new Message("BID_SUCCESS", "Đặt giá thành công.");
         } finally {
             auction.unlock();
