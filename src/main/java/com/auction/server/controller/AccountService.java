@@ -25,7 +25,11 @@ public class AccountService {
       return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
     }
     if (bidder != null) {
-      return new Message("LOGIN_SUCCESS", bidder );
+      if (bidder.getPassword().equals(password)) {
+        return new Message("LOGIN_SUCCESS", bidder);
+      } else {
+        return new Message("LOGIN_FAIL", "Sai mật khẩu");
+      }
     }
     if (seller != null) {
       return new Message("LOGIN_SUCCESS", seller);

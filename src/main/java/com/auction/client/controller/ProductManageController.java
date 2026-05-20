@@ -10,9 +10,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 
-/// class AuctionController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình PHIÊN ĐẤU GIÁ.
+/// class HomeController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình ,và xử lý các yêu cầu từ server.
 
-public class AuctionController implements NetworkClient.MessageListener {
+public class ProductManageController implements NetworkClient.MessageListener {
 
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
@@ -35,24 +35,12 @@ public class AuctionController implements NetworkClient.MessageListener {
         }
     }
 
-    /// Các hàm trống này để chống lỗi khi bạn bấm vào các nút Filter trên giao diện
-    @FXML
-    public void filterAll(ActionEvent event) { }
-
-    @FXML
-    public void filterRunning(ActionEvent event) { }
-
-    @FXML
-    public void filterUpcoming(ActionEvent event) { }
-
-    @FXML
-    public void filterFinished(ActionEvent event) { }
-
     /// Method này thực hiện khi thao tác click vào Trang chủ
     @FXML
     public void onBackToHomeClick(javafx.event.ActionEvent event) {
         try {
             NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
+
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
             Parent root = loader.load();
@@ -92,44 +80,13 @@ public class AuctionController implements NetworkClient.MessageListener {
         }
     }
 
+    /// Method này thực hiện khi thao tác click vào Phiên đấu giá
     @FXML
-    public void onProductManagementClick(javafx.event.ActionEvent event) {
-        //  Lấy thông tin người dùng hiện tại từ Session
-        com.auction.shared.model.User currentUser = com.auction.client.session.UserSession.getInstance().getLoginUser();
-
-        // KIỂM TRA ROLE ĐỂ VÀO MÀN HÌNH
-        if (currentUser != null && "Seller".equalsIgnoreCase(currentUser.getRole())) {         // Nếu đủ điều kiện thfi chuyển màn hiình sang màn quản lý tài sản.
-            try {
-                NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
-
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/product_management.fxml"));
-                Parent root = loader.load();
-
-                javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-                source.getScene().setRoot(root);
-
-                javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-                currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
-            } catch (java.io.IOException e) {
-                e.printStackTrace();
-                System.err.println("Lỗi: Không tìm thấy file product_management.fxml!");
-            }
-        } else {
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);    //Nếu không đủ điều kiện , hiện lên thông báo để chuyển hướng.
-            alert.setTitle("Từ chối truy cập");
-            alert.setHeaderText(null);
-            alert.setContentText("Xin lỗi, tính năng TÀI SẢN ĐẤU GIÁ chỉ dành riêng cho Người Bán (Seller)!");
-            alert.showAndWait();
-        }
-    }
-
-    /// Method này thực hiện khi người dùng click vào nút LỊCH SỬ ĐẤU GIÁ.
-    @FXML
-    public void onHistoryClick(javafx.event.ActionEvent event) {
+    public void onAuctionSessionClick(javafx.event.ActionEvent event) {
         try {
             NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/history.fxml")); //Tải file phiendaugia.fxml
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/phiendaugia.fxml")); //Tải file phiendaugia.fxml
             Parent root = loader.load();
 
             javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
@@ -141,7 +98,7 @@ public class AuctionController implements NetworkClient.MessageListener {
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            System.err.println("Lỗi: Không tìm thấy file history.fxml! Hãy kiểm tra lại đường dẫn.");
+            System.err.println("Lỗi: Không tìm thấy file phiendaugia.fxml! Hãy kiểm tra lại đường dẫn.");
         }
     }
 
@@ -169,6 +126,28 @@ public class AuctionController implements NetworkClient.MessageListener {
         }
     }
 
+    /// Method này thực hiện khi người dùng click vào nút LỊCH SỬ ĐẤU GIÁ.
+    @FXML
+    public void onHistoryClick(javafx.event.ActionEvent event) {
+        try {
+            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/history.fxml")); //Tải file phiendaugia.fxml
+            Parent root = loader.load();
+
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
+            javafx.scene.Scene currentScene = source.getScene();
+            currentScene.setRoot(root);
+
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
+
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi: Không tìm thấy file history.fxml! Hãy kiểm tra lại đường dẫn.");
+        }
+    }
+
     /// Method này thực hiện khi click vào nút CÀI ĐẶT
     @FXML
     public void onSettingClick(javafx.event.ActionEvent event) {
@@ -185,6 +164,27 @@ public class AuctionController implements NetworkClient.MessageListener {
 
             // 3. Đổi tiêu đề cửa sổ
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
+
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi: Không tìm thấy file setting.fxml!");
+        }
+    }
+
+    // Hàm này dùng để hứng sự kiện khi bấm nút "+ Thêm sản phẩm"
+    @FXML
+    public void handleAdd(javafx.event.ActionEvent event) {
+        try {
+            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/add_edit_product.fxml"));  // Tải file màn hình
+            Parent root = loader.load();
+
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();         // Thay đổi màn hình
+            source.getScene().setRoot(root);
+
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();   //  Đổi tiêu đề cửa sổ
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
@@ -229,4 +229,3 @@ public class AuctionController implements NetworkClient.MessageListener {
         });
     }
 }
-

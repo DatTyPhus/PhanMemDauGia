@@ -2,20 +2,22 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.layout.Region?>
-<?import javafx.scene.image.Image?>
-<BorderPane prefHeight="800" prefWidth="1400" style="-fx-background-color: #f5f7fb;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.ProfileController">
-    <!-- ===== HEADER ===== -->
+
+<BorderPane prefHeight="900" prefWidth="1400" style="-fx-background-color: #f6f8fc;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.SettingController">
+
     <top>
         <HBox alignment="CENTER_LEFT" prefHeight="75.0" minHeight="75.0" spacing="15" style="-fx-background-color: white; -fx-border-color: #E5EAF2; -fx-border-width: 0 0 1 0;">
             <padding>
@@ -34,15 +36,16 @@
             </ImageView>
             <VBox alignment="CENTER_LEFT" prefHeight="75.0">
                 <Label fx:id="lblUserName" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Nguyễn Văn A" />
-
                 <Label fx:id="lblUserRole" style="-fx-text-fill: gray; -fx-font-size: 12;" text="Bidder" />
             </VBox>
             <Button style="-fx-background-color: transparent; -fx-font-size: 14; -fx-cursor: hand;" text="⌄" />
 
             <BorderPane.margin>
-                <Insets left="196.0" /> </BorderPane.margin>
+                <Insets left="196.0" />
+            </BorderPane.margin>
         </HBox>
     </top>
+
     <left>
         <VBox prefHeight="700.0" prefWidth="196.0" style="-fx-background-color: #0B1F3A;" BorderPane.alignment="CENTER">
             <children>
@@ -73,83 +76,77 @@
                 <Button onAction="#onProductManagementClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lý tài sản" />
                 <Button onAction="#onHistoryClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Lịch sử đấu giá" />
                 <Button onAction="#onNotificationClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Thông báo" />
-                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hồ sơ của tôi" />
-                <Button onAction="#onSettingClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt" />
-
+                <Button onAction="#onProfileClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hồ sơ của tôi" />
+                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt" />
             </children>
+
             <BorderPane.margin>
                 <Insets top="-75.0" />
             </BorderPane.margin>
         </VBox>
     </left>
 
-    <!-- ===== CONTENT ===== -->
+    <!-- ================= MAIN CONTENT ================= -->
     <center>
-        <HBox spacing="30">
-            <padding>
-                <Insets bottom="30" left="30" right="30" top="30" />
-            </padding>
+        <ScrollPane fitToWidth="true" style="-fx-background: #f6f8fc;                            -fx-border-color: transparent;">
 
-            <!-- ===== LEFT: AVATAR ===== -->
-            <VBox spacing="15">
+            <content>
+                <VBox spacing="25">
 
-                <Label text="Ảnh đại diện" />
+                    <padding>
+                        <Insets bottom="30" left="30" right="30" top="30" />
+                    </padding>
 
-                <StackPane prefHeight="200" prefWidth="200" style="-fx-border-color:#cbd5e1; -fx-border-radius:10;">
-                    <children>
-                        <ImageView fitHeight="150" fitWidth="150" preserveRatio="true" />
-                        <Label text="+ Upload" />
-                    </children>
-                </StackPane>
+                    <!-- TITLE -->
+                    <Label style="-fx-font-size:28;                                   -fx-font-weight:bold;" text="Cài đặt" />
 
-                <Button maxWidth="Infinity" text="Chọn ảnh" />
-            <HBox.margin>
-               <Insets />
-            </HBox.margin>
+                    <!-- AUCTION -->
+                    <VBox spacing="15" style="-fx-background-color:white;                                  -fx-background-radius:15;">
 
-            </VBox>
+                        <padding>
+                            <Insets bottom="25" left="25" right="25" top="25" />
+                        </padding>
 
-            <!-- ===== RIGHT: FORM ===== -->
-            <VBox prefWidth="400" spacing="12">
+                        <Label style="-fx-font-size:18;                                       -fx-font-weight:bold;" text="Đấu giá của tôi" />
 
-                <Label text="Họ và tên" />
-                <TextField promptText="Nguyễn Văn A" />
+                        <Button maxWidth="Infinity" text="Danh sách đã tham gia" />
 
-                <Label text="Email" />
-                <TextField promptText="email@gmail.com" />
+                        <Button maxWidth="Infinity" text="Sản phẩm đang theo dõi" />
+                    </VBox>
 
-                <Label text="Số điện thoại" />
-                <TextField promptText="0123456789" />
+                    <!-- SECURITY -->
+                    <VBox spacing="15" style="-fx-background-color:white;                                  -fx-background-radius:15;">
 
-                <Label text="Địa chỉ" />
-                <TextField promptText="Hà Nội" />
+                        <padding>
+                            <Insets bottom="25" left="25" right="25" top="25" />
+                        </padding>
 
-                <Label text="Tên đăng nhập" />
-                <TextField editable="false" text="username123" />
+                        <Label style="-fx-font-size:18;                                       -fx-font-weight:bold;" text="Bảo mật" />
 
-                <Separator />
+                        <PasswordField promptText="Đổi mật khẩu" />
 
-                <Label style="-fx-font-weight:bold;" text="Đổi mật khẩu" />
+                        <HBox>
+                            <Label text="Xác thực 2 lớp (2FA)" />
+                            <Pane HBox.hgrow="ALWAYS" />
+                            <ToggleButton text="Tắt" />
+                        </HBox>
+                    </VBox>
 
-                <Label text="Mật khẩu cũ" />
-                <PasswordField />
+                    <!-- LANGUAGE -->
+                    <VBox spacing="15" style="-fx-background-color:white;                                  -fx-background-radius:15;">
 
-                <Label text="Mật khẩu mới" />
-                <PasswordField />
+                        <padding>
+                            <Insets bottom="25" left="25" right="25" top="25" />
+                        </padding>
 
-                <Label text="Xác nhận mật khẩu" />
-                <PasswordField />
+                        <Label style="-fx-font-size:18;                                       -fx-font-weight:bold;" text="Ngôn ngữ" />
 
-                <!-- BUTTON -->
-                <HBox spacing="10">
-                    <Button maxWidth="Infinity" style="-fx-background-color:#ef4444; -fx-text-fill:white;" text="HỦY" />
-
-                    <Button maxWidth="Infinity" style="-fx-background-color:#22c55e; -fx-text-fill:white;" text="CẬP NHẬT" />
-                </HBox>
-
-            </VBox>
-
-        </HBox>
+                        <ComboBox promptText="Tiếng Việt" />
+                    </VBox>
+                    <Button onAction="#onLogoutClick" prefWidth="210" style="-fx-background-color:white; -fx-border-color:#ef4444; -fx-border-radius:10; -fx-text-fill:#ef4444; -fx-font-size:15; -fx-background-radius:10;" text="↩ Đăng xuất" />
+                </VBox>
+            </content>
+        </ScrollPane>
     </center>
 
 </BorderPane>

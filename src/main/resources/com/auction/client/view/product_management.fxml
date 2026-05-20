@@ -3,19 +3,18 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Pagination?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<?import javafx.scene.layout.Region?>
-<?import javafx.scene.image.Image?>
-<BorderPane prefHeight="800" prefWidth="1400" style="-fx-background-color: #f5f7fb;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.ProfileController">
-    <!-- ===== HEADER ===== -->
+<BorderPane prefHeight="800.0" prefWidth="1280.0" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.ProductManageController">
     <top>
         <HBox alignment="CENTER_LEFT" prefHeight="75.0" minHeight="75.0" spacing="15" style="-fx-background-color: white; -fx-border-color: #E5EAF2; -fx-border-width: 0 0 1 0;">
             <padding>
@@ -34,15 +33,16 @@
             </ImageView>
             <VBox alignment="CENTER_LEFT" prefHeight="75.0">
                 <Label fx:id="lblUserName" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Nguyễn Văn A" />
-
                 <Label fx:id="lblUserRole" style="-fx-text-fill: gray; -fx-font-size: 12;" text="Bidder" />
             </VBox>
             <Button style="-fx-background-color: transparent; -fx-font-size: 14; -fx-cursor: hand;" text="⌄" />
 
             <BorderPane.margin>
-                <Insets left="196.0" /> </BorderPane.margin>
+                <Insets left="196.0" />
+            </BorderPane.margin>
         </HBox>
     </top>
+
     <left>
         <VBox prefHeight="700.0" prefWidth="196.0" style="-fx-background-color: #0B1F3A;" BorderPane.alignment="CENTER">
             <children>
@@ -70,86 +70,58 @@
 
                 <Button onAction="#onBackToHomeClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ" />
                 <Button onAction="#onAuctionSessionClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Phiên đấu giá" />
-                <Button onAction="#onProductManagementClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lý tài sản" />
+                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lý tài sản" />
                 <Button onAction="#onHistoryClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Lịch sử đấu giá" />
                 <Button onAction="#onNotificationClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Thông báo" />
-                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hồ sơ của tôi" />
+                <Button onAction="#onProfileClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hồ sơ của tôi" />
                 <Button onAction="#onSettingClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt" />
-
             </children>
+
             <BorderPane.margin>
                 <Insets top="-75.0" />
             </BorderPane.margin>
         </VBox>
     </left>
 
-    <!-- ===== CONTENT ===== -->
+    <!-- MAIN -->
     <center>
-        <HBox spacing="30">
+        <VBox spacing="15" style="-fx-background-color:#f1f5f9;">
             <padding>
-                <Insets bottom="30" left="30" right="30" top="30" />
+                <Insets left="20" right="20" top="20" />
             </padding>
 
-            <!-- ===== LEFT: AVATAR ===== -->
-            <VBox spacing="15">
+            <!-- HEADER -->
+            <HBox>
+                <Label style="-fx-font-size:20; -fx-font-weight:bold;" text="Quản lý sản tài sản" />
 
-                <Label text="Ảnh đại diện" />
+                <Region HBox.hgrow="ALWAYS" />
 
-                <StackPane prefHeight="200" prefWidth="200" style="-fx-border-color:#cbd5e1; -fx-border-radius:10;">
-                    <children>
-                        <ImageView fitHeight="150" fitWidth="150" preserveRatio="true" />
-                        <Label text="+ Upload" />
-                    </children>
-                </StackPane>
+                <Button onAction="#handleAdd" text="+ Thêm sản phẩm" />
+            </HBox>
 
-                <Button maxWidth="Infinity" text="Chọn ảnh" />
-            <HBox.margin>
+            <!-- TABLE -->
+            <TableView fx:id="productTable" prefHeight="500.0">
+                <columns>
+                    <TableColumn fx:id="colName" prefWidth="200" text="Sản phẩm" />
+                    <TableColumn fx:id="colPrice" prefWidth="120" text="Giá" />
+                    <TableColumn fx:id="colStatus" prefWidth="120" text="Trạng thái" />
+                    <TableColumn fx:id="colEnd" prefWidth="180" text="Kết thúc" />
+                    <TableColumn fx:id="colAction" prefWidth="200" text="Thao tác" />
+                </columns>
+            <opaqueInsets>
                <Insets />
-            </HBox.margin>
+            </opaqueInsets>
+            </TableView>
 
-            </VBox>
+            <!-- PAGINATION -->
+            <HBox alignment="CENTER">
+                <Pagination fx:id="pagination" maxPageIndicatorCount="5" prefWidth="400">
+               <HBox.margin>
+                  <Insets top="40.0" />
+               </HBox.margin></Pagination>
+            </HBox>
 
-            <!-- ===== RIGHT: FORM ===== -->
-            <VBox prefWidth="400" spacing="12">
-
-                <Label text="Họ và tên" />
-                <TextField promptText="Nguyễn Văn A" />
-
-                <Label text="Email" />
-                <TextField promptText="email@gmail.com" />
-
-                <Label text="Số điện thoại" />
-                <TextField promptText="0123456789" />
-
-                <Label text="Địa chỉ" />
-                <TextField promptText="Hà Nội" />
-
-                <Label text="Tên đăng nhập" />
-                <TextField editable="false" text="username123" />
-
-                <Separator />
-
-                <Label style="-fx-font-weight:bold;" text="Đổi mật khẩu" />
-
-                <Label text="Mật khẩu cũ" />
-                <PasswordField />
-
-                <Label text="Mật khẩu mới" />
-                <PasswordField />
-
-                <Label text="Xác nhận mật khẩu" />
-                <PasswordField />
-
-                <!-- BUTTON -->
-                <HBox spacing="10">
-                    <Button maxWidth="Infinity" style="-fx-background-color:#ef4444; -fx-text-fill:white;" text="HỦY" />
-
-                    <Button maxWidth="Infinity" style="-fx-background-color:#22c55e; -fx-text-fill:white;" text="CẬP NHẬT" />
-                </HBox>
-
-            </VBox>
-
-        </HBox>
+        </VBox>
     </center>
 
 </BorderPane>

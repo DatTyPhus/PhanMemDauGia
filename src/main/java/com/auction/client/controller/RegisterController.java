@@ -9,19 +9,19 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-
 import java.io.IOException;
+
+/// Class RegisterController này dùng để xử lý những yêu cầu của người dùng khi thao tác trên màn hình đăng ký, và xử lý các phản hồi từ server để hiển thị lên màn hình.
 
 public class RegisterController {
 
-    // 1. Móc nối với các thành phần trên giao diện
+    /// Liên kết với các ô nhập thông tin hay click trên giao diện
     @FXML private TextField fullName;
     @FXML private TextField userName;
     @FXML private PasswordField password;
@@ -31,21 +31,20 @@ public class RegisterController {
 
     @FXML private Label lblMessage;            // Thêm 1 Label ẩn trên giao diện để hiện chữ báo lỗi
 
-    // Biến lưu trữ Role hiện tại mà người dùng đang chọn (Mặc định là BIDDER)
-    private String selectedRole = "BIDDER";
+    /// Biến lưu trữ Role hiện tại mà người dùng đang chọn (Mặc định là BIDDER)
+    private String selectedRole = "BIDDER";       // Khi người dùng đăng ký không click vào bất cứ ô chọn role nào thì mặc định sẽ là BIDDER.
 
-    // 2. KHỞI TẠO: CẮM PHÍCH LẮNG NGHE MẠNG
     @FXML
-    public void initialize() {
+    public void initialize() {               /// Khởi tạo đối tượng để nghe phản hồi từ mạng.
         // Tự động tô màu xanh cho vòng tròn Bidder lúc mới mở màn hình
         role_bidder.setFill(Color.DODGERBLUE);
         role_seller.setFill(Color.WHITE);
 
-        // Kêu NetworkClient: "Có tin nhắn gửi về thì ném vào hàm handleServerResponse cho tôi"
+        // Khi NetworkClient có tín hiệu phản hồi từ server sẽ được đi vào hàm handleServerResponse.
         try{
-            NetworkClient.getInstance().setListener(new NetworkClient.MessageListener() {
+            NetworkClient.getInstance().addListener(new NetworkClient.MessageListener() {
                 @Override
-                public void onMessageReceived(Message msg) {
+                public void onMessageReceived(Message msg) {            /// Thực hiện các xử lý phản hồi từ server phải thực hiện trên luồng JavaFX Application Thread cho bất kì tác vụ nào liên quan đến JavaFX.
                     Platform.runLater(() -> handleServerResponse(msg));
                 }
             });
@@ -54,7 +53,7 @@ public class RegisterController {
         }
     }
 
-    // 3. XỬ LÝ CHỌN ROLE (Khi bấm vào hình tròn)
+    // XỬ LÝ CHỌN ROLE (Khi bấm vào hình tròn)
     @FXML
     public void onBidderSelected() {
         selectedRole = "BIDDER";
@@ -69,7 +68,8 @@ public class RegisterController {
         role_bidder.setFill(Color.WHITE);
     }
 
-    // 4. XỬ LÝ NÚT TẠO TÀI KHOẢN
+
+    /// XỬ LÝ NÚT TẠO TÀI KHOẢN
     @FXML
     public void onRegisterClick() {
         // Lấy thông tin từ các ô nhập liệu
@@ -78,7 +78,7 @@ public class RegisterController {
         String pass = password.getText();
         String rePass = re_password.getText();
 
-        // Kiểm tra tính hợp lệ cơ bản
+        // Kiểm tra việc nhập thông tin
         if (name.isEmpty() || user.isEmpty() || pass.isEmpty() || rePass.isEmpty()) {
             lblMessage.setText("Vui lòng điền đầy đủ thông tin!");
             lblMessage.setStyle("-fx-text-fill: red;");
@@ -92,7 +92,7 @@ public class RegisterController {
             return;
         }
 
-        // 1. Logic Đa hình: Khai báo lớp abstract nhưng khởi tạo lớp con
+        // Đa hình: Khai báo lớp abstract nhưng khởi tạo lớp con
         User newUser;
         if (selectedRole.equals("BIDDER")) {
             newUser = new Bidder(user, pass, name, "BIDDER");
@@ -100,10 +100,10 @@ public class RegisterController {
             newUser = new Seller(user, pass, name, "SELLER");
         }
 
-        // 2. Đóng gói vào Message với nhãn "REGISTER"
+        // Đóng gói vào Message với nhãn "REGISTER"
         Message regMsg = new Message("REGISTER", newUser);
 
-        // 3. Gửi đi qua NetworkClient
+        // Gửi yêu cầu đăng ký xuống server để xử lý đi qua NetworkClient
         try {
             NetworkClient.getInstance().send(regMsg);
         } catch (IOException e) {
@@ -111,29 +111,26 @@ public class RegisterController {
         }
     }
 
-    // 5. XỬ LÝ PHẢN HỒI TỪ SERVER VÀ CHUYỂN MÀN HÌNH
+    /// XỬ LÝ PHẢN HỒI TỪ SERVER VÀ CHUYỂN MÀN HÌNH.
     private void handleServerResponse(Message msg) {
         // Kiểm tra nhãn của kiện hàng trả về
         switch (msg.getAction()) {
-            case "REGISTER_SUCCESS":
-                // 1. Thông báo cho người dùng
+            case "REGISTER_SUCCESS":       //Khi Message gửi lên từ server có action là "REGISTER_SUCCESS"...
+                // Thông báo cho người dùng
                 System.out.println("Đăng ký thành công!");
 
-                // 2. Logic chuyển màn hình: Quay lại Đăng nhập
-                // Vì việc chuyển màn hình tác động đến UI, ta phải dùng Platform.runLater
-                Platform.runLater(() -> {
+                Platform.runLater(() -> {       //Tạo luồng để xử lý các tác vụ liên quan đến giao dện JavaFX
                     try {
-                        // Tải file fxml của màn hình đăng nhập
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/sample.fxml"));
+                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/sample.fxml"));  //Dùng để tải file .fxml
                         Parent root = loader.load();
 
-                        // Lấy Stage (cửa sổ) hiện tại từ bất kỳ component nào (ví dụ: userName)
-                        Stage currentStage = (Stage) userName.getScene().getWindow();
+                        //Thay đổi giao diện giao diện
+                        userName.getScene().setRoot(root);
 
-                        // Thay thế cảnh (Scene) hiện tại bằng cảnh Đăng nhập
-                        currentStage.setScene(new Scene(root, 1400, 800));
-                        currentStage.setTitle("Đăng nhập hệ thống");
-                        currentStage.centerOnScreen();
+                        // Hiển thị tiêu đề của cửa sổ window
+                        Stage currentStage = (Stage) userName.getScene().getWindow();
+                        currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
+
 
                     } catch (IOException e) {
                         System.err.println("Không thể chuyển màn hình: " + e.getMessage());
@@ -141,7 +138,7 @@ public class RegisterController {
                 });
                 break;
 
-            case "REGISTER_FAIL":
+            case "REGISTER_FAIL":             // Khi Message gửi lên từ server có thông tin action là "REGISTER_FAIL"
                 // Nếu thất bại (ví dụ trùng tên user), hiển thị lỗi lên màn hình
                 Platform.runLater(() -> {
                     lblMessage.setText(msg.getPayload().toString());
@@ -151,8 +148,7 @@ public class RegisterController {
         }
     }
 
-    // 6. CHUYỂN VỀ MÀN HÌNH ĐĂNG NHẬP
-    // 6. CHUYỂN VỀ MÀN HÌNH ĐĂNG NHẬP
+    /// CHUYỂN VỀ MÀN HÌNH ĐĂNG NHẬP (khi đã đăng ký thành công)
     @FXML
     public void onBackToLoginClick() {
         try {
@@ -162,9 +158,8 @@ public class RegisterController {
             // SỬ DỤNG SET_ROOT ĐỂ KHÔNG BỊ GIẬT MÀN HÌNH
             userName.getScene().setRoot(root);
 
-            // Sửa lại tiêu đề cho đúng
             Stage currentStage = (Stage) userName.getScene().getWindow();
-            currentStage.setTitle("Đăng nhập hệ thống");
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (IOException e) {
             e.printStackTrace();

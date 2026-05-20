@@ -4,15 +4,14 @@ import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
 import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
-import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 
-/// class AuctionController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình PHIÊN ĐẤU GIÁ.
+/// class AuctionHistoryController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình LỊCH SỬ ĐẤU GIÁ.
 
-public class AuctionController implements NetworkClient.MessageListener {
+public class AuctionHistoryController implements NetworkClient.MessageListener {
 
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
@@ -34,19 +33,6 @@ public class AuctionController implements NetworkClient.MessageListener {
             e.printStackTrace();
         }
     }
-
-    /// Các hàm trống này để chống lỗi khi bạn bấm vào các nút Filter trên giao diện
-    @FXML
-    public void filterAll(ActionEvent event) { }
-
-    @FXML
-    public void filterRunning(ActionEvent event) { }
-
-    @FXML
-    public void filterUpcoming(ActionEvent event) { }
-
-    @FXML
-    public void filterFinished(ActionEvent event) { }
 
     /// Method này thực hiện khi thao tác click vào Trang chủ
     @FXML
@@ -92,6 +78,28 @@ public class AuctionController implements NetworkClient.MessageListener {
         }
     }
 
+    /// Method này thực hiện khi thao tác click vào Phiên đấu giá
+    @FXML
+    public void onAuctionSessionClick(javafx.event.ActionEvent event) {
+        try {
+            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/phiendaugia.fxml")); //Tải file phiendaugia.fxml
+            Parent root = loader.load();
+
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
+            javafx.scene.Scene currentScene = source.getScene();
+            currentScene.setRoot(root);
+
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
+
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi: Không tìm thấy file phiendaugia.fxml! Hãy kiểm tra lại đường dẫn.");
+        }
+    }
+
     @FXML
     public void onProductManagementClick(javafx.event.ActionEvent event) {
         //  Lấy thông tin người dùng hiện tại từ Session
@@ -120,28 +128,6 @@ public class AuctionController implements NetworkClient.MessageListener {
             alert.setHeaderText(null);
             alert.setContentText("Xin lỗi, tính năng TÀI SẢN ĐẤU GIÁ chỉ dành riêng cho Người Bán (Seller)!");
             alert.showAndWait();
-        }
-    }
-
-    /// Method này thực hiện khi người dùng click vào nút LỊCH SỬ ĐẤU GIÁ.
-    @FXML
-    public void onHistoryClick(javafx.event.ActionEvent event) {
-        try {
-            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/history.fxml")); //Tải file phiendaugia.fxml
-            Parent root = loader.load();
-
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
-            javafx.scene.Scene currentScene = source.getScene();
-            currentScene.setRoot(root);
-
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
-            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
-
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-            System.err.println("Lỗi: Không tìm thấy file history.fxml! Hãy kiểm tra lại đường dẫn.");
         }
     }
 
@@ -229,4 +215,3 @@ public class AuctionController implements NetworkClient.MessageListener {
         });
     }
 }
-
