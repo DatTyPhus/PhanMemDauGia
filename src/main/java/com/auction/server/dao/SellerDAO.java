@@ -14,7 +14,7 @@ public class SellerDAO {
         return new SellerDAO();
     }
     
-    public void create(User obj) {
+    public static void create(User obj) {
 
       String sql = "INSERT INTO sellers (username, password, full_name, role) VALUES ('"
                 + obj.getUsername() + "', '"
@@ -38,7 +38,7 @@ public class SellerDAO {
       }
     }
 
-    public Seller getSellersByUserid(int id) {
+    public static Seller getSellersByUserid(int id) {
         String sql = "SELECT user_id, username, balance FROM sellers WHERE user_id = ?";
         
         try (Connection conn = JDBCUtil.getConnection();
@@ -62,7 +62,7 @@ public class SellerDAO {
         return null; // Trả về null nếu không tìm thấy người dùng
       }
     
-    public Seller selectByUsername(String username) {
+    public static Seller selectByUsername(String username) {
     String sql = "SELECT * FROM sellers WHERE username = ?";
     
     try (Connection conn = JDBCUtil.getConnection();

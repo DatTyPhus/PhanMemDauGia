@@ -14,13 +14,14 @@ public class ItemDAO  {
     }
 
     public void create(Item obj) {
-        String sql = "INSERT INTO items (item_id, seller_id, item_name, description, starting_price, image_url) VALUES ('"
+        String sql = "INSERT INTO items (item_id, seller_id, item_name, description, starting_price, image_url , status) VALUES ('"
                 + obj.getId() + "', '"
                 + obj.getSellerId() + "', '"
                 + obj.getName() + "', '"
                 + obj.getDescription() + "', "
                 + obj.getStartingPrice() + ", "
-                + obj.getImageUrl() +  "')";
+                + obj.getImageUrl() + ", '"
+                + obj.getStatus() + "')";
         Connection connection = null;
         try{
             connection = JDBCUtil.getConnection();

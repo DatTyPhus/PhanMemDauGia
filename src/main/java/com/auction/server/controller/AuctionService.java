@@ -7,21 +7,20 @@ package com.auction.server.controller;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import com.auction.server.dao.*;
 import com.auction.shared.model.*;
-import com.auction.shared.network.Message;;
+import com.auction.shared.network.Message;
 
 public class AuctionService {
   private static int auctionIdCounter = 0; 
   protected static Auction currentAuction; // Biến để lưu trữ đấu giá hiện tại đang diễn ra
-  private final BidderDAO bidderDAO = new BidderDAO();
-  private final AuctionDAO auctionDAO = new AuctionDAO();
-  private final AuctionSchedular auctionSchedular = new AuctionSchedular();
   protected static Map<Integer, Auction> waitingAuctions; // Giả sử có một map để quản lý các đấu giá đang chờ xử lý
 
   //đao tạo đấu giá mới
-  public Auction createAuction(Item item) {
+  public static Auction createAuction(Item item) {
     Auction auction = new Auction();
     auction.setId(++auctionIdCounter); // Tăng counter và gán làm ID cho đấu giá mới
     auction.setItemId(item.getId());
@@ -29,15 +28,15 @@ public class AuctionService {
     auction.setCurrentPrice(item.getStartingPrice());
     auction.setCurrentPrice(item.getStartingPrice());
     auction.setDurationMinutes(item.getDurationMinutes());
-    if (auctionSchedular.getTimeline() == null || java.time.LocalDateTime.now().isAfter(auctionSchedular.getTimeline())) {
-        auctionSchedular.setTimeline(java.time.LocalDateTime.now().plusMinutes(item.getDurationMinutes()));
+    if (AuctionSchedular.getTimeline() == null || java.time.LocalDateTime.now().isAfter(AuctionSchedular.getTimeline())) {
+        AuctionSchedular.setTimeline(java.time.LocalDateTime.now().plusMinutes(item.getDurationMinutes()));
         auction.setStartTime(auction.changeTimetoString(java.time.LocalDateTime.now()));
         auction.setEndTime(auction.changeTimetoString(java.time.LocalDateTime.now().plusMinutes(item.getDurationMinutes())));
     }
     else {
-        auction.setStartTime(auction.changeTimetoString(auctionSchedular.getTimeline()));
-        auction.setEndTime(auction.changeTimetoString(auctionSchedular.getTimeline().plusMinutes(item.getDurationMinutes())));
-        auctionSchedular.setTimeline(auctionSchedular.getTimeline().plusMinutes(item.getDurationMinutes()));
+        auction.setStartTime(auction.changeTimetoString(AuctionSchedular.getTimeline()));
+        auction.setEndTime(auction.changeTimetoString(AuctionSchedular.getTimeline().plusMinutes(item.getDurationMinutes())));
+        AuctionSchedular.setTimeline(AuctionSchedular.getTimeline().plusMinutes(item.getDurationMinutes()));
     }
     auction.setStatus("PENDING");
     return auction;
@@ -58,8 +57,9 @@ public class AuctionService {
 //   }
 
     //đặ bit giá cho một đấu giá cụ thể
-  public Message processBid(String bidder_name, BigDecimal bidAmount ) {
-        Auction auction =  auctionDAO.selectByItemName(currentAuction.getItemName());
+  public static Message processBid(String bidder_name, BigDecimal bidAmount ) {
+        Auction auction =  AuctionDAO.selectByItemName(currentAuction.getItemName());
+        LocalDateTime now = LocalDateTime.now();
         if (auction == null) {
             return new Message("BID_FAIL", "Đấu giá không tồn tại.");
         }
@@ -68,11 +68,11 @@ public class AuctionService {
           if (bidAmount.compareTo(auction.getCurrentPrice()) <= 0) {
                 return new Message("BID_FAIL", "Giá đặt phải cao hơn giá hiện tại (" + auction.getCurrentPrice() + ").");
           }
-          Bidder bidder = bidderDAO.selectByUsername(bidder_name);
+          Bidder bidder = BidderDAO.selectByUsername(bidder_name);
           if (bidder.getBalance().compareTo(bidAmount) < 0) {
             return new Message("BID_FAIL", "Số dư không đủ.");
           }
-          Bidder previousHighestBidder = bidderDAO.selectByUsername(auction.getHighestBidderName());
+          Bidder previousHighestBidder = BidderDAO.selectByUsername(auction.getHighestBidderName());
           auction.setCurrentPrice(bidAmount);
           auction.setHighestBidderName(bidder_name);
           return new Message("BID_SUCCESS", previousHighestBidder);
@@ -82,10 +82,10 @@ public class AuctionService {
     }
 
 
-    public void setCurrentAuction(Auction auction) {
+    public static void setCurrentAuction(Auction auction) {
         currentAuction = auction;
     }
-    public Auction getCurrentAuction() {
+    public static Auction getCurrentAuction() {
         return currentAuction;
     }
 }

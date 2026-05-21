@@ -10,14 +10,11 @@ import com.auction.shared.model.*;
 import com.auction.shared.network.Message;;
 
 public class AccountService {
-  private final BidderDAO bidderDAO = new BidderDAO();
-  private final SellerDAO sellerDAO = new SellerDAO();
-  private final AdminDAO adminDAO = new AdminDAO();
   
   public Message login (String username, String password) {
-    Bidder bidder = bidderDAO.selectByUsername(username);
-    Seller seller = sellerDAO.selectByUsername(username);
-    Admin admin = adminDAO.selectByUsername(username);
+    Bidder bidder = BidderDAO.selectByUsername(username);
+    Seller seller = SellerDAO.selectByUsername(username);
+    Admin admin = AdminDAO.selectByUsername(username);
     if (bidder == null && seller == null && admin == null) {
       return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
     }
@@ -48,20 +45,20 @@ public class AccountService {
     // Xóa khoảng trắng thừa và không phân biệt hoa thường
     if (role.trim().equalsIgnoreCase("BIDDER")) {
       System.out.println("-> Đang nhảy vào luồng BIDDER...");
-      if (bidderDAO.selectByUsername(username) != null) {
+      if (BidderDAO.selectByUsername(username) != null) {
         return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
       }
       Bidder newUser = new Bidder(username, password, fullName, "BIDDER");
-      bidderDAO.create(newUser);
+      BidderDAO.create(newUser);
       return new Message("REGISTER_SUCCESS", newUser);
 
     } else if (role.trim().equalsIgnoreCase("SELLER")) {
       System.out.println("-> Đang nhảy vào luồng SELLER...");
-      if (sellerDAO.selectByUsername(username) != null) {
+      if (SellerDAO.selectByUsername(username) != null) {
         return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
       }
       Seller newUser = new Seller(username, password, fullName, "SELLER");
-      sellerDAO.create(newUser);
+      SellerDAO.create(newUser);
       return new Message("REGISTER_SUCCESS", newUser);
 
     } else {
