@@ -14,23 +14,24 @@ public class ItemDAO  {
     }
 
     public void create(Item obj) {
-        // BƯỚC 4: Sử dụng PreparedStatement (?) để chống lỗi nháy đơn và SQL Injection.
-        // Tuyệt đối không chèn item_id vì nó tự động tăng (AUTO_INCREMENT).
-        // Sửa lại cho đúng tên cột trong DB: start_price, item_type, duration_minutes.
-        String sql = "INSERT INTO items (seller_id, item_name, description, item_type, start_price, image_url, duration_minutes, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        // ĐÃ SỬA: Bổ sung special_info vào cuối danh sách cột và thêm 1 dấu ? vào cuối VALUES (tổng 9 dấu ?)
+        String sql = "INSERT INTO items (seller_id, item_name, description, item_type, start_price, image_url, duration_minutes, status, special_info) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection connection = JDBCUtil.getConnection();
              PreparedStatement ps = connection.prepareStatement(sql)) {
 
-            // Bơm dữ liệu từ Object vào các dấu hỏi chấm (?) theo đúng thứ tự
+            // Bơm dữ liệu từ Object vào các dấu hỏi chấm (?)
             ps.setInt(1, obj.getSellerId());
             ps.setString(2, obj.getName());
             ps.setString(3, obj.getDescription());
-            ps.setString(4, obj.getItemType());          // Lưu loại (ART, ELECTRONIC, VEHICLE)
-            ps.setBigDecimal(5, obj.getStartingPrice()); // Lưu giá
-            ps.setString(6, obj.getImageUrl() != null ? obj.getImageUrl() : ""); // Tránh lỗi null ảnh
-            ps.setInt(7, obj.getDurationMinutes());      // Lưu thời gian
-            ps.setString(8, obj.getStatus());            // Trạng thái PENDING
+            ps.setString(4, obj.getItemType());
+            ps.setBigDecimal(5, obj.getStartingPrice());
+            ps.setString(6, obj.getImageUrl() != null ? obj.getImageUrl() : "");
+            ps.setInt(7, obj.getDurationMinutes());
+            ps.setString(8, obj.getStatus());
+
+            // ĐÃ SỬA: Bơm dữ liệu Thông tin đặc biệt vào dấu ? thứ 9
+            ps.setString(9, obj.getSpecialInfo() != null ? obj.getSpecialInfo() : "");
 
             // Thực thi lệnh chèn xuống CSDL
             int kq = ps.executeUpdate();

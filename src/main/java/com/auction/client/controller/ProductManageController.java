@@ -2,6 +2,7 @@ package com.auction.client.controller;
 
 import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
+import com.auction.shared.model.Item;
 import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
 import javafx.event.ActionEvent;
@@ -9,6 +10,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.cell.PropertyValueFactory;
+
+import java.math.BigDecimal;
 
 /// class HomeController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình ,và xử lý các yêu cầu từ server.
 
@@ -17,6 +22,15 @@ public class ProductManageController implements NetworkClient.MessageListener {
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
+
+    @FXML private TableColumn<Item, String> colName;
+    @FXML private TableColumn<Item, String> colType;        // Mới
+    @FXML private TableColumn<Item, String> colDescription; // Mới
+    @FXML private TableColumn<Item, BigDecimal> colPrice;
+    @FXML private TableColumn<Item, Integer> colDuration;   // Mới
+    @FXML private TableColumn<Item, String> colStatus;
+    @FXML private TableColumn<Item, Void> colAction;
+    @FXML private javafx.scene.control.Pagination pagination;
 
     /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
     @FXML
@@ -29,6 +43,29 @@ public class ProductManageController implements NetworkClient.MessageListener {
             if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
                 lblUserName.setText(currentUser.getFullName());
                 lblUserRole.setText(currentUser.getRole());
+            }
+            colName.setCellValueFactory(new PropertyValueFactory<>("name"));
+            colType.setCellValueFactory(new PropertyValueFactory<>("itemType"));
+            colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
+            colPrice.setCellValueFactory(new PropertyValueFactory<>("startingPrice"));
+            colDuration.setCellValueFactory(new PropertyValueFactory<>("durationMinutes"));
+            colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+            colPrice.setCellValueFactory(new PropertyValueFactory<>("startingPrice"));
+            colDuration.setCellValueFactory(new PropertyValueFactory<>("durationMinutes"));
+            colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+            // =========================================================
+            // CHÈN ĐOẠN CODE NÀY VÀO ĐÂY (TRƯỚC KHI ĐÓNG KHỐI TRY)
+            // ---- "ĐỘ" PAGINATION SANG TẦM LUXURY ----
+            if (pagination != null) {
+                // Reset style về dạng Bullet mặc định
+                pagination.getStyleClass().add(javafx.scene.control.Pagination.STYLE_CLASS_BULLET);
+
+                // Dùng code để ép CSS trực tiếp cho Pagination
+                pagination.setStyle(
+                        "-fx-page-information-visible: false; " +  // Ẩn dòng chữ "1/10" thừa thãi
+                                "-fx-background-color: transparent;"       // Làm trong suốt nền
+                );
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -181,10 +218,16 @@ public class ProductManageController implements NetworkClient.MessageListener {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/add_edit_product.fxml"));  // Tải file màn hình
             Parent root = loader.load();
 
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();         // Thay đổi màn hình
+            // 1. Lấy cái nút vừa được bấm
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+
+            // 2. QUAN TRỌNG: Lấy cái Cửa sổ (Stage) TRƯỚC KHI thay đổi màn hình
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
+
+            // 3. Bây giờ mới được phép thay ruột (giao diện mới)
             source.getScene().setRoot(root);
 
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();   //  Đổi tiêu đề cửa sổ
+            // 4. Đặt lại tiêu đề
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
