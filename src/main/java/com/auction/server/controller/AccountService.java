@@ -7,31 +7,49 @@ package com.auction.server.controller;
 
 import com.auction.server.dao.*;
 import com.auction.shared.model.*;
-import com.auction.shared.network.Message;;
+import com.auction.shared.network.Message;
 
 public class AccountService {
-  
-  public Message login (String username, String password) {
-    Bidder bidder = BidderDAO.selectByUsername(username);
-    Seller seller = SellerDAO.selectByUsername(username);
-    Admin admin = AdminDAO.selectByUsername(username);
-    if (bidder == null && seller == null && admin == null) {
-      return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
-    }
-    if (!bidder.getPassword().equals(password) && !seller.getPassword().equals(password) && !admin.getPassword().equals(password)) {
-      return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
-    }
+
+  // 3 DÒNG NÀY LÀ CỰC KỲ QUAN TRỌNG ĐỂ JAVA NHẬN DIỆN ĐƯỢC DAO (BẠN ĐÃ LỠ XÓA MẤT NÓ)
+  private final BidderDAO bidderDAO = new BidderDAO();
+  private final SellerDAO sellerDAO = new SellerDAO();
+  private final AdminDAO adminDAO = new AdminDAO();
+
+  public Message login(String username, String password) {
+
+    // 1. Kiểm tra bên kho Bidder
+    Bidder bidder = bidderDAO.selectByUsername(username);
     if (bidder != null) {
       if (bidder.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", bidder);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu Bidder.");
       }
     }
+
+    // 2. Kiểm tra bên kho Seller
+    Seller seller = sellerDAO.selectByUsername(username);
     if (seller != null) {
-      return new Message("LOGIN_SUCCESS", seller);
+      if (seller.getPassword().equals(password)) {
+        return new Message("LOGIN_SUCCESS", seller);
+      } else {
+        return new Message("LOGIN_FAIL", "Sai mật khẩu Seller.");
+      }
     }
-    return new Message("LOGIN_SUCCESS", admin);
+
+    // 3. Kiểm tra bên kho Admin
+    Admin admin = adminDAO.selectByUsername(username);
+    if (admin != null) {
+      if (admin.getPassword().equals(password)) {
+        return new Message("LOGIN_SUCCESS", admin);
+      } else {
+        return new Message("LOGIN_FAIL", "Sai mật khẩu Admin.");
+      }
+    }
+
+    // 4. Nếu tìm cả 3 kho đều không thấy
+    return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc tài khoản không tồn tại.");
   }
 
   public Message register(String username, String password, String fullName , String role) {
@@ -45,20 +63,20 @@ public class AccountService {
     // Xóa khoảng trắng thừa và không phân biệt hoa thường
     if (role.trim().equalsIgnoreCase("BIDDER")) {
       System.out.println("-> Đang nhảy vào luồng BIDDER...");
-      if (BidderDAO.selectByUsername(username) != null) {
+      if (bidderDAO.selectByUsername(username) != null) {
         return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
       }
       Bidder newUser = new Bidder(username, password, fullName, "BIDDER");
-      BidderDAO.create(newUser);
+      bidderDAO.create(newUser);
       return new Message("REGISTER_SUCCESS", newUser);
 
     } else if (role.trim().equalsIgnoreCase("SELLER")) {
       System.out.println("-> Đang nhảy vào luồng SELLER...");
-      if (SellerDAO.selectByUsername(username) != null) {
+      if (sellerDAO.selectByUsername(username) != null) {
         return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
       }
       Seller newUser = new Seller(username, password, fullName, "SELLER");
-      SellerDAO.create(newUser);
+      sellerDAO.create(newUser);
       return new Message("REGISTER_SUCCESS", newUser);
 
     } else {

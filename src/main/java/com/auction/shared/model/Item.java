@@ -11,8 +11,8 @@ public abstract class Item extends Entity {
     protected String imageUrl;  
     protected String itemType;  
     protected int durationMinutes;
-    protected String status; // Trạng thái đặc biệt, có thể dùng để lưu thông tin riêng cho từng loại item, ví dụ như "condition" cho đồ điện tử, "artist" cho tranh, v.v.
     protected String special_info;
+    protected String status;
 
 
     public static Item createFromType(String type) {
@@ -45,7 +45,9 @@ public abstract class Item extends Entity {
     public String getImageUrl() {return imageUrl;}
     public String getItemType() {return itemType;}
     public int getDurationMinutes() {return durationMinutes;}
-    public String getStatus() {return special_info;}
+    public String getStatus() { return status; }
+    public String getSpecialInfo() { return special_info; }
+
     
     public void setSellerId(int sellerId) {this.sellerId = sellerId;}
     public void setName(String itemName) {this.itemName = itemName;}
@@ -54,6 +56,7 @@ public abstract class Item extends Entity {
     public void setImageUrl(String imageUrl) {this.imageUrl = imageUrl;}
     public void setItemType(String itemType) {this.itemType = itemType;}
     public void setDurationMinutes(int durationMinutes) {this.durationMinutes = durationMinutes;}
-    public void setStatus(String status) {this.special_info = status;}
+    public void setStatus(String status) { this.status = status; }
+    public void setSpecialInfo(String special_info) { this.special_info = special_info; }
 
 }

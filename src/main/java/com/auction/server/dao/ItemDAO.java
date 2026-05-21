@@ -14,30 +14,38 @@ public class ItemDAO  {
     }
 
     public void create(Item obj) {
-        String sql = "INSERT INTO items (item_id, seller_id, item_name, description, starting_price, image_url , status) VALUES ('"
-                + obj.getId() + "', '"
-                + obj.getSellerId() + "', '"
-                + obj.getName() + "', '"
-                + obj.getDescription() + "', "
-                + obj.getStartingPrice() + ", "
-                + obj.getImageUrl() + ", '"
-                + obj.getStatus() + "')";
-        Connection connection = null;
-        try{
-            connection = JDBCUtil.getConnection();
-            Statement st= connection.createStatement();
+        // BƯỚC 4: Sử dụng PreparedStatement (?) để chống lỗi nháy đơn và SQL Injection.
+        // Tuyệt đối không chèn item_id vì nó tự động tăng (AUTO_INCREMENT).
+        // Sửa lại cho đúng tên cột trong DB: start_price, item_type, duration_minutes.
+        String sql = "INSERT INTO items (seller_id, item_name, description, item_type, start_price, image_url, duration_minutes, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-            int kq = st.executeUpdate(sql);
+        try (Connection connection = JDBCUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            // Bơm dữ liệu từ Object vào các dấu hỏi chấm (?) theo đúng thứ tự
+            ps.setInt(1, obj.getSellerId());
+            ps.setString(2, obj.getName());
+            ps.setString(3, obj.getDescription());
+            ps.setString(4, obj.getItemType());          // Lưu loại (ART, ELECTRONIC, VEHICLE)
+            ps.setBigDecimal(5, obj.getStartingPrice()); // Lưu giá
+            ps.setString(6, obj.getImageUrl() != null ? obj.getImageUrl() : ""); // Tránh lỗi null ảnh
+            ps.setInt(7, obj.getDurationMinutes());      // Lưu thời gian
+            ps.setString(8, obj.getStatus());            // Trạng thái PENDING
+
+            // Thực thi lệnh chèn xuống CSDL
+            int kq = ps.executeUpdate();
+
             if (kq > 0) {
-                System.out.println("Them san pham thanh cong!");
+                System.out.println("[DATABASE] Đã lưu sản phẩm '" + obj.getName() + "' vào kho CHỜ DUYỆT thành công!");
             } else {
-                System.out.println("Them that bai, vui long kiem tra lai du lieu.");
+                System.out.println("[DATABASE] Thêm thất bại, vui lòng kiểm tra lại dữ liệu.");
             }
-            JDBCUtil.closeConnection(connection);
-        } catch(Exception e){
+
+        } catch (Exception e) {
+            System.err.println("[DATABASE ERROR] Lỗi khi lưu sản phẩm: " + e.getMessage());
             e.printStackTrace();
+        }
     }
-  }
 
   
   public void update(Item obj) {

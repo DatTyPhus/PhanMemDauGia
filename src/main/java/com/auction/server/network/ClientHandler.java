@@ -65,17 +65,43 @@ public class ClientHandler implements Runnable {
                             out.println(new Message("REGISTER_FAIL", "Lỗi Server: " + e.getMessage()).toJson());
                         }
                         break;
-                        
+
                     case "ADD_ITEM":
                         try {
-                            Item item = (Item) msg.getPayload();
-                            ItemDAO itemDAO = new ItemDAO();
-                            itemDAO.create(item);
-                            Message addItemResult = new Message("ADD_ITEM_REQUEST", item);
-                            out.println(addItemResult.toJson());
+                            // 1. Nhận chuỗi JSON từ Client của Đạt gửi lên
+                            String jsonStr = msg.getPayload().toString();
+                            System.out.println("\n[SERVER] Nhận được sản phẩm mới: " + jsonStr);
+
+                            // 2. Dùng JsonParser đọc trước JSON để lấy "itemType"
+                            com.google.gson.JsonObject jsonObj = com.google.gson.JsonParser.parseString(jsonStr).getAsJsonObject();
+
+                            // LƯU Ý: Phải get đúng chữ "itemType" vì class Item.java khai báo biến này
+                            String itemType = jsonObj.get("itemType").getAsString();
+
+                            // 3. Dịch ngược JSON thành đối tượng Java (Factory)
+                            com.google.gson.Gson gson = new com.google.gson.Gson();
+                            com.auction.shared.model.Item itemObj = null;
+
+                            // Chú ý: Value giờ là "ART", "ELECTRONIC", "VEHICLE" (Không có S)
+                            if ("ART".equals(itemType)) {
+                                itemObj = gson.fromJson(jsonStr, com.auction.shared.model.Art.class);
+                            } else if ("ELECTRONIC".equals(itemType)) {
+                                itemObj = gson.fromJson(jsonStr, com.auction.shared.model.Electronics.class);
+                            } else if ("VEHICLE".equals(itemType)) {
+                                itemObj = gson.fromJson(jsonStr, com.auction.shared.model.Vehicle.class);
+                            }
+
+                            if (itemObj != null) {
+                                // 4. Đưa xuống tầng DAO để lưu vào CSDL
+                                com.auction.server.dao.ItemDAO.instance().create(itemObj);
+
+                                // 5. Phản hồi thành công về cho Seller
+                                this.sendMessage(new Message("ADD_ITEM_SUCCESS", "Sản phẩm đã được gửi! Đang chờ Admin xét duyệt."));
+                            }
                         } catch (Exception e) {
+                            System.err.println("[SERVER ERROR] Lỗi khi xử lý ADD_ITEM: " + e.getMessage());
                             e.printStackTrace();
-                            out.println(new Message("ADD_ITEM_FAIL", "Lỗi Server: " + e.getMessage()).toJson());
+                            this.sendMessage(new Message("ADD_ITEM_FAIL", "Lỗi Server: " + e.getMessage()));
                         }
                         break;
 
