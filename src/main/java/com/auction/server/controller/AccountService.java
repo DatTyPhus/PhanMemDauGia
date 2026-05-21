@@ -13,28 +13,41 @@ public class AccountService {
   private final BidderDAO bidderDAO = new BidderDAO();
   private final SellerDAO sellerDAO = new SellerDAO();
   private final AdminDAO adminDAO = new AdminDAO();
-  
-  public Message login (String username, String password) {
+
+  public Message login(String username, String password) {
+
+    // 1. Kiểm tra bên kho Bidder
     Bidder bidder = bidderDAO.selectByUsername(username);
-    Seller seller = sellerDAO.selectByUsername(username);
-    Admin admin = adminDAO.selectByUsername(username);
-    if (bidder == null && seller == null && admin == null) {
-      return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
-    }
-    if (!bidder.getPassword().equals(password) && !seller.getPassword().equals(password) && !admin.getPassword().equals(password)) {
-      return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
-    }
     if (bidder != null) {
       if (bidder.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", bidder);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu.");
       }
     }
+
+    // 2. Kiểm tra bên kho Seller
+    Seller seller = sellerDAO.selectByUsername(username);
     if (seller != null) {
-      return new Message("LOGIN_SUCCESS", seller);
+      if (seller.getPassword().equals(password)) {
+        return new Message("LOGIN_SUCCESS", seller);
+      } else {
+        return new Message("LOGIN_FAIL", "Sai mật khẩu.");
+      }
     }
-    return new Message("LOGIN_SUCCESS", admin);
+
+    // 3. Kiểm tra bên kho Admin
+    Admin admin = adminDAO.selectByUsername(username);
+    if (admin != null) {
+      if (admin.getPassword().equals(password)) {
+        return new Message("LOGIN_SUCCESS", admin);
+      } else {
+        return new Message("LOGIN_FAIL", "Sai mật khẩu.");
+      }
+    }
+
+    // 4. Nếu tìm cả 3 kho đều không thấy ai có username đó
+    return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
   }
 
   public Message register(String username, String password, String fullName , String role) {

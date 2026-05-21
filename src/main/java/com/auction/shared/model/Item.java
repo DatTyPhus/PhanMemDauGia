@@ -30,7 +30,6 @@ public abstract class Item extends Entity {
         this.category = category;
         this.startPrice = startPrice;
         this.imageUrl = imageUrl;
-        this.createdAt = LocalDateTime.now();
     }
 
     public Item() {

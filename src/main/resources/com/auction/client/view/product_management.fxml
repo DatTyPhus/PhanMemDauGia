@@ -92,7 +92,7 @@
 
             <!-- HEADER -->
             <HBox>
-                <Label style="-fx-font-size:20; -fx-font-weight:bold;" text="Quản lý sản tài sản" />
+                <Label style="-fx-font-size:20; -fx-font-weight:bold;" text="Quản lý tài sản" />
 
                 <Region HBox.hgrow="ALWAYS" />
 

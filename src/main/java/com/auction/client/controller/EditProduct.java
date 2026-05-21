@@ -13,27 +13,136 @@ import javafx.scene.control.Label;
 
 public class EditProduct implements NetworkClient.MessageListener {
 
-    // Các biến dùng để link các nút từ màn hình.
-    @FXML private Label lblUserName;
-    @FXML private Label lblUserRole;
+
+    @FXML private javafx.scene.control.TextField txtProductName;
+    @FXML private javafx.scene.control.ComboBox<String> cbCategory;
+    @FXML private javafx.scene.control.TextArea txtDescription;
+    @FXML private javafx.scene.control.TextField txtStartPrice;
+    @FXML private javafx.scene.control.ComboBox<String> cbDuration;
 
     /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
     @FXML
     public void initialize() {
         try{
             NetworkClient.getInstance().addListener(this);
-            User currentUser = UserSession.getInstance().getLoginUser();  /// Lấy thông tin người dùng hiện tại đang thao tác lưu vào kho để khi chuyển màn không bị mất thông tin.
 
-            // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
-            if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
-                lblUserName.setText(currentUser.getFullName());
-                lblUserRole.setText(currentUser.getRole());
+            // 1. Nạp dữ liệu cho ComboBox Danh mục đúng 3 dòng bạn cần
+            if (cbCategory != null) {
+                cbCategory.getItems().addAll("ART", "ELECTRONIC", "VEHICLE");
+                cbCategory.setValue("ART"); // Lựa chọn mặc định ban đầu
+            }
+
+            // 2. Nạp dữ liệu cho ComboBox Thời lượng đúng các mốc bạn cần
+            if (cbDuration != null) {
+                cbDuration.getItems().addAll("5p", "15p", "30p", "1h", "2h");
+                cbDuration.setValue("5p"); // Lựa chọn mặc định ban đầu
             }
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
+    @FXML
+    public void onSaveClick() {
+        try {
+            // 1. Kiểm tra trạng thái đăng nhập của người dùng
+            User currentUser = UserSession.getInstance().getLoginUser();
+            if (currentUser == null) {
+                showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi xác thực", "Không tìm thấy thông tin người bán. Vui lòng đăng nhập lại!");
+                return;
+            }
+
+            // 2. Thu thập dữ liệu từ các ô nhập liệu dạng văn bản trên giao diện
+            String name = (txtProductName != null) ? txtProductName.getText().trim() : "";
+            String selectedCategory = (cbCategory != null) ? cbCategory.getValue() : null;
+            String description = (txtDescription != null) ? txtDescription.getText().trim() : "";
+            String startPriceStr = (txtStartPrice != null) ? txtStartPrice.getText().trim() : "";
+            String duration = (cbDuration != null) ? cbDuration.getValue() : null;
+
+            // 3. Kiểm tra dữ liệu trống (Validation cơ bản)
+            if (name.isEmpty() || selectedCategory == null || startPriceStr.isEmpty() || duration == null) {
+                showAlert(javafx.scene.control.Alert.AlertType.WARNING, "Cảnh báo dữ liệu", "Vui lòng nhập đầy đủ các trường thông tin bắt buộc!");
+                return;
+            }
+
+            // 4. Kiểm tra tính hợp lệ và định dạng của giá tiền ban đầu
+            java.math.BigDecimal startPrice;
+            try {
+                startPrice = new java.math.BigDecimal(startPriceStr);
+                if (startPrice.compareTo(java.math.BigDecimal.ZERO) <= 0) {
+                    showAlert(javafx.scene.control.Alert.AlertType.WARNING, "Dữ liệu không hợp lệ", "Giá khởi điểm của tài sản phải lớn hơn 0!");
+                    return;
+                }
+            } catch (NumberFormatException e) {
+                showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Sai định dạng", "Giá khởi điểm phải là một dãy số hợp lệ!");
+                return;
+            }
+
+            // 5. Chuẩn hóa chuỗi danh mục để truyền vào mẫu thiết kế Factory Pattern
+            // Chuyển đổi từ "ART", "ELECTRONIC", "VEHICLE" thành "ARTS", "ELECTRONICS", "VEHICLES"
+            String factoryType = selectedCategory.toUpperCase() + "S";
+
+            // 6. Tạo thực thể đối tượng con tương ứng (Art, Electronics, Vehicle) từ lớp cha trừu tượng Item
+            com.auction.shared.model.Item newItem = com.auction.shared.model.Item.createFromType(factoryType);
+
+            // 7. Gán toàn bộ các thông số từ giao diện vào đối tượng Item vừa tạo
+            newItem.setSellerId(currentUser.getId());
+            newItem.setName(name);
+            newItem.setCategory(factoryType);
+            newItem.setDescription(description);
+            newItem.setStartingPrice(startPrice);
+            newItem.setImageUrl(""); // Đường dẫn hình ảnh tạm thời để trống
+            newItem.setCreatedAt(java.time.LocalDateTime.now()); // Lưu mốc thời gian đăng tải tài sản
+
+            // 8. Chuyển đổi cấu trúc đối tượng Item sang định dạng chuỗi JSON phẳng
+            com.google.gson.Gson gson = new com.google.gson.Gson();
+            String jsonPayload = gson.toJson(newItem);
+
+            // 9. Đóng gói dữ liệu chuỗi JSON vào lớp mạng Message và đẩy qua Socket lên Server
+            Message msg = new Message("ADD_ITEM", jsonPayload);
+            NetworkClient.getInstance().send(msg);
+
+            // 10. Log kiểm tra hệ thống và hiển thị hộp thoại thông báo thành công cho người dùng
+            System.out.println("\n[CLIENT] Đã phát lệnh gửi sản phẩm thành công!");
+            System.out.println("Nội dung Payload JSON gửi đi:\n" + jsonPayload);
+            System.out.println("Thời lượng đấu giá đi kèm được chọn: " + duration);
+
+            showAlert(javafx.scene.control.Alert.AlertType.INFORMATION, "Thành công", "Đã gửi yêu cầu thêm tài sản đấu giá mới lên hệ thống xử lý!");
+
+            // 11. Dọn dẹp làm sạch form nhập liệu để sẵn sàng cho lần nhập tiếp theo
+            clearForm();
+
+        } catch (Exception e) {
+            System.err.println("[CLIENT ERROR] Thất bại khi thực hiện lưu sản phẩm: " + e.getMessage());
+            e.printStackTrace();
+            showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi hệ thống", "Đã xảy ra lỗi ngoài ý muốn: " + e.getMessage());
+        }
+    }
+
+
+    // ================= CÁC HÀM HỖ TRỢ PHỤ TRỢ (TRÁNH LẶP CODE) =================
+
+    /**
+     * Hàm phụ trợ hiển thị nhanh một hộp thoại thông báo Pop-up trên giao diện JavaFX
+     */
+    private void showAlert(javafx.scene.control.Alert.AlertType type, String title, String content) {
+        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(type);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
+
+    /**
+     * Hàm dọn sạch nội dung các trường nhập liệu sau khi gửi dữ liệu thành công
+     */
+    private void clearForm() {
+        if (txtProductName != null) txtProductName.clear();
+        if (txtDescription != null) txtDescription.clear();
+        if (txtStartPrice != null) txtStartPrice.clear();
+        if (cbCategory != null) cbCategory.setValue("ART");
+        if (cbDuration != null) cbDuration.setValue("5p");
+    }
 
 
     /// Method này thực hiện khi thao tác click vào nút chuyển sang màn notification.fxml.

@@ -9,8 +9,8 @@ import java.sql.SQLException;
 
 public class AdminDAO {
   public Admin selectByUsername(String username) {
-    String sql = "SELECT * FROM admins WHERE username = ?";
-    
+      String sql = "SELECT * FROM admin WHERE username = ?";
+
     try (Connection conn = JDBCUtil.getConnection();
          PreparedStatement stmt = conn.prepareStatement(sql)) {
         
@@ -19,10 +19,12 @@ public class AdminDAO {
 
         if (rs.next()) {
             Admin user = new Admin();
-            user.setId(rs.getInt("user_id")); // Lưu ý: Tên cột nên khớp với DB (thường là user_id hoặc id)
+            user.setId(rs.getInt("admin_id")); // Lưu ý: Tên cột nên khớp với DB (thường là user_id hoặc id)
             user.setUsername(rs.getString("username"));
             user.setPassword(rs.getString("password"));
-            
+
+            user.setRole("Admin");
+
             return user;
         }
     } catch (SQLException e) {
