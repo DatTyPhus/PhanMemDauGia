@@ -7,7 +7,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
-import java.math.BigDecimal;
 import java.net.Socket;
 import com.auction.shared.model.*;
 
@@ -17,8 +16,6 @@ public class ClientHandler implements Runnable {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out; // BỔ SUNG: Ống gửi dữ liệu xuống Client
-    private AuctionService auctionService = new AuctionService();
-    private AuctionSchedular auctionSchedular = new AuctionSchedular();
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -111,8 +108,8 @@ public class ClientHandler implements Runnable {
                     case "ADD_ITEM_SUCCESS":// đây sẽ là chỗ tạo ra các auction mới, sau đó gọi hàm timer để bắt đầu đếm ngược thời gian đấu giá
                         Item item = (Item) msg.getPayload();
 
-                        Auction auction = auctionService.createAuction(item);
-                        auctionSchedular.timer(auction);
+                        Auction auction = AuctionService.createAuction(item);
+                        AuctionSchedular.timer(auction);
                         Message addItemSuccessResponse = new Message("ADD_ITEM_THANHCONG", auction);
                         out.println(addItemSuccessResponse.toJson());
                         break; 

@@ -7,7 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,7 +15,7 @@ public class AuctionDAO {
         return new AuctionDAO();
     }
 
-    public void create(Auction obj) {
+    public static void create(Auction obj) {
       String sql = "INSERT INTO auctions ( auction_id, item_id, current_price, durationMinutes) VALUES ('"
                 + obj.getId() + "', "
                 + obj.getItemId() + "', "
@@ -39,7 +38,7 @@ public class AuctionDAO {
       }
     }
     
-    public Auction selectById(Integer id) {
+    public static Auction selectById(Integer id) {
         String sql = "SELECT * FROM auctions WHERE auction_id = ?";
         
         try (Connection conn = JDBCUtil.getConnection();
@@ -65,7 +64,7 @@ public class AuctionDAO {
         return null; // Trả về null nếu không tìm thấy người dùng
     }
 
-    public Auction selectStartTime (String endTime){
+    public static Auction selectStartTime (String endTime){
         String sql = "SELECT * FROM auctions WHERE end_time = ?";
         
         try (Connection conn = JDBCUtil.getConnection();
@@ -91,7 +90,7 @@ public class AuctionDAO {
         return null; // Trả về null nếu không tìm thấy người dùng
     }
 
-    public Auction selectByItemName(String item_name) {
+    public static Auction selectByItemName(String item_name) {
     String sql = "SELECT * FROM auctions WHERE item_name = ?";
     
     try (Connection conn = JDBCUtil.getConnection();
@@ -117,7 +116,7 @@ public class AuctionDAO {
 }
 
 
-    public Auction updateDateTime(Auction auction, String startTime, String endTime) {
+    public static Auction updateDateTime(Auction auction, String startTime, String endTime) {
         String sql = "UPDATE auctions SET start_time = ?, end_time = ? WHERE auction_id = ?";
         Connection connection = null;
         try {
@@ -144,7 +143,7 @@ public class AuctionDAO {
     }
 
     // có thể phải sửa lại để update được giá và người thắng
-    public void update(Auction obj) {
+    public static void update(Auction obj) {
     // Câu lệnh SQL update toàn bộ các cột, định danh bằng dấu hỏi chấm (?)
     String sql = "UPDATE auctions SET item_id = ?, item_name = ?, current_price = ?, "
                + "highest_bidder_id = ?, start_time = ?, end_time = ?, "
@@ -182,7 +181,7 @@ public class AuctionDAO {
     }
 }
 
-    public List<Auction> findFromAuction(int auctionId) {
+    public static List<Auction> findFromAuction(int auctionId) {
     List<Auction> result = new ArrayList<>();
     String sql = """
         SELECT * FROM auction 
@@ -204,7 +203,7 @@ public class AuctionDAO {
     }
     return result;
 }
-    private Auction mapResultSet(ResultSet rs) throws SQLException {
+    private static Auction mapResultSet(ResultSet rs) throws SQLException {
         Auction auction = new Auction();
         auction.setId       (rs.getInt   ("id"));
         auction.setItemId   (rs.getInt   ("item_id"));
@@ -219,7 +218,7 @@ public class AuctionDAO {
         return auction;
     }
 
-    public void delete(Integer id) {
+    public static void delete(Integer id) {
         String sql = "DELETE FROM auctions WHERE auction_id = " + id;
         Connection connection = null;
         try {

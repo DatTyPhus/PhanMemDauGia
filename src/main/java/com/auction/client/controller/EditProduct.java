@@ -343,8 +343,18 @@ public class EditProduct implements NetworkClient.MessageListener {
                         // sau đó gọi lệnh set text để cập nhật lại label giá tiền trên cái Card đó)
                     }
                     break;
+                case "ADD_ITEM_SUCCESS":
+                    // Hiện Popup báo thành công và xóa trắng Form
+                    showAlert(javafx.scene.control.Alert.AlertType.INFORMATION, "Thành công", msg.getPayload().toString());
+                    clearForm();
+                    break;
 
-                // (Các thông báo như LOGIN_SUCCESS... nó sẽ rơi vào default và bị bỏ qua, không làm loạn màn hình này)
+                case "ADD_ITEM_FAIL":
+                    // Hiện Popup báo lỗi nếu Server trục trặc
+                    showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi", msg.getPayload().toString());
+                    break;
+
+                // Các tín hiệu khác tạm thời bỏ qua
                 default:
                     break;
             }

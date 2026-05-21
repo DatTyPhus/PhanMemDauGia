@@ -7,9 +7,11 @@ package com.auction.server.controller;
 
 import com.auction.server.dao.*;
 import com.auction.shared.model.*;
-import com.auction.shared.network.Message;;
+import com.auction.shared.network.Message;
 
 public class AccountService {
+
+  // 3 DÒNG NÀY LÀ CỰC KỲ QUAN TRỌNG ĐỂ JAVA NHẬN DIỆN ĐƯỢC DAO (BẠN ĐÃ LỠ XÓA MẤT NÓ)
   private final BidderDAO bidderDAO = new BidderDAO();
   private final SellerDAO sellerDAO = new SellerDAO();
   private final AdminDAO adminDAO = new AdminDAO();
@@ -22,7 +24,7 @@ public class AccountService {
       if (bidder.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", bidder);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu.");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu Bidder.");
       }
     }
 
@@ -32,7 +34,7 @@ public class AccountService {
       if (seller.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", seller);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu.");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu Seller.");
       }
     }
 
@@ -42,12 +44,12 @@ public class AccountService {
       if (admin.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", admin);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu.");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu Admin.");
       }
     }
 
-    // 4. Nếu tìm cả 3 kho đều không thấy ai có username đó
-    return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc mật khẩu.");
+    // 4. Nếu tìm cả 3 kho đều không thấy
+    return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc tài khoản không tồn tại.");
   }
 
   public Message register(String username, String password, String fullName , String role) {

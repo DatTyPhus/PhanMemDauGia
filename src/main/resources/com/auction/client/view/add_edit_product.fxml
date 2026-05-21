@@ -114,7 +114,7 @@
                 <HBox spacing="10">
                     <Button maxWidth="Infinity" style="-fx-background-color:#ef4444; -fx-text-fill:white;" text="HỦY" />
 
-                    <Button maxWidth="Infinity" style="-fx-background-color:#22c55e; -fx-text-fill:white;" text="LƯU" />
+                    <Button maxWidth="Infinity" style="-fx-background-color:#22c55e; -fx-text-fill:white;" onAction="#onSaveClick" text="LƯU" />
                 </HBox>
 
             </VBox>
