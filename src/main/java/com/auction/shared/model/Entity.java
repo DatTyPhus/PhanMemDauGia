@@ -10,13 +10,13 @@ public abstract class Entity {
         return id;
     }
     public String changeTimetoString( LocalDateTime time) {
-        DateTimeFormatter khuon = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter khuon = DateTimeFormatter.ofPattern("HH:mm:ss");
         String newTime = time.format(khuon);
         return newTime;
     }
 
     public LocalDateTime changeStringToTime(String time) {
-        DateTimeFormatter khuon = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter khuon = DateTimeFormatter.ofPattern("H:mm:ss");
         LocalDateTime newTime = LocalDateTime.parse(time, khuon);
         return newTime;
     }

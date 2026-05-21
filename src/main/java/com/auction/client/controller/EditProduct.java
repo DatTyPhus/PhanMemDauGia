@@ -45,85 +45,89 @@ public class EditProduct implements NetworkClient.MessageListener {
     @FXML
     public void onSaveClick() {
         try {
-            // 1. Kiểm tra trạng thái đăng nhập của người dùng
+            // 1. Kiểm tra thông tin người bán đang đăng nhập
             User currentUser = UserSession.getInstance().getLoginUser();
             if (currentUser == null) {
-                showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi xác thực", "Không tìm thấy thông tin người bán. Vui lòng đăng nhập lại!");
+                showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi", "Không tìm thấy thông tin phiên đăng nhập. Vui lòng thử lại!");
                 return;
             }
 
-            // 2. Thu thập dữ liệu từ các ô nhập liệu dạng văn bản trên giao diện
+            // 2. Thu thập dữ liệu từ các ô nhập liệu trên giao diện
             String name = (txtProductName != null) ? txtProductName.getText().trim() : "";
-            String selectedCategory = (cbCategory != null) ? cbCategory.getValue() : null;
+            String selectedCategory = (cbCategory != null) ? cbCategory.getValue() : null; // Lấy "ART", "ELECTRONIC", hoặc "VEHICLE"
             String description = (txtDescription != null) ? txtDescription.getText().trim() : "";
             String startPriceStr = (txtStartPrice != null) ? txtStartPrice.getText().trim() : "";
-            String duration = (cbDuration != null) ? cbDuration.getValue() : null;
+            String duration = (cbDuration != null) ? cbDuration.getValue() : null; // Lấy "5p", "15p", "30p", "1h", "2h"
 
-            // 3. Kiểm tra dữ liệu trống (Validation cơ bản)
+            // 3. Kiểm tra dữ liệu trống (Validation)
             if (name.isEmpty() || selectedCategory == null || startPriceStr.isEmpty() || duration == null) {
-                showAlert(javafx.scene.control.Alert.AlertType.WARNING, "Cảnh báo dữ liệu", "Vui lòng nhập đầy đủ các trường thông tin bắt buộc!");
+                showAlert(javafx.scene.control.Alert.AlertType.WARNING, "Thiếu thông tin", "Vui lòng nhập đầy đủ tất cả các trường dữ liệu!");
                 return;
             }
 
-            // 4. Kiểm tra tính hợp lệ và định dạng của giá tiền ban đầu
+            // 4. Kiểm tra định dạng số tiền khởi điểm
             java.math.BigDecimal startPrice;
             try {
                 startPrice = new java.math.BigDecimal(startPriceStr);
                 if (startPrice.compareTo(java.math.BigDecimal.ZERO) <= 0) {
-                    showAlert(javafx.scene.control.Alert.AlertType.WARNING, "Dữ liệu không hợp lệ", "Giá khởi điểm của tài sản phải lớn hơn 0!");
+                    showAlert(javafx.scene.control.Alert.AlertType.WARNING, "Dữ liệu sai", "Giá khởi điểm phải lớn hơn 0!");
                     return;
                 }
             } catch (NumberFormatException e) {
-                showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Sai định dạng", "Giá khởi điểm phải là một dãy số hợp lệ!");
+                showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Sai định dạng", "Giá khởi điểm bắt buộc phải là một dãy số!");
                 return;
             }
 
-            // 5. Chuẩn hóa chuỗi danh mục để truyền vào mẫu thiết kế Factory Pattern
-            // Chuyển đổi từ "ART", "ELECTRONIC", "VEHICLE" thành "ARTS", "ELECTRONICS", "VEHICLES"
-            String factoryType = selectedCategory.toUpperCase() + "S";
+            // 5. Quy đổi chuỗi thời lượng hiển thị (5p, 1h...) sang số phút nguyên (int) để lưu DB
+            int durationMinutes = 5; // Mặc định nếu có lỗi xảy ra
+            switch (duration) {
+                case "5p":   durationMinutes = 5; break;
+                case "15p":  durationMinutes = 15; break;
+                case "30p":  durationMinutes = 30; break;
+                case "1h":   durationMinutes = 60; break;
+                case "2h":   durationMinutes = 120; break;
+            }
 
-            // 6. Tạo thực thể đối tượng con tương ứng (Art, Electronics, Vehicle) từ lớp cha trừu tượng Item
-            com.auction.shared.model.Item newItem = com.auction.shared.model.Item.createFromType(factoryType);
+            // 6. KHỞI TẠO ĐỐI TƯỢNG: Truyền đúng loại "ART", "ELECTRONIC", "VEHICLE" vào hàm createFromType
+            com.auction.shared.model.Item newItem = com.auction.shared.model.Item.createFromType(selectedCategory);
 
-            // 7. Gán toàn bộ các thông số từ giao diện vào đối tượng Item vừa tạo
+            // 7. ĐỔ DỮ LIỆU: Gọi chuẩn xác các hàm set tương thích hoàn toàn với lớp Item.java
             newItem.setSellerId(currentUser.getId());
             newItem.setName(name);
-            newItem.setCategory(factoryType);
+            newItem.setItemType(selectedCategory); // Khớp với trường itemType trong Item.java
             newItem.setDescription(description);
             newItem.setStartingPrice(startPrice);
-            newItem.setImageUrl(""); // Đường dẫn hình ảnh tạm thời để trống
-            newItem.setCreatedAt(java.time.LocalDateTime.now()); // Lưu mốc thời gian đăng tải tài sản
+            newItem.setImageUrl(""); // Tạm thời để trống đường dẫn ảnh
+            newItem.setDurationMinutes(durationMinutes); // Gán số phút quy đổi
+            newItem.setStatus("PENDING"); // Gắn cờ chờ Admin duyệt theo đúng logic của nhóm
 
-            // 8. Chuyển đổi cấu trúc đối tượng Item sang định dạng chuỗi JSON phẳng
+            // 8. CHUYỂN ĐỔI SANG JSON: Sử dụng thư viện Gson
             com.google.gson.Gson gson = new com.google.gson.Gson();
             String jsonPayload = gson.toJson(newItem);
 
-            // 9. Đóng gói dữ liệu chuỗi JSON vào lớp mạng Message và đẩy qua Socket lên Server
+            // 9. BẮN GÓI TIN: Gửi mã hành động "ADD_ITEM" đồng bộ theo thiết kế xử lý của Server
             Message msg = new Message("ADD_ITEM", jsonPayload);
             NetworkClient.getInstance().send(msg);
 
-            // 10. Log kiểm tra hệ thống và hiển thị hộp thoại thông báo thành công cho người dùng
-            System.out.println("\n[CLIENT] Đã phát lệnh gửi sản phẩm thành công!");
-            System.out.println("Nội dung Payload JSON gửi đi:\n" + jsonPayload);
-            System.out.println("Thời lượng đấu giá đi kèm được chọn: " + duration);
+            // In log kiểm tra tiến trình dưới Console
+            System.out.println("\n[CLIENT] Đã nặn đối tượng và bắn lệnh ADD_ITEM lên Server thành công!");
+            System.out.println("Nội dung chuỗi JSON gửi đi:\n" + jsonPayload);
 
-            showAlert(javafx.scene.control.Alert.AlertType.INFORMATION, "Thành công", "Đã gửi yêu cầu thêm tài sản đấu giá mới lên hệ thống xử lý!");
+            // Hiển thị thông báo thành công cho người dùng trực quan
+            showAlert(javafx.scene.control.Alert.AlertType.INFORMATION, "Thành công", "Đã gửi sản phẩm lên hệ thống! Vui lòng chờ Admin xét duyệt.");
 
-            // 11. Dọn dẹp làm sạch form nhập liệu để sẵn sàng cho lần nhập tiếp theo
+            // 10. Làm sạch biểu mẫu để chuẩn bị cho lượt nhập tiếp theo
             clearForm();
 
         } catch (Exception e) {
-            System.err.println("[CLIENT ERROR] Thất bại khi thực hiện lưu sản phẩm: " + e.getMessage());
+            System.err.println("[CLIENT ERROR] Lỗi khi thực hiện lưu sản phẩm: " + e.getMessage());
             e.printStackTrace();
-            showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi hệ thống", "Đã xảy ra lỗi ngoài ý muốn: " + e.getMessage());
+            showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi hệ thống", "Có lỗi xảy ra: " + e.getMessage());
         }
     }
 
-
-    // ================= CÁC HÀM HỖ TRỢ PHỤ TRỢ (TRÁNH LẶP CODE) =================
-
     /**
-     * Hàm phụ trợ hiển thị nhanh một hộp thoại thông báo Pop-up trên giao diện JavaFX
+     * Hàm phụ trợ hiển thị nhanh hộp thoại thông báo Pop-up trên giao diện JavaFX
      */
     private void showAlert(javafx.scene.control.Alert.AlertType type, String title, String content) {
         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(type);
@@ -134,7 +138,7 @@ public class EditProduct implements NetworkClient.MessageListener {
     }
 
     /**
-     * Hàm dọn sạch nội dung các trường nhập liệu sau khi gửi dữ liệu thành công
+     * Hàm dọn sạch nội dung form sau khi hoàn tất gửi dữ liệu lên mạng
      */
     private void clearForm() {
         if (txtProductName != null) txtProductName.clear();

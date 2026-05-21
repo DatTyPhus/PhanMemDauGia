@@ -14,41 +14,39 @@ public class ItemDAO  {
     }
 
     public void create(Item obj) {
-        String sql = "INSERT INTO items (item_id, seller_id, item_name, description, category, starting_price, image_url, created_at) VALUES ('"
-                + obj.getId() + "', '"
-                + obj.getSellerId() + "', '"
-                + obj.getName() + "', '"
-                + obj.getDescription() + "', "
-                + obj.getCategory() + ", "
-                + obj.getStartingPrice() + ", "
-                + obj.getImageUrl() + ", '"
-                + obj.getCreatedAt().toString() + "')";
-        Connection connection = null;
-        try{
-            connection = JDBCUtil.getConnection();
-            Statement st= connection.createStatement();
+        // Sử dụng PreparedStatement (?) để chống lỗi nháy đơn và SQL Injection
+        // LƯU Ý: Không chèn item_id vì nó tự động tăng (AUTO_INCREMENT)
+        String sql = "INSERT INTO items (seller_id, item_name, description, item_type, starting_price, image_url, duration_minutes, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
-            int kq = st.executeUpdate(sql);
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setInt(1, obj.getSellerId());
+            ps.setString(2, obj.getName());
+            ps.setString(3, obj.getDescription());
+            ps.setString(4, obj.getItemType());
+            ps.setBigDecimal(5, obj.getStartingPrice());
+            ps.setString(6, obj.getImageUrl() != null ? obj.getImageUrl() : ""); // Tránh lỗi null ảnh
+            ps.setInt(7, obj.getDurationMinutes());
+            ps.setString(8, obj.getStatus()); // Lấy trạng thái "PENDING" từ Client gửi lên
+
+            int kq = ps.executeUpdate();
             if (kq > 0) {
-                System.out.println("Them san pham thanh cong!");
-            } else {
-                System.out.println("Them that bai, vui long kiem tra lai du lieu.");
+                System.out.println("[DATABASE] Đã lưu sản phẩm '" + obj.getName() + "' vào kho CHỜ DUYỆT thành công!");
             }
-            JDBCUtil.closeConnection(connection);
         } catch(Exception e){
+            System.err.println("[DATABASE ERROR] Lỗi lưu sản phẩm: " + e.getMessage());
             e.printStackTrace();
+        }
     }
-  }
 
   
   public void update(Item obj) {
       String sql = "UPDATE items SET seller_id = '" + obj.getSellerId() + "', "
               + "item_name = '" + obj.getName() + "', "
               + "description = '" + obj.getDescription() + "', "
-              + "category = '" + obj.getCategory() + "', "
               + "starting_price = " + obj.getStartingPrice() + ", "
               + "image_url = '" + obj.getImageUrl() + "', "
-              + "created_at = '" + obj.getCreatedAt().toString() + "' "
               + "WHERE item_id = " + obj.getId();
       Connection connection = null;
       try{
@@ -109,8 +107,9 @@ public class ItemDAO  {
             item.setSellerId(rs.getInt("seller_id"));
             item.setName(rs.getString("item_name"));
             item.setDescription(rs.getString("description"));
-            item.setCategory(rs.getString("category"));
             item.setStartingPrice(rs.getBigDecimal("starting_price"));
+            item.setImageUrl(rs.getString("image_url"));
+            item.setDurationMinutes(rs.getInt("duration_minutes"));
             return item;
         }
     } catch (SQLException e) {

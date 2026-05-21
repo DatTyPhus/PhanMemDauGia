@@ -7,6 +7,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AuctionDAO {
     public static AuctionDAO instance() {
@@ -43,6 +46,32 @@ public class AuctionDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, id); // Gán giá trị id vào dấu chấm hỏi
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Auction auction = new Auction();
+                auction.setId(rs.getInt("auction_id"));
+                auction.setItemId(rs.getInt("item_id"));
+                auction.setItemName(rs.getString("item_name"));
+                auction.setCurrentPrice(rs.getBigDecimal("current_price"));
+                auction.setDurationMinutes(rs.getInt("durationMinutes"));
+                auction.setStatus(rs.getString("status"));
+
+                return auction;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Trả về null nếu không tìm thấy người dùng
+    }
+
+    public Auction selectStartTime (String endTime){
+        String sql = "SELECT * FROM auctions WHERE end_time = ?";
+        
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setTimestamp(1, java.sql.Timestamp.valueOf(endTime)); // Gán giá trị endTime vào dấu chấm hỏi
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
@@ -153,7 +182,43 @@ public class AuctionDAO {
     }
 }
 
-    
+    public List<Auction> findFromAuction(int auctionId) {
+    List<Auction> result = new ArrayList<>();
+    String sql = """
+        SELECT * FROM auction 
+        WHERE start_time >= (SELECT start_time FROM auction WHERE id = ?)
+        AND status = 'PENDING'
+        ORDER BY start_time ASC
+    """;
+
+    Connection c = JDBCUtil.getConnection();
+    try {
+        PreparedStatement ps = c.prepareStatement(sql);
+        ps.setInt(1, auctionId);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            result.add(mapResultSet(rs));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return result;
+}
+    private Auction mapResultSet(ResultSet rs) throws SQLException {
+        Auction auction = new Auction();
+        auction.setId       (rs.getInt   ("id"));
+        auction.setItemId   (rs.getInt   ("item_id"));
+        auction.setItemName     (rs.getString("name"));
+        auction.setStartingPrice(rs.getBigDecimal("starting_price"));
+        auction.setCurrentPrice (rs.getBigDecimal("current_price"));
+        auction.setDurationMinutes(rs.getInt("durationMinutes"));
+        auction.setStatus   (rs.getString("status"));
+        auction.setStartTime(rs.getString("start_time")); // hoặc convert sang LocalDateTime
+        auction.setEndTime  (rs.getString("end_time"));
+        // thêm các field khác tùy theo bảng DB của bạn
+        return auction;
+    }
+
     public void delete(Integer id) {
         String sql = "DELETE FROM auctions WHERE auction_id = " + id;
         Connection connection = null;
