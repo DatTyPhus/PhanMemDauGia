@@ -1,7 +1,10 @@
 package com.auction.client.controller;
 
+import java.io.IOException;
+
 import com.auction.client.network.NetworkClient;
 import com.auction.shared.network.Message;
+
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,7 +13,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
-import java.io.IOException;
 
 /// Class LoginController này dùng để thực hiện các yêu cầu của người dùng qua các thao tác trên màn hình ,và xử lý các phản hồi từ server.
 
@@ -30,6 +32,10 @@ public class LoginController {
         } catch (IOException e) {
             lblMessage.setText("Lỗi kết nối mạng!");
         }
+
+        // Xoá thông báo lỗi khi người dùng bắt đầu gõ lại
+        ten_dang_nhap.textProperty().addListener((obs, oldVal, newVal) -> lblMessage.setText(""));
+        mat_khau.textProperty().addListener((obs, oldVal, newVal) -> lblMessage.setText(""));
     }
 
     /// Hàm này thực hiện khi người dùng click vào nút "Đăng nhập" ->Kiểm tra về việc nhập thông tin,và gửi yêu cầu muốn đăng nhập vào hệ thống xuống server xử lý.
@@ -40,6 +46,27 @@ public class LoginController {
 
         if (user.isEmpty() || pass.isEmpty()) {
             lblMessage.setText("Vui lòng nhập đủ thông tin!");
+            return;
+        }
+
+        // Tên đăng nhập không được chứa khoảng trắng
+        if (user.contains(" ")) {
+            lblMessage.setText("Tên đăng nhập không được chứa khoảng trắng.");
+            ten_dang_nhap.requestFocus();
+            return;
+        }
+
+        // Tên đăng nhập tối thiểu 4 ký tự
+        if (user.length() < 4) {
+            lblMessage.setText("Tên đăng nhập phải có ít nhất 4 ký tự.");
+            ten_dang_nhap.requestFocus();
+            return;
+        }
+
+        // Mật khẩu tối thiểu 6 ký tự
+        if (pass.length() < 6) {
+            lblMessage.setText("Mật khẩu phải có ít nhất 6 ký tự.");
+            mat_khau.requestFocus();
             return;
         }
 
@@ -126,6 +153,8 @@ public class LoginController {
             }
         } else if (msg.getAction().equals("LOGIN_FAIL")) {
             lblMessage.setText(msg.getPayload().toString());
+            mat_khau.clear();          // Xoá mật khẩu để người dùng nhập lại
+            mat_khau.requestFocus();   // Focus vào ô mật khẩu luôn
         }
     }
 }
