@@ -176,9 +176,11 @@ public class LoginController implements NetworkClient.MessageListener {
                 lblMessage.setText("Lỗi không tìm thấy file home.fxml!");
             }
         } else if (msg.getAction().equals("LOGIN_FAIL")) {
-            lblMessage.setText(msg.getPayload().toString());
-            mat_khau.clear();          // Xoá mật khẩu để người dùng nhập lại
-            mat_khau.requestFocus();   // Focus vào ô mật khẩu luôn
+            mat_khau.clear();          // 1. Phải xóa mật khẩu trước (sự kiện xóa chữ sẽ chạy ở đây)
+
+            lblMessage.setText(msg.getPayload().toString()); // 2. Sau đó mới in lỗi (đè lên chữ rỗng)
+
+            mat_khau.requestFocus();   // 3. Đưa con trỏ chuột vào ô mật khẩu
         }
     }
 }
