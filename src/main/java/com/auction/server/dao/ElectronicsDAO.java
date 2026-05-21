@@ -8,7 +8,7 @@ import com.auction.shared.model.Electronics;
 
 public class ElectronicsDAO {
   public Electronics getItemByUserid(int id) {
-        String sql = "SELECT item_id, seller_id, item_name, description, category, start_price, image_url FROM electronics WHERE id = ?";
+        String sql = "SELECT item_id, seller_id, item_name, description, start_price, image_url FROM electronics WHERE id = ?";
         
         try (Connection conn = JDBCUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -22,7 +22,6 @@ public class ElectronicsDAO {
                 electronic.setSellerId(rs.getInt("seller_id"));
                 electronic.setName(rs.getString("item_name"));
                 electronic.setDescription(rs.getString("description"));
-                electronic.setCategory(rs.getString("category"));
                 electronic.setStartingPrice(rs.getBigDecimal("start_price"));
                 electronic.setImageUrl(rs.getString("image_url"));
                 return electronic;

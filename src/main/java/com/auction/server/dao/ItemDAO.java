@@ -14,12 +14,11 @@ public class ItemDAO  {
     }
 
     public void create(Item obj) {
-        String sql = "INSERT INTO items (item_id, seller_id, item_name, description, category, starting_price, image_url) VALUES ('"
+        String sql = "INSERT INTO items (item_id, seller_id, item_name, description, starting_price, image_url) VALUES ('"
                 + obj.getId() + "', '"
                 + obj.getSellerId() + "', '"
                 + obj.getName() + "', '"
                 + obj.getDescription() + "', "
-                + obj.getCategory() + ", "
                 + obj.getStartingPrice() + ", "
                 + obj.getImageUrl() +  "')";
         Connection connection = null;
@@ -44,7 +43,6 @@ public class ItemDAO  {
       String sql = "UPDATE items SET seller_id = '" + obj.getSellerId() + "', "
               + "item_name = '" + obj.getName() + "', "
               + "description = '" + obj.getDescription() + "', "
-              + "category = '" + obj.getCategory() + "', "
               + "starting_price = " + obj.getStartingPrice() + ", "
               + "image_url = '" + obj.getImageUrl() + "', "
               + "WHERE item_id = " + obj.getId();
@@ -107,7 +105,6 @@ public class ItemDAO  {
             item.setSellerId(rs.getInt("seller_id"));
             item.setName(rs.getString("item_name"));
             item.setDescription(rs.getString("description"));
-            item.setCategory(rs.getString("category"));
             item.setStartingPrice(rs.getBigDecimal("starting_price"));
             item.setImageUrl(rs.getString("image_url"));
             item.setDurationMinutes(rs.getInt("duration_minutes"));

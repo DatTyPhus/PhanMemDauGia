@@ -14,7 +14,6 @@ public class AuctionSchedular {
   private static LocalDateTime timeline= null;
   private final AuctionDAO auctionDAO = new AuctionDAO();
   private final AuctionService auctionService = new AuctionService();
-  private final AuctionSchedular auctionSchedular = new AuctionSchedular();
   private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
   public void updateTimeLine (Auction auction) {
     LocalDateTime endTime = null;

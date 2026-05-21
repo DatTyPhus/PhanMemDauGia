@@ -15,9 +15,7 @@ import com.auction.shared.network.Message;;
 public class AuctionService {
   private static int auctionIdCounter = 0; 
   protected static Auction currentAuction; // Biến để lưu trữ đấu giá hiện tại đang diễn ra
-  private final ItemDAO itemDAO = new ItemDAO();
   private final BidderDAO bidderDAO = new BidderDAO();
-  private final SellerDAO sellerDAO = new SellerDAO();
   private final AuctionDAO auctionDAO = new AuctionDAO();
   private final AuctionSchedular auctionSchedular = new AuctionSchedular();
   protected static Map<Integer, Auction> waitingAuctions; // Giả sử có một map để quản lý các đấu giá đang chờ xử lý
