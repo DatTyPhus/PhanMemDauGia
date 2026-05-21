@@ -1,6 +1,7 @@
 package com.auction.server.network;
 
 import com.auction.server.controller.*;
+import com.auction.server.dao.*;
 import com.auction.shared.network.Message;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -71,6 +72,8 @@ public class ClientHandler implements Runnable {
                     case "ADD_ITEM":
                         try {
                             Item item = (Item) msg.getPayload();
+                            ItemDAO itemDAO = new ItemDAO();
+                            itemDAO.create(item);
                             Message addItemResult = new Message("ADD_ITEM_REQUEST", item);
                             out.println(addItemResult.toJson());
                         } catch (Exception e) {
@@ -81,6 +84,7 @@ public class ClientHandler implements Runnable {
 
                     case "ADD_ITEM_SUCCESS":// đây sẽ là chỗ tạo ra các auction mới, sau đó gọi hàm timer để bắt đầu đếm ngược thời gian đấu giá
                         Item item = (Item) msg.getPayload();
+
                         Auction auction = auctionService.createAuction(item);
                         auctionSchedular.timer(auction);
                         Message addItemSuccessResponse = new Message("ADD_ITEM_THANHCONG", auction);

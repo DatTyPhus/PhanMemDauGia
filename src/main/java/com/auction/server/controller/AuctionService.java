@@ -39,6 +39,7 @@ public class AuctionService {
         auction.setEndTime(auction.changeTimetoString(auctionSchedular.getTimeline().plusMinutes(item.getDurationMinutes())));
         auctionSchedular.setTimeline(auctionSchedular.getTimeline().plusMinutes(item.getDurationMinutes()));
     }
+    auction.setStatus("PENDING");
     return auction;
   }
 // public void updateTimeLine (Auction auction) {

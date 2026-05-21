@@ -41,30 +41,6 @@ LOCK TABLES `admin` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `arts`
---
-
-DROP TABLE IF EXISTS `arts`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `arts` (
-  `item_id` int NOT NULL,
-  `special_info` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`item_id`),
-  CONSTRAINT `fk_arts_items` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `arts`
---
-
-LOCK TABLES `arts` WRITE;
-/*!40000 ALTER TABLE `arts` DISABLE KEYS */;
-/*!40000 ALTER TABLE `arts` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `auctions`
 --
 
@@ -126,30 +102,6 @@ LOCK TABLES `bidders` WRITE;
 UNLOCK TABLES;
 
 --
--- Table structure for table `electronics`
---
-
-DROP TABLE IF EXISTS `electronics`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `electronics` (
-  `item_id` int NOT NULL,
-  `special_info` varchar(150) DEFAULT NULL,
-  PRIMARY KEY (`item_id`),
-  CONSTRAINT `fk_electronics_items` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `electronics`
---
-
-LOCK TABLES `electronics` WRITE;
-/*!40000 ALTER TABLE `electronics` DISABLE KEYS */;
-/*!40000 ALTER TABLE `electronics` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `items`
 --
 
@@ -161,11 +113,12 @@ CREATE TABLE `items` (
   `seller_id` int NOT NULL,
   `item_name` varchar(255) NOT NULL,
   `description` text,
-  `category` varchar(100) DEFAULT NULL,
   `start_price` decimal(15,2) NOT NULL DEFAULT '0.00',
   `image_url` varchar(500) DEFAULT NULL,
   `item_type` varchar(50) NOT NULL,
   `duration_minutes` int DEFAULT NULL,
+  `status` varchar(50) DEFAULT NULL,
+  `special_info` varchar(200) DEFAULT NULL,
   PRIMARY KEY (`item_id`),
   KEY `fk_items_seller` (`seller_id`),
   CONSTRAINT `fk_items_seller` FOREIGN KEY (`seller_id`) REFERENCES `sellers` (`user_id`) ON DELETE CASCADE
@@ -208,30 +161,6 @@ LOCK TABLES `sellers` WRITE;
 /*!40000 ALTER TABLE `sellers` DISABLE KEYS */;
 /*!40000 ALTER TABLE `sellers` ENABLE KEYS */;
 UNLOCK TABLES;
-
---
--- Table structure for table `vehicles`
---
-
-DROP TABLE IF EXISTS `vehicles`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `vehicles` (
-  `item_id` int NOT NULL,
-  `special_info` varchar(100) DEFAULT NULL,
-  PRIMARY KEY (`item_id`),
-  CONSTRAINT `fk_vehicles_items` FOREIGN KEY (`item_id`) REFERENCES `items` (`item_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `vehicles`
---
-
-LOCK TABLES `vehicles` WRITE;
-/*!40000 ALTER TABLE `vehicles` DISABLE KEYS */;
-/*!40000 ALTER TABLE `vehicles` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -242,4 +171,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-20 21:37:02
+-- Dump completed on 2026-05-21 15:17:52

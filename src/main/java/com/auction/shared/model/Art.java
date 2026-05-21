@@ -7,9 +7,5 @@ public class Art extends Item {
 
     public Art(){
         super();
-    }    
-    @Override
-    public void printInfo() {
-        System.out.println("Art Work: " + itemName + " | Artist: " + artist + " | itemId:" + itemId);
     }
 }

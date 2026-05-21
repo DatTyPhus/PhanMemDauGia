@@ -9,8 +9,4 @@ public class Vehicle extends Item {
     public Vehicle(){
         super();
     }
-    @Override
-    public void printInfo() {
-        System.out.println("Vehicle: " + itemName + " | Brand: " + brand + " | itemId:" + itemId);
-    }
 }

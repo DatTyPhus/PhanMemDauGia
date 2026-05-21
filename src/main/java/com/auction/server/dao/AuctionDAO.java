@@ -8,6 +8,8 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AuctionDAO {
     public static AuctionDAO instance() {
@@ -180,7 +182,43 @@ public class AuctionDAO {
     }
 }
 
-    
+    public List<Auction> findFromAuction(int auctionId) {
+    List<Auction> result = new ArrayList<>();
+    String sql = """
+        SELECT * FROM auction 
+        WHERE start_time >= (SELECT start_time FROM auction WHERE id = ?)
+        AND status = 'PENDING'
+        ORDER BY start_time ASC
+    """;
+
+    Connection c = JDBCUtil.getConnection();
+    try {
+        PreparedStatement ps = c.prepareStatement(sql);
+        ps.setInt(1, auctionId);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            result.add(mapResultSet(rs));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return result;
+}
+    private Auction mapResultSet(ResultSet rs) throws SQLException {
+        Auction auction = new Auction();
+        auction.setId       (rs.getInt   ("id"));
+        auction.setItemId   (rs.getInt   ("item_id"));
+        auction.setItemName     (rs.getString("name"));
+        auction.setStartingPrice(rs.getBigDecimal("starting_price"));
+        auction.setCurrentPrice (rs.getBigDecimal("current_price"));
+        auction.setDurationMinutes(rs.getInt("durationMinutes"));
+        auction.setStatus   (rs.getString("status"));
+        auction.setStartTime(rs.getString("start_time")); // hoặc convert sang LocalDateTime
+        auction.setEndTime  (rs.getString("end_time"));
+        // thêm các field khác tùy theo bảng DB của bạn
+        return auction;
+    }
+
     public void delete(Integer id) {
         String sql = "DELETE FROM auctions WHERE auction_id = " + id;
         Connection connection = null;
