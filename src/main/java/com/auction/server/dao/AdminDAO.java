@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AdminDAO {
-  public Admin selectByUsername(String username) {
+  public static Admin selectByUsername(String username) {
     String sql = "SELECT * FROM admins WHERE username = ?";
     
     try (Connection conn = JDBCUtil.getConnection();

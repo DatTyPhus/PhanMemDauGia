@@ -16,14 +16,12 @@ import com.auction.server.dao.*;
 public class AuctionSchedular {
   
   private static LocalDateTime timeline= null;
-  private final AuctionDAO auctionDAO = new AuctionDAO();
-  private final AuctionService auctionService = new AuctionService();
-  private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
-  private final Map<Integer, ScheduledFuture<?>> startTasks = new ConcurrentHashMap<>();
-  private final Map<Integer, ScheduledFuture<?>> endTasks   = new ConcurrentHashMap<>();
+  private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(10);
+  private static final Map<Integer, ScheduledFuture<?>> startTasks = new ConcurrentHashMap<>();
+  private static final Map<Integer, ScheduledFuture<?>> endTasks   = new ConcurrentHashMap<>();
 
 
-  public void updateTimeLine (Auction auction) {
+  public static void updateTimeLine (Auction auction) {
     LocalDateTime endTime = null;
     LocalDateTime startTime =null;
     if (timeline == null || LocalDateTime.now().isAfter(timeline)) {
@@ -35,10 +33,10 @@ public class AuctionSchedular {
     } 
     String startTimeStr = auction.changeTimetoString(startTime);
     String endTimeStr = auction.changeTimetoString(endTime);
-    auctionDAO.updateDateTime(auction, startTimeStr, endTimeStr);
+    AuctionDAO.updateDateTime(auction, startTimeStr, endTimeStr);
   }
 
-   public void timer(Auction auction) {
+   public static void timer(Auction auction) {
         long secondsUntilStart = Duration.between(LocalDateTime.now(),auction.changeStringToTime(auction.getStartTime())).getSeconds();
         long secondsUntilEnd   = Duration.between(LocalDateTime.now(), auction.changeStringToTime(auction.getEndTime())).getSeconds();
 
@@ -57,34 +55,34 @@ public class AuctionSchedular {
         System.out.println("  Đóng lúc: " + auction.getEndTime());
     }
 
-  public void start (Auction auction) {
+  public static void start (Auction auction) {
     auction.setStatus("OPEN");
-    auctionDAO.update(auction);
-    auctionService.setCurrentAuction(auction);
+    AuctionDAO.update(auction);
+    AuctionService.setCurrentAuction(auction);
     timer(auction);
   }
 
-  public void end (Auction auction) {
+  public static void end (Auction auction) {
     auction.setStatus("CLOSED");
-    auctionDAO.update(auction);
-    Auction nextAuction = auctionDAO.selectStartTime(auction.getEndTime());
+    AuctionDAO.update(auction);
+    Auction nextAuction = AuctionDAO.selectStartTime(auction.getEndTime());
     if (nextAuction != null) {
         start(nextAuction);
     }
   }
 
-  public void reschedule(Auction auction) {
+  public static void reschedule(Auction auction) {
         cancelTasks(auction.getId());
         timer(auction);
         System.out.println("[Scheduler] Đã reschedule auction " + auction.getId());
   }
 
-  public void delayFromAuction(int auctionId, int delayMinutes) {
-        List<Auction> affectedAuctions = auctionDAO.findFromAuction(auctionId);
+  public static void delayFromAuction(int auctionId, int delayMinutes) {
+        List<Auction> affectedAuctions = AuctionDAO.findFromAuction(auctionId);
         for (Auction auction : affectedAuctions) {
             auction.setStartTime(auction.changeTimetoString(auction.changeStringToTime(auction.getStartTime()).plusMinutes(delayMinutes)));
             auction.setEndTime(auction.changeTimetoString(auction.changeStringToTime(auction.getEndTime()).plusMinutes(delayMinutes)));
-            auctionDAO.update(auction);
+            AuctionDAO.update(auction);
             reschedule(auction);
             System.out.println("[Scheduler] Đã dời auction " + auction.getId()
                 + " → mở " + auction.getStartTime()
@@ -92,16 +90,16 @@ public class AuctionSchedular {
         }
     }
 
-  public void delay(int auctionId, int delayMinutes) {
-        Auction auction = auctionDAO.selectById(auctionId);
+  public static void delay(int auctionId, int delayMinutes) {
+        Auction auction = AuctionDAO.selectById(auctionId);
         auction.setStartTime(auction.changeTimetoString(auction.changeStringToTime(auction.getStartTime()).plusMinutes(delayMinutes)));
         auction.setEndTime(auction.changeTimetoString(auction.changeStringToTime(auction.getEndTime()).plusMinutes(delayMinutes)));
-        auctionDAO.update(auction);
+        AuctionDAO.update(auction);
         reschedule(auction);
         System.out.println("[Scheduler] Đã dời auction " + auctionId + " thêm " + delayMinutes + " phút");
     }
 
-  private void cancelTasks(int auctionId) {
+  private static void cancelTasks(int auctionId) {
         ScheduledFuture<?> startTask = startTasks.get(auctionId);
         ScheduledFuture<?> endTask   = endTasks.get(auctionId);
         if (startTask != null) startTask.cancel(false);
@@ -110,10 +108,10 @@ public class AuctionSchedular {
         endTasks.remove(auctionId);
     }
   
-  public LocalDateTime getTimeline() {
+  public static LocalDateTime getTimeline() {
     return timeline;
   }
-  public void setTimeline(LocalDateTime timeline1) {
+  public static void setTimeline(LocalDateTime timeline1) {
     timeline = timeline1;
   }
 }

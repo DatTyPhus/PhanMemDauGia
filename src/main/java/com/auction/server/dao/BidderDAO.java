@@ -14,7 +14,7 @@ public class BidderDAO {
         return new BidderDAO();
     }
   
-    public Bidder getUserByUserid(int id) {
+    public static Bidder getUserByUserid(int id) {
         String sql = "SELECT id, username, balance FROM bidders WHERE id = ?";
         
         try (Connection conn = JDBCUtil.getConnection();
@@ -38,7 +38,7 @@ public class BidderDAO {
         return null; // Trả về null nếu không tìm thấy người dùng
       }
 
-    public Bidder selectByUsername(String username) {
+    public static Bidder selectByUsername(String username) {
     String sql = "SELECT * FROM bidders WHERE username = ?";
     
     try (Connection conn = JDBCUtil.getConnection();
@@ -62,7 +62,7 @@ public class BidderDAO {
     }
     return null; // Trả về null nếu không tìm thấy người dùng
 }
-public void create(User obj) {
+public static void create(User obj) {
 
       String sql = "INSERT INTO bidders (username, password, full_name, role) VALUES ('"
                 + obj.getUsername() + "', '"
