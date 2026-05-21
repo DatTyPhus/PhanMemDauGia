@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
 
 public class AuctionDAO {
     public static AuctionDAO instance() {
@@ -43,6 +44,32 @@ public class AuctionDAO {
              PreparedStatement stmt = conn.prepareStatement(sql)) {
             
             stmt.setInt(1, id); // Gán giá trị id vào dấu chấm hỏi
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Auction auction = new Auction();
+                auction.setId(rs.getInt("auction_id"));
+                auction.setItemId(rs.getInt("item_id"));
+                auction.setItemName(rs.getString("item_name"));
+                auction.setCurrentPrice(rs.getBigDecimal("current_price"));
+                auction.setDurationMinutes(rs.getInt("durationMinutes"));
+                auction.setStatus(rs.getString("status"));
+
+                return auction;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Trả về null nếu không tìm thấy người dùng
+    }
+
+    public Auction selectStartTime (String endTime){
+        String sql = "SELECT * FROM auctions WHERE end_time = ?";
+        
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setTimestamp(1, java.sql.Timestamp.valueOf(endTime)); // Gán giá trị endTime vào dấu chấm hỏi
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {

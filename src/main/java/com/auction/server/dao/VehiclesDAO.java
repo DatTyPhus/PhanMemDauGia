@@ -8,7 +8,7 @@ import com.auction.shared.model.Vehicle;
 
 public class VehiclesDAO {
   public Vehicle getItemByUserid(int id) {
-        String sql = "SELECT item_id, seller_id, item_name, description, category, start_price, image_url, created_at FROM vehicles WHERE id = ?";
+        String sql = "SELECT item_id, seller_id, item_name, description,  start_price, image_url, created_at FROM vehicles WHERE id = ?";
         
         try (Connection conn = JDBCUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -22,10 +22,8 @@ public class VehiclesDAO {
                 vehicle.setSellerId(rs.getInt("seller_id"));
                 vehicle.setName(rs.getString("item_name"));
                 vehicle.setDescription(rs.getString("description"));
-                vehicle.setCategory(rs.getString("category"));
                 vehicle.setStartingPrice(rs.getBigDecimal("start_price"));
                 vehicle.setImageUrl(rs.getString("image_url"));
-                vehicle.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 return vehicle;
             }
         } catch (SQLException e) {
