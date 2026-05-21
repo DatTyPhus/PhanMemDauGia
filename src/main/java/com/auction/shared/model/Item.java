@@ -1,4 +1,5 @@
 package com.auction.shared.model;
+
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -10,6 +11,8 @@ public abstract class Item extends Entity {
     protected String imageUrl;  
     protected String itemType;  
     protected int durationMinutes;
+    protected String special_info;
+
 
     public static Item createFromType(String type) {
         return switch (type) {
@@ -33,7 +36,6 @@ public abstract class Item extends Entity {
     public Item() {
     }
 
-    public abstract void printInfo();
     // Getters and Setters
     public int getSellerId() {return sellerId;}
     public String getName() {return itemName;}
