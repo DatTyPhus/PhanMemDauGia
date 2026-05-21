@@ -60,8 +60,13 @@ public class AuctionService {
   public static Message processBid(String bidder_name, BigDecimal bidAmount ) {
         Auction auction =  AuctionDAO.selectByItemName(currentAuction.getItemName());
         LocalDateTime now = LocalDateTime.now();
+        int secondsBetween = (int) ChronoUnit.SECONDS.between(now, auction.changeStringToTime(auction.getEndTime()));
         if (auction == null) {
             return new Message("BID_FAIL", "Đấu giá không tồn tại.");
+        }
+        if (secondsBetween <=60){
+            AuctionSchedular.delay(auction.getId(), 5);
+            AuctionSchedular.delayFromAuction(auction.getId(), 5);
         }
         auction.lock();
         try{

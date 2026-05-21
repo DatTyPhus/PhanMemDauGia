@@ -55,7 +55,6 @@ public class AccountService {
   public Message register(String username, String password, String fullName , String role) {
     System.out.println("\n=== SERVER ĐANG XỬ LÝ ĐĂNG KÝ ===");
     System.out.println("Role nhận được từ Client: [" + role + "]");
-
     if (role == null) {
       return new Message("REGISTER_FAIL", "Lỗi: Role gửi lên bị trống!");
     }
