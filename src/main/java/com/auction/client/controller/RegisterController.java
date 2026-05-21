@@ -51,6 +51,12 @@ public class RegisterController {
         }catch (IOException e){
             e.printStackTrace();
         }
+
+        // Xoá thông báo lỗi khi người dùng bắt đầu gõ lại vào bất kỳ ô nào
+        fullName.textProperty().addListener((obs, oldVal, newVal) -> lblMessage.setText(""));
+        userName.textProperty().addListener((obs, oldVal, newVal) -> lblMessage.setText(""));
+        password.textProperty().addListener((obs, oldVal, newVal) -> lblMessage.setText(""));
+        re_password.textProperty().addListener((obs, oldVal, newVal) -> lblMessage.setText(""));
     }
 
     // XỬ LÝ CHỌN ROLE (Khi bấm vào hình tròn)
@@ -89,6 +95,38 @@ public class RegisterController {
         if (!pass.equals(rePass)) {
             lblMessage.setText("Mật khẩu nhập lại không khớp!");
             lblMessage.setStyle("-fx-text-fill: red;");
+            return;
+        }
+
+        // Tên đăng nhập không được chứa khoảng trắng
+        if (user.contains(" ")) {
+            lblMessage.setText("Tên đăng nhập không được chứa khoảng trắng.");
+            lblMessage.setStyle("-fx-text-fill: red;");
+            userName.requestFocus();
+            return;
+        }
+
+        // Tên đăng nhập tối thiểu 4 ký tự
+        if (user.length() < 4) {
+            lblMessage.setText("Tên đăng nhập phải có ít nhất 4 ký tự.");
+            lblMessage.setStyle("-fx-text-fill: red;");
+            userName.requestFocus();
+            return;
+        }
+
+        // Mật khẩu tối thiểu 6 ký tự
+        if (pass.length() < 6) {
+            lblMessage.setText("Mật khẩu phải có ít nhất 6 ký tự.");
+            lblMessage.setStyle("-fx-text-fill: red;");
+            password.requestFocus();
+            return;
+        }
+
+        // Họ tên không được chứa số
+        if (name.matches(".*\\d.*")) {
+            lblMessage.setText("Họ tên không được chứa chữ số.");
+            lblMessage.setStyle("-fx-text-fill: red;");
+            fullName.requestFocus();
             return;
         }
 
@@ -143,6 +181,8 @@ public class RegisterController {
                 Platform.runLater(() -> {
                     lblMessage.setText(msg.getPayload().toString());
                     lblMessage.setStyle("-fx-text-fill: red;");
+                    userName.clear();          // Xoá username để người dùng nhập lại
+                    userName.requestFocus();   // Focus vào ô username
                 });
                 break;
         }
