@@ -25,7 +25,6 @@ public class VehiclesDAO {
                 vehicle.setCategory(rs.getString("category"));
                 vehicle.setStartingPrice(rs.getBigDecimal("start_price"));
                 vehicle.setImageUrl(rs.getString("image_url"));
-                vehicle.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 return vehicle;
             }
         } catch (SQLException e) {

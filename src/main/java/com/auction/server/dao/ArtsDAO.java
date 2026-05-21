@@ -8,7 +8,7 @@ import com.auction.shared.model.Art;
 
 public class ArtsDAO {
   public Art getItemByUserid(int id) {
-        String sql = "SELECT item_id, seller_id, item_name, description, category, start_price, image_url, created_at FROM arts WHERE id = ?";
+        String sql = "SELECT item_id, seller_id, item_name, description, category, start_price, image_url FROM arts WHERE id = ?";
         
         try (Connection conn = JDBCUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -25,7 +25,6 @@ public class ArtsDAO {
                 art.setCategory(rs.getString("category"));
                 art.setStartingPrice(rs.getBigDecimal("start_price"));
                 art.setImageUrl(rs.getString("image_url"));
-                art.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 return art;
             }
         } catch (SQLException e) {

@@ -1,9 +1,6 @@
 package com.auction.server.network;
 
-import com.auction.server.controller.AccountService;
-import com.auction.server.controller.AuctionSchedular;
-import com.auction.server.controller.AuctionService;
-import com.auction.shared.model.Auction;
+import com.auction.server.controller.*;
 import com.auction.shared.network.Message;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.math.BigDecimal;
 import java.net.Socket;
+import com.auction.shared.model.*;
 
 //
 
@@ -18,6 +16,8 @@ public class ClientHandler implements Runnable {
     private Socket socket;
     private BufferedReader in;
     private PrintWriter out; // BỔ SUNG: Ống gửi dữ liệu xuống Client
+    private AuctionService auctionService = new AuctionService();
+    private AuctionSchedular auctionSchedular = new AuctionSchedular();
 
     public ClientHandler(Socket socket) {
         this.socket = socket;
@@ -67,30 +67,29 @@ public class ClientHandler implements Runnable {
                             out.println(new Message("REGISTER_FAIL", "Lỗi Server: " + e.getMessage()).toJson());
                         }
                         break;
+                        
                     case "ADD_ITEM":
                         try {
-                            java.util.Map<String, Object> map = (java.util.Map<String, Object>) msg.getPayload();
-                            String itemName = (String) map.get("itemName");
-                            double startingPriceDouble = (double) map.get("startingPrice");
-                            int durationMinutes = (int) map.get("durationMinutes");
-
-                            AuctionService auctionService = new AuctionService();
-                            Message addItemResult = auctionService.createAuction(itemName, BigDecimal.valueOf(startingPriceDouble), durationMinutes);
+                            Item item = (Item) msg.getPayload();
+                            Message addItemResult = new Message("ADD_ITEM_REQUEST", item);
                             out.println(addItemResult.toJson());
                         } catch (Exception e) {
                             e.printStackTrace();
                             out.println(new Message("ADD_ITEM_FAIL", "Lỗi Server: " + e.getMessage()).toJson());
                         }
                         break;
-                    case "ADD_ITEM_SUCCESS":
-                        AuctionSchedular auctionSchedular = new AuctionSchedular();
-                        Auction auction = (Auction) msg.getPayload();
-                        auctionSchedular.updateTimeLine(auction);
-                        auctionSchedular.start(auction);
-                        
+
+                    case "ADD_ITEM_SUCCESS":// đây sẽ là chỗ tạo ra các auction mới, sau đó gọi hàm timer để bắt đầu đếm ngược thời gian đấu giá
+                        Item item = (Item) msg.getPayload();
+                        Auction auction = auctionService.createAuction(item);
+                        auctionSchedular.timer(auction);
+                        Message addItemSuccessResponse = new Message("ADD_ITEM_THANHCONG", auction);
+                        out.println(addItemSuccessResponse.toJson());
                         break; 
                     case "ADD_ITEM_FAIL":
-                         
+                        String errorMsg = (String) msg.getPayload();
+                        Message errorResponse = new Message("ADD_ITEM_THATBAI", errorMsg);
+                        out.println(errorResponse.toJson());
                         break;
                     case "GET_MY_ITEMS":
                         // Xử lý khi Seller muốn xem kho đồ của mình. payload : null.

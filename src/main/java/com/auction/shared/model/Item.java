@@ -9,8 +9,8 @@ public abstract class Item extends Entity {
     protected String category;
     protected BigDecimal startPrice;
     protected String imageUrl;
-    protected LocalDateTime createdAt;
     protected String itemType;
+    protected int durationMinutes;
 
     public static Item createFromType(String type) {
         return switch (type) {
@@ -21,17 +21,17 @@ public abstract class Item extends Entity {
         };
     }
 
-    public Item(int sellerId, String itemName, String description,
-                String category, BigDecimal startPrice, String imageUrl) {
-        super();
-        this.sellerId = sellerId;
-        this.itemName = itemName;
-        this.description = description;
-        this.category = category;
-        this.startPrice = startPrice;
-        this.imageUrl = imageUrl;
-        this.createdAt = LocalDateTime.now();
-    }
+    // public Item(int sellerId, String itemName, String description,
+    //             String category, BigDecimal startPrice, String imageUrl) {
+    //     super();
+    //     this.sellerId = sellerId;
+    //     this.itemName = itemName;
+    //     this.description = description;
+    //     this.category = category;
+    //     this.startPrice = startPrice;
+    //     this.imageUrl = imageUrl;
+    //     this.createdAt = LocalDateTime.now();
+    // }
 
     public Item() {
     }
@@ -44,7 +44,8 @@ public abstract class Item extends Entity {
     public String getCategory() {return category;}
     public BigDecimal getStartingPrice() {return startPrice;}
     public String getImageUrl() {return imageUrl;}
-    public LocalDateTime getCreatedAt() {return createdAt;}   
+    public String getItemType() {return itemType;}
+    public int getDurationMinutes() {return durationMinutes;}
     
     public void setSellerId(int sellerId) {this.sellerId = sellerId;}
     public void setName(String itemName) {this.itemName = itemName;}
@@ -52,6 +53,7 @@ public abstract class Item extends Entity {
     public void setCategory(String category) {this.category = category;}
     public void setStartingPrice(BigDecimal startPrice) {this.startPrice = startPrice;}
     public void setImageUrl(String imageUrl) {this.imageUrl = imageUrl;}
-    public void setCreatedAt(LocalDateTime createdAt) {this.createdAt = createdAt;}
+    public void setItemType(String itemType) {this.itemType = itemType;}
+    public void setDurationMinutes(int durationMinutes) {this.durationMinutes = durationMinutes;}
 
 }

@@ -14,15 +14,14 @@ public class ItemDAO  {
     }
 
     public void create(Item obj) {
-        String sql = "INSERT INTO items (item_id, seller_id, item_name, description, category, starting_price, image_url, created_at) VALUES ('"
+        String sql = "INSERT INTO items (item_id, seller_id, item_name, description, category, starting_price, image_url) VALUES ('"
                 + obj.getId() + "', '"
                 + obj.getSellerId() + "', '"
                 + obj.getName() + "', '"
                 + obj.getDescription() + "', "
                 + obj.getCategory() + ", "
                 + obj.getStartingPrice() + ", "
-                + obj.getImageUrl() + ", '"
-                + obj.getCreatedAt().toString() + "')";
+                + obj.getImageUrl() +  "')";
         Connection connection = null;
         try{
             connection = JDBCUtil.getConnection();
@@ -48,7 +47,6 @@ public class ItemDAO  {
               + "category = '" + obj.getCategory() + "', "
               + "starting_price = " + obj.getStartingPrice() + ", "
               + "image_url = '" + obj.getImageUrl() + "', "
-              + "created_at = '" + obj.getCreatedAt().toString() + "' "
               + "WHERE item_id = " + obj.getId();
       Connection connection = null;
       try{
@@ -111,6 +109,8 @@ public class ItemDAO  {
             item.setDescription(rs.getString("description"));
             item.setCategory(rs.getString("category"));
             item.setStartingPrice(rs.getBigDecimal("starting_price"));
+            item.setImageUrl(rs.getString("image_url"));
+            item.setDurationMinutes(rs.getInt("duration_minutes"));
             return item;
         }
     } catch (SQLException e) {
