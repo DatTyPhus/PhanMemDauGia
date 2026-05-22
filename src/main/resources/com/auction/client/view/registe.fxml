@@ -14,7 +14,7 @@
 <?import javafx.scene.shape.Circle?>
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1400.0" style="-fx-background-color: linear-gradient(to bottom right, #e6ecf5, #c9d6e8);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.RegisterController">   <children>
-      <ImageView pickOnBounds="true" preserveRatio="true">
+      <ImageView layoutY="-169.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../image/background.png" />
          </image>
