@@ -8,13 +8,15 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.ToggleButton?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="900" prefWidth="1400" style="-fx-background-color: #f6f8fc;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.adminController.Setting">
+<BorderPane prefHeight="900" prefWidth="1400" style="-fx-background-color: #f6f8fc;" stylesheets="@../sidebar.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.adminController.Setting">
 
     <top>
         <HBox alignment="CENTER_LEFT" minHeight="90.0" prefHeight="90.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 5);" BorderPane.alignment="CENTER">
@@ -57,11 +59,11 @@
             <children>
                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="196.0">
                     <children>
-                        <Label style="-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold;" text="🔨">
-                            <HBox.margin>
-                                <Insets left="15.0" />
-                            </HBox.margin>
-                        </Label>
+                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../image/54699acc-6fba-4ff0-b214-6edb30950a28.png" />
+                     </image>
+                  </ImageView>
                         <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="120.0">
                             <children>
                                 <Label style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;" text="ĐẤU GIÁ" />
@@ -77,12 +79,12 @@
                     </VBox.margin>
                 </HBox>
 
-                <Button mnemonicParsing="false" onAction="#onBackHomeClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ" />
-                <Button mnemonicParsing="false" onAction="#onAuctionSessionClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Phiên đấu giá" />
-                <Button mnemonicParsing="false" onAction="#onHistoryClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20;" text="Lịch sử đấu giá" />
-                <Button mnemonicParsing="false" onAction="#onUsersManagementClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lý người dùng" />
-                <Button mnemonicParsing="false" onAction="#onProductManagementClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lý sản phẩm" />
-                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt" />
+                <Button mnemonicParsing="false" onAction="#onBackHomeClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Trang chủ" />
+                <Button mnemonicParsing="false" onAction="#onAuctionSessionClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Phiên đấu giá" />
+                <Button mnemonicParsing="false" onAction="#onHistoryClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20;" styleClass="nav-btn" text="Lịch sử đấu giá" />
+                <Button mnemonicParsing="false" onAction="#onUsersManagementClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Quản lý người dùng" />
+                <Button mnemonicParsing="false" onAction="#onProductManagementClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Quản lý sản phẩm" />
+                <Button maxWidth="250.0" mnemonicParsing="false" styleClass="nav-btn-active" text="Cài đặt" />
             </children>
 
             <BorderPane.margin>

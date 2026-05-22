@@ -3,13 +3,15 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="800" prefWidth="1400" style="-fx-background-color: #f1f5f9;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.adminController.Home">
+<BorderPane prefHeight="800" prefWidth="1400" style="-fx-background-color: #f1f5f9;" stylesheets="@../sidebar.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.adminController.Home">
 
     <top>
         <HBox alignment="CENTER_LEFT" minHeight="90.0" prefHeight="90.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 5);" BorderPane.alignment="CENTER">
@@ -47,9 +49,11 @@
             <children>
                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="196.0">
                     <children>
-                        <Label style="-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold;" text="🔨">
-                            <HBox.margin><Insets left="15.0" /></HBox.margin>
-                        </Label>
+                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../image/54699acc-6fba-4ff0-b214-6edb30950a28.png" />
+                     </image>
+                  </ImageView>
                         <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="120.0">
                             <children>
                                 <Label style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;" text="ĐẤU GIÁ" />
@@ -61,28 +65,28 @@
                     <VBox.margin><Insets bottom="20.0" top="15.0" /></VBox.margin>
                 </HBox>
 
-                <Button mnemonicParsing="false" style="-fx-background-color: #1e293b; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 8;" text="Trang chủ">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button maxWidth="250.0" mnemonicParsing="false" styleClass="nav-btn-active" text="Trang chủ">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
 
-                <Button onAction="#onAuctionSessionClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Phiên đấu giá">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button mnemonicParsing="false" onAction="#onAuctionSessionClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Phiên đấu giá">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
 
-                <Button onAction="#onHistoryClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20;" text="Lịch sử đấu giá">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button mnemonicParsing="false" onAction="#onHistoryClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20;" styleClass="nav-btn" text="Lịch sử đấu giá">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
 
-                <Button onAction="#onUsersManagementClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lý người dùng">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button mnemonicParsing="false" onAction="#onUsersManagementClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Quản lý người dùng">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
 
-                <Button onAction="#onProductManagementClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lý sản phẩm">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button mnemonicParsing="false" onAction="#onProductManagementClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Quản lý sản phẩm">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
 
-                <Button onAction="#onSettingClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button mnemonicParsing="false" onAction="#onSettingClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Cài đặt">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
             </children>
             <BorderPane.margin>
@@ -100,7 +104,7 @@
             </VBox>
 
             <HBox spacing="25">
-                <HBox alignment="CENTER_LEFT" maxWidth="Infinity" HBox.hgrow="ALWAYS" spacing="20" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 15, 0, 0, 5);">
+                <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="20" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 15, 0, 0, 5);" HBox.hgrow="ALWAYS">
                     <StackPane prefHeight="65" prefWidth="65" style="-fx-background-color: #dbeafe; -fx-background-radius: 14;">
                         <Label style="-fx-font-size: 28; -fx-text-fill: #3b82f6;" text="📦" />
                     </StackPane>
@@ -110,7 +114,7 @@
                     </VBox>
                 </HBox>
 
-                <HBox alignment="CENTER_LEFT" maxWidth="Infinity" HBox.hgrow="ALWAYS" spacing="20" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 15, 0, 0, 5);">
+                <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="20" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 15, 0, 0, 5);" HBox.hgrow="ALWAYS">
                     <StackPane prefHeight="65" prefWidth="65" style="-fx-background-color: #fef3c7; -fx-background-radius: 14;">
                         <Label style="-fx-font-size: 28; -fx-text-fill: #d97706;" text="🔥" />
                     </StackPane>
@@ -120,7 +124,7 @@
                     </VBox>
                 </HBox>
 
-                <HBox alignment="CENTER_LEFT" maxWidth="Infinity" HBox.hgrow="ALWAYS" spacing="20" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 15, 0, 0, 5);">
+                <HBox alignment="CENTER_LEFT" maxWidth="Infinity" spacing="20" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 25; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 15, 0, 0, 5);" HBox.hgrow="ALWAYS">
                     <StackPane prefHeight="65" prefWidth="65" style="-fx-background-color: #dcfce7; -fx-background-radius: 14;">
                         <Label style="-fx-font-size: 28; -fx-text-fill: #16a34a;" text="👥" />
                     </StackPane>
@@ -132,12 +136,12 @@
             </HBox>
 
             <HBox spacing="25" VBox.vgrow="ALWAYS">
-                <VBox maxWidth="Infinity" HBox.hgrow="ALWAYS" spacing="20" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 30; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 15, 0, 0, 5);">
+                <VBox maxWidth="Infinity" spacing="20" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 30; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 15, 0, 0, 5);" HBox.hgrow="ALWAYS">
                     <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="⚡ Lối tắt nghiệp vụ" />
                     <Label style="-fx-text-fill: #64748b; -fx-font-size: 14;" text="Xử lý nhanh các yêu cầu đang tồn đọng trên hệ thống." />
 
                     <HBox spacing="20" style="-fx-padding: 10 0 0 0;">
-                        <Button onAction="#onProductManagementClick" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="100" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-background-radius: 12; -fx-cursor: hand; -fx-alignment: CENTER_LEFT; -fx-padding: 20;">
+                        <Button maxWidth="Infinity" onAction="#onProductManagementClick" prefHeight="100" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-background-radius: 12; -fx-cursor: hand; -fx-alignment: CENTER_LEFT; -fx-padding: 20;" HBox.hgrow="ALWAYS">
                             <graphic>
                                 <VBox spacing="5">
                                     <Label style="-fx-font-size: 24;" text="📝" />
@@ -146,7 +150,7 @@
                             </graphic>
                         </Button>
 
-                        <Button onAction="#onUsersManagementClick" maxWidth="Infinity" HBox.hgrow="ALWAYS" prefHeight="100" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-background-radius: 12; -fx-cursor: hand; -fx-alignment: CENTER_LEFT; -fx-padding: 20;">
+                        <Button maxWidth="Infinity" onAction="#onUsersManagementClick" prefHeight="100" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 12; -fx-background-radius: 12; -fx-cursor: hand; -fx-alignment: CENTER_LEFT; -fx-padding: 20;" HBox.hgrow="ALWAYS">
                             <graphic>
                                 <VBox spacing="5">
                                     <Label style="-fx-font-size: 24;" text="🔐" />
@@ -157,7 +161,7 @@
                     </HBox>
                 </VBox>
 
-                <VBox alignment="CENTER" prefWidth="400" minWidth="350" spacing="15" style="-fx-background-color: linear-gradient(to bottom right, #1e293b, #0f172a); -fx-background-radius: 16; -fx-padding: 40; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 20, 0, 0, 10);">
+                <VBox alignment="CENTER" minWidth="350" prefWidth="400" spacing="15" style="-fx-background-color: linear-gradient(to bottom right, #1e293b, #0f172a); -fx-background-radius: 16; -fx-padding: 40; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.1), 20, 0, 0, 10);">
                     <Label style="-fx-font-size: 40;" text="🛡️" />
                     <Label style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: white;" text="Bảo vệ sự minh bạch" />
                     <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 14; -fx-alignment: center;" text="Hệ thống đang hoạt động ổn định. Vai trò của bạn giúp nền tảng luôn công bằng và an toàn." textAlignment="CENTER" wrapText="true" />

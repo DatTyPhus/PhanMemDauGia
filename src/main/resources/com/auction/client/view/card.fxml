@@ -16,7 +16,7 @@
 
     <!-- IMAGE + STATUS -->
     <StackPane>
-        <ImageView fx:id="image" fitHeight="143.0" fitWidth="235.0" preserveRatio="false" style="-fx-background-radius: 8; -fx-border-radius:8;" />
+        <ImageView fx:id="image" fitHeight="151.0" fitWidth="250.0" preserveRatio="false" style="-fx-background-radius: 8; -fx-border-radius:8;" />
 
         <!-- STATUS BADGE -->
         <Label fx:id="statusLabel" style="-fx-background-color:#22c55e;                       -fx-text-fill:white;                       -fx-font-size:12;                       -fx-font-weight:bold;                       -fx-padding:4 8;                       -fx-background-radius:20;" text="Đang diễn ra" StackPane.alignment="TOP_LEFT">
@@ -35,7 +35,7 @@
     <!-- TIME -->
     <HBox alignment="CENTER_LEFT" spacing="5">
         <Label text="⏱" />
-        <Label fx:id="timeLabel" style="-fx-text-fill:#64748b; -fx-font-size:12;" text="Kết thúc sau: ">
+        <Label fx:id="timeLabel" style="-fx-text-fill: #64748b; -fx-font-size: 14;" text="Kết thúc sau: ">
          <HBox.margin>
             <Insets />
          </HBox.margin></Label>
@@ -45,7 +45,7 @@
     <!-- CURRENT PRICE -->
     <HBox alignment="CENTER_LEFT" spacing="5">
         <Label text="💰" />
-        <Label style="-fx-text-fill:#64748b; -fx-font-size:12;" text="Giá hiện tại:" />
+        <Label style="-fx-text-fill: #64748b; -fx-font-size: 14;" text="Giá hiện tại:" />
         <Label fx:id="priceLabel" style="-fx-text-fill:#16a34a;                       -fx-font-size:14;                       -fx-font-weight:bold;" text="850.000.000 đ" />
       <VBox.margin>
          <Insets top="3.0" />
@@ -55,8 +55,8 @@
     <!-- START PRICE -->
     <HBox alignment="CENTER_LEFT" spacing="5">
         <Label text="🏷" />
-        <Label style="-fx-text-fill:#64748b; -fx-font-size:12;" text="Giá khởi điểm:" />
-        <Label fx:id="startPriceLabel" style="-fx-text-fill:#334155; -fx-font-size:12;" text="700.000.000 đ" />
+        <Label style="-fx-text-fill: #64748b; -fx-font-size: 14;" text="Giá khởi điểm:" />
+        <Label fx:id="startPriceLabel" style="-fx-text-fill: #334155; -fx-font-size: 14;" text="700.000.000 đ" />
       <VBox.margin>
          <Insets top="3.0" />
       </VBox.margin>

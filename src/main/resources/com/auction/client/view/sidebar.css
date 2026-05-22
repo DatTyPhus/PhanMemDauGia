@@ -1,0 +1,89 @@
+/* ============================================
+   SIDEBAR MENU - Đấu Giá Trực Tuyến
+   ============================================ */
+
+/* --- Sidebar container --- */
+.sidebar {
+    -fx-background-color: #0B1F3A;
+}
+
+/* --- Brand header --- */
+.sidebar-brand {
+    -fx-border-color: transparent transparent rgba(255,255,255,0.1) transparent;
+    -fx-border-width: 0 0 1 0;
+    -fx-padding: 20 20 20 20;
+}
+
+.sidebar-brand-title {
+    -fx-text-fill: white;
+    -fx-font-size: 15;
+    -fx-font-weight: bold;
+}
+
+.sidebar-brand-subtitle {
+    -fx-text-fill: rgba(255,255,255,0.45);
+    -fx-font-size: 10;
+}
+
+/* --- Nav button mặc định --- */
+.nav-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: rgba(255,255,255,0.6);
+    -fx-font-size: 13.5;
+    -fx-font-weight: normal;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 11 16 11 20;
+    -fx-background-radius: 10;
+    -fx-cursor: hand;
+}
+
+/* --- Hover --- */
+.nav-btn:hover {
+    -fx-background-color: rgba(255,255,255,0.07);
+    -fx-text-fill: rgba(255,255,255,0.9);
+}
+
+/* --- Active state: dùng layered background để giả lập thanh vàng bên trái --- */
+.nav-btn-active {
+    /*
+     * Kỹ thuật: vẽ 3 layer chồng nhau
+     * Layer 1 (ngoài cùng): thanh vàng #F4A800, rộng 4px bên trái
+     * Layer 2: nền xanh sidebar #0B1F3A che phần padding trái (4px)
+     * Layer 3: nền trắng mờ cho phần nội dung button
+     */
+    -fx-background-color:
+        #F4A800,
+        #0B1F3A,
+        rgba(255,255,255,0.09);
+    -fx-background-insets:
+        0 0 0 0,
+        0 0 0 4,
+        2 4 2 8;
+    -fx-background-radius:
+        0 10 10 0,
+        0 10 10 0,
+        8;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13.5;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 11 16 11 16;
+    -fx-cursor: hand;
+}
+
+/* Hover trên active giữ nguyên */
+.nav-btn-active:hover {
+    -fx-background-color:
+        #F4A800,
+        #0B1F3A,
+        rgba(255,255,255,0.14);
+    -fx-background-insets:
+        0 0 0 0,
+        0 0 0 4,
+        2 4 2 8;
+    -fx-background-radius:
+        0 10 10 0,
+        0 10 10 0,
+        8;
+    -fx-text-fill: white;
+}
