@@ -22,6 +22,7 @@ public class Auction extends Entity {
     public Auction( int id, int itemId, String itemName, BigDecimal startingPrice, int durationMinutes) {
         this.id =id;
         this.itemId = itemId;
+        this.itemName = itemName;
         this.StartingPrice = startingPrice;
         this.durationMinutes = durationMinutes;
     }

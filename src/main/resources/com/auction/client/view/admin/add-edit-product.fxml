@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -19,10 +20,14 @@
          <children>
             <HBox prefHeight="100.0" prefWidth="200.0">
                <children>
-                  <Label style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;" text="🔨">
+                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../../image/54699acc-6fba-4ff0-b214-6edb30950a28.png" />
+                     </image>
                      <HBox.margin>
-                        <Insets left="13.0" top="19.0" />
-                     </HBox.margin></Label>
+                        <Insets left="7.0" top="10.0" />
+                     </HBox.margin>
+                  </ImageView>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Label style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;" text="ĐẤU GIÁ">
