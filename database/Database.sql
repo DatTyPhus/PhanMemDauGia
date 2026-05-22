@@ -28,7 +28,7 @@ CREATE TABLE `admin` (
   `password` varchar(255) NOT NULL,
   PRIMARY KEY (`admin_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -61,7 +61,7 @@ CREATE TABLE `auctions` (
   KEY `fk_auctions_items` (`item_id`),
   KEY `fk_auctions_bidder` (`highest_bidder_id`),
   CONSTRAINT `fk_auctions_bidder` FOREIGN KEY (`highest_bidder_id`) REFERENCES `bidders` (`user_id`) ON DELETE SET NULL
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -71,6 +71,32 @@ CREATE TABLE `auctions` (
 LOCK TABLES `auctions` WRITE;
 /*!40000 ALTER TABLE `auctions` DISABLE KEYS */;
 /*!40000 ALTER TABLE `auctions` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `autobid`
+--
+
+DROP TABLE IF EXISTS `autobid`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!50503 SET character_set_client = utf8mb4 */;
+CREATE TABLE `autobid` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `id_auction` int DEFAULT '0',
+  `autoBidAmount` decimal(20,5) DEFAULT NULL,
+  `autoBidderName` varchar(200) DEFAULT NULL,
+  `autoBidStep` decimal(20,5) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `autobid`
+--
+
+LOCK TABLES `autobid` WRITE;
+/*!40000 ALTER TABLE `autobid` DISABLE KEYS */;
+/*!40000 ALTER TABLE `autobid` ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -89,7 +115,7 @@ CREATE TABLE `bidders` (
   `balance` decimal(15,2) DEFAULT '0.00',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -122,7 +148,7 @@ CREATE TABLE `items` (
   PRIMARY KEY (`item_id`),
   KEY `fk_items_seller` (`seller_id`),
   CONSTRAINT `fk_items_seller` FOREIGN KEY (`seller_id`) REFERENCES `sellers` (`user_id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -150,7 +176,7 @@ CREATE TABLE `sellers` (
   `balance` decimal(15,2) DEFAULT '0.00',
   PRIMARY KEY (`user_id`),
   UNIQUE KEY `username` (`username`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -171,4 +197,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-21 15:17:52
+-- Dump completed on 2026-05-22 15:25:13

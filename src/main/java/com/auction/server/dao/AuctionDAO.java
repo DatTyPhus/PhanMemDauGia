@@ -115,34 +115,6 @@ public class AuctionDAO {
     return null; // Trả về null nếu không tìm thấy người dùng
 }
 
-
-    public static Auction updateDateTime(Auction auction, String startTime, String endTime) {
-        String sql = "UPDATE auctions SET start_time = ?, end_time = ? WHERE auction_id = ?";
-        Connection connection = null;
-        try {
-            connection = JDBCUtil.getConnection();
-            PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setTimestamp(1, java.sql.Timestamp.valueOf(startTime));
-            stmt.setTimestamp(2, java.sql.Timestamp.valueOf(endTime));
-            stmt.setInt(3, auction.getId());
-
-            int kq = stmt.executeUpdate();
-            if (kq > 0) {
-                System.out.println("Cập nhật thời gian đấu giá thành công!");
-                auction.setStartTime(startTime);
-                auction.setEndTime(endTime);
-                return auction;
-            } else {
-                System.out.println("Cập nhật thời gian thất bại, vui lòng kiểm tra lại dữ liệu.");
-            }
-            JDBCUtil.closeConnection(connection);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null; // Trả về null nếu cập nhật thất bại
-    }
-
-    // có thể phải sửa lại để update được giá và người thắng
     public static void update(Auction obj) {
     // Câu lệnh SQL update toàn bộ các cột, định danh bằng dấu hỏi chấm (?)
     String sql = "UPDATE auctions SET item_id = ?, item_name = ?, current_price = ?, "
@@ -216,6 +188,33 @@ public class AuctionDAO {
         auction.setEndTime  (rs.getString("end_time"));
         // thêm các field khác tùy theo bảng DB của bạn
         return auction;
+    }
+
+
+    public static List<Auction> selectByStatus(String status) {
+        List<Auction> auctions = new ArrayList<>();
+        String sql = "SELECT * FROM auctions WHERE status = ?";
+        
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setString(1, status); // Gán giá trị status vào dấu chấm hỏi
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Auction auction = new Auction();
+                auction.setId(rs.getInt("auction_id"));
+                auction.setItemId(rs.getInt("item_id"));
+                auction.setItemName(rs.getString("item_name"));
+                auction.setCurrentPrice(rs.getBigDecimal("current_price"));
+                auction.setDurationMinutes(rs.getInt("durationMinutes"));
+                auction.setStatus(rs.getString("status"));
+                auctions.add(auction);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return auctions; // Trả về danh sách đấu giá có trạng thái tương ứng
     }
 
     public static void delete(Integer id) {

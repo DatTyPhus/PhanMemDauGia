@@ -4,6 +4,8 @@ import com.auction.shared.network.Message;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
+import com.auction.server.controller.*;
+import com.auction.server.dao.*;
 import java.util.concurrent.CopyOnWriteArrayList; // Cấu trúc danh sách an toàn cho Đa luồng
 
 public class ServerCore {
@@ -16,7 +18,7 @@ public class ServerCore {
     public static void main(String[] args) {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Trạm thu sóng Server đang mở tại cổng " + PORT + "...");
-
+            AuctionSchedular.onServerStart(); // Gọi hàm này ngay khi Server khởi động để khởi tạo lại các đấu giá đang chờ
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Khách hàng mới vừa kết nối: " + clientSocket.getInetAddress());

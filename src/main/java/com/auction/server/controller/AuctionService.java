@@ -15,9 +15,12 @@ import com.auction.shared.model.*;
 import com.auction.shared.network.Message;
 
 public class AuctionService {
-  private static int auctionIdCounter = 0; 
-  protected static Auction currentAuction; // Biến để lưu trữ đấu giá hiện tại đang diễn ra
-  protected static Map<Integer, Auction> waitingAuctions; // Giả sử có một map để quản lý các đấu giá đang chờ xử lý
+    private static BigDecimal autoBidAmount = BigDecimal.ZERO;
+    private static String autoBidderName = null;
+    private static BigDecimal autoBiddStep = BigDecimal.ZERO;
+    private static int auctionIdCounter = 0; 
+    private static Auction currentAuction; // Biến tĩnh để lưu phiên đấu giá hiện tại
+    protected static Map<Integer, Auction> waitingAuctions; // Giả sử có một map để quản lý các đấu giá đang chờ xử lý
 
   //đao tạo đấu giá mới
   public static Auction createAuction(Item item) {
@@ -39,6 +42,7 @@ public class AuctionService {
         AuctionSchedular.setTimeline(AuctionSchedular.getTimeline().plusMinutes(item.getDurationMinutes()));
     }
     auction.setStatus("PENDING");
+    AuctionDAO.create(auction);
     return auction;
   }
 // public void updateTimeLine (Auction auction) {
@@ -56,9 +60,38 @@ public class AuctionService {
 //     auctionDAO.updateDateTime(auction, startTimeStr, endTimeStr);
 //   }
 
+
+public static Message processAutoBid(BidTransaction bidTransaction) {
+    Auction auction = AuctionDAO.selectById(bidTransaction.getAuctionId());
+    if (auction == null) {
+        return new Message("AUTO_BID_FAIL", "Đấu giá không tồn tại.");
+    }
+    Bidder bidder = BidderDAO.selectByUsername(bidTransaction.getBiddername());
+    if (bidder == null) {
+        return new Message("AUTO_BID_FAIL", "Người đặt không tồn tại.");
+    }
+    if (bidder.getBalance().compareTo(bidTransaction.getBidAmount()) < 0) {
+        return new Message("AUTO_BID_FAIL", "Số dư không đủ.");
+    }
+    if (bidTransaction.getBidAmount().compareTo(auction.getCurrentPrice()) <= 0) {
+        return new Message("AUTO_BID_FAIL", "Giá đặt phải cao hơn giá hiện tại (" + auction.getCurrentPrice() + ").");
+    }
+    if (bidTransaction.getBidAmount().compareTo(AuctionService.getAutoBidAmount()) <= 0) {
+        return new Message("AUTO_BID_FAIL", "Giá đặt phải vượt quá mức đặt tự động đã thiết lập (" + AuctionService.getAutoBidAmount() + ").");
+    }
+
+    BidTransaction bidTransaction2 = new BidTransaction(bidTransaction.getAuctionId(), bidTransaction.getBiddername(), auction.getCurrentPrice().add(bidTransaction.getStep()));
+    processBid(bidTransaction2);
+    autoBidAmount = bidTransaction.getBidAmount();
+    autoBidderName = bidTransaction.getBiddername();
+    autoBiddStep = bidTransaction.getStep();
+
+    return new Message("AUTO_BID_SUCCESS", bidTransaction);
+}
+
     //đặ bit giá cho một đấu giá cụ thể
-  public static Message processBid(String bidder_name, BigDecimal bidAmount ) {
-        Auction auction =  AuctionDAO.selectByItemName(currentAuction.getItemName());
+  public static Message processBid( BidTransaction bidTransaction) {
+        Auction auction =  AuctionDAO.selectById(bidTransaction.getAuctionId());
         LocalDateTime now = LocalDateTime.now();
         int secondsBetween = (int) ChronoUnit.SECONDS.between(now, auction.changeStringToTime(auction.getEndTime()));
         if (auction == null) {
@@ -70,16 +103,26 @@ public class AuctionService {
         }
         auction.lock();
         try{
-          if (bidAmount.compareTo(auction.getCurrentPrice()) <= 0) {
+          if (bidTransaction.getBidAmount().compareTo(auction.getCurrentPrice()) <= 0) {
                 return new Message("BID_FAIL", "Giá đặt phải cao hơn giá hiện tại (" + auction.getCurrentPrice() + ").");
           }
-          Bidder bidder = BidderDAO.selectByUsername(bidder_name);
-          if (bidder.getBalance().compareTo(bidAmount) < 0) {
+          Bidder bidder = BidderDAO.selectByUsername(bidTransaction.getBiddername());
+          if (bidder.getBalance().compareTo(bidTransaction.getBidAmount()) < 0) {
             return new Message("BID_FAIL", "Số dư không đủ.");
           }
+          if (bidTransaction.getBidAmount().compareTo(autoBidAmount)<=0){
+            if (autoBidAmount.compareTo(bidTransaction.getBidAmount().add(autoBiddStep)) <=0){
+               auction.setCurrentPrice(autoBidAmount);           
+                return new Message("BID_FAILED", "Có người đặt giá tự động cao hơn bạn, giá tự dộng cập nhật là: "+ autoBidAmount);
+            }
+            else{
+                auction.setCurrentPrice(bidTransaction.getBidAmount().add(autoBiddStep));
+                return new Message("BID_FAILED", "Có người đặt giá tự động cao hơn bạn, giá tự dộng cập nhật là: "+ bidTransaction.getBidAmount().add(autoBiddStep));
+            }
+          }
           Bidder previousHighestBidder = BidderDAO.selectByUsername(auction.getHighestBidderName());
-          auction.setCurrentPrice(bidAmount);
-          auction.setHighestBidderName(bidder_name);
+          auction.setCurrentPrice(bidTransaction.getBidAmount());
+          auction.setHighestBidderName(bidTransaction.getBiddername());
           return new Message("BID_SUCCESS", previousHighestBidder);
         } finally {
             auction.unlock();
@@ -87,10 +130,13 @@ public class AuctionService {
     }
 
 
-    public static void setCurrentAuction(Auction auction) {
-        currentAuction = auction;
-    }
-    public static Auction getCurrentAuction() {
-        return currentAuction;
-    }
+    public static void setCurrentAuction(Auction auction) {currentAuction = auction;}
+    public static Auction getCurrentAuction() {return currentAuction;}
+
+    public static BigDecimal getAutoBidAmount() { return autoBidAmount; }
+    public static void setAutoBidAmount(BigDecimal amount) { autoBidAmount = amount; }
+    public static String getAutoBidderName() { return autoBidderName; }
+    public static void setAutoBidderName(String name) { autoBidderName = name; }
+    public static BigDecimal getAutoBidStep() { return autoBiddStep; }
+    public static void setAutoBidStep(BigDecimal step) { autoBiddStep = step; }
 }
