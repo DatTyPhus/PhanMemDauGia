@@ -7,30 +7,59 @@ package com.auction.server.controller;
 
 import java.math.BigDecimal;
 import java.util.Map;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 import com.auction.server.dao.*;
 import com.auction.shared.model.*;
-import com.auction.shared.network.Message;;
+import com.auction.shared.network.Message;
 
 public class AuctionService {
   private static int auctionIdCounter = 0; 
-  private final ItemDAO itemDAO = new ItemDAO();
-  private final BidderDAO bidderDAO = new BidderDAO();
-  private final SellerDAO sellerDAO = new SellerDAO();
-  private final AuctionDAO auctionDAO = new AuctionDAO();
-  public static Map<Integer, Auction> waitingAuctions; // Giả sử có một map để quản lý các đấu giá đang chờ xử lý
+  protected static Auction currentAuction; // Biến để lưu trữ đấu giá hiện tại đang diễn ra
+  protected static Map<Integer, Auction> waitingAuctions; // Giả sử có một map để quản lý các đấu giá đang chờ xử lý
 
   //đao tạo đấu giá mới
-  public Message createAuction(String itemName, BigDecimal startingPrice, int durationMinutes) {
-    Item item = itemDAO.selectByName(itemName);
-    Auction auction = new Auction(item.getId(), itemName, startingPrice, durationMinutes);
-    waitingAuctions.put(auction.getId(), auction);
-    return new Message("ADD_ITEM_REQUEST", item);
+  public static Auction createAuction(Item item) {
+    Auction auction = new Auction();
+    auction.setId(++auctionIdCounter); // Tăng counter và gán làm ID cho đấu giá mới
+    auction.setItemId(item.getId());
+    auction.setItemName(item.getName());
+    auction.setCurrentPrice(item.getStartingPrice());
+    auction.setCurrentPrice(item.getStartingPrice());
+    auction.setDurationMinutes(item.getDurationMinutes());
+    if (AuctionSchedular.getTimeline() == null || java.time.LocalDateTime.now().isAfter(AuctionSchedular.getTimeline())) {
+        AuctionSchedular.setTimeline(java.time.LocalDateTime.now().plusMinutes(item.getDurationMinutes()));
+        auction.setStartTime(auction.changeTimetoString(java.time.LocalDateTime.now()));
+        auction.setEndTime(auction.changeTimetoString(java.time.LocalDateTime.now().plusMinutes(item.getDurationMinutes())));
+    }
+    else {
+        auction.setStartTime(auction.changeTimetoString(AuctionSchedular.getTimeline()));
+        auction.setEndTime(auction.changeTimetoString(AuctionSchedular.getTimeline().plusMinutes(item.getDurationMinutes())));
+        AuctionSchedular.setTimeline(AuctionSchedular.getTimeline().plusMinutes(item.getDurationMinutes()));
+    }
+    auction.setStatus("PENDING");
+    return auction;
   }
+// public void updateTimeLine (Auction auction) {
+//     LocalDateTime endTime = null;
+//     LocalDateTime startTime =null;
+//     if (timeline == null || LocalDateTime.now().isAfter(timeline)) {
+//         timeline = LocalDateTime.now().plusMinutes(auction.getDurationMinutes());
+//     }
+//     else{
+//         startTime = timeline;
+//         endTime = timeline.plusMinutes(auction.getDurationMinutes());
+//     } 
+//     String startTimeStr = auction.changeTimetoString(startTime);
+//     String endTimeStr = auction.changeTimetoString(endTime);
+//     auctionDAO.updateDateTime(auction, startTimeStr, endTimeStr);
+//   }
 
     //đặ bit giá cho một đấu giá cụ thể
-  public Message processBid(String bidder_name, String item_name, BigDecimal bidAmount ) {
-        Auction auction =  auctionDAO.selectByItemName(item_name);
+  public static Message processBid(String bidder_name, BigDecimal bidAmount ) {
+        Auction auction =  AuctionDAO.selectByItemName(currentAuction.getItemName());
+        LocalDateTime now = LocalDateTime.now();
         if (auction == null) {
             return new Message("BID_FAIL", "Đấu giá không tồn tại.");
         }
@@ -39,15 +68,24 @@ public class AuctionService {
           if (bidAmount.compareTo(auction.getCurrentPrice()) <= 0) {
                 return new Message("BID_FAIL", "Giá đặt phải cao hơn giá hiện tại (" + auction.getCurrentPrice() + ").");
           }
-          Bidder bidder = bidderDAO.selectByUsername(bidder_name);
+          Bidder bidder = BidderDAO.selectByUsername(bidder_name);
           if (bidder.getBalance().compareTo(bidAmount) < 0) {
             return new Message("BID_FAIL", "Số dư không đủ.");
           }
+          Bidder previousHighestBidder = BidderDAO.selectByUsername(auction.getHighestBidderName());
           auction.setCurrentPrice(bidAmount);
-          auction.setHighestBidderId(auction.getId());
-          return new Message("BID_SUCCESS", "Đặt giá thành công.");
+          auction.setHighestBidderName(bidder_name);
+          return new Message("BID_SUCCESS", previousHighestBidder);
         } finally {
             auction.unlock();
         }
+    }
+
+
+    public static void setCurrentAuction(Auction auction) {
+        currentAuction = auction;
+    }
+    public static Auction getCurrentAuction() {
+        return currentAuction;
     }
 }

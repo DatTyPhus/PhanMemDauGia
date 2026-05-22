@@ -7,14 +7,12 @@ import com.auction.shared.network.Message;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import javafx.stage.Stage;
 
-import java.io.IOException;
+/// class AuctionController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình PHIÊN ĐẤU GIÁ.
 
-public class SettingController implements NetworkClient.MessageListener {
+public class AuctionController implements NetworkClient.MessageListener {
 
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
@@ -37,55 +35,24 @@ public class SettingController implements NetworkClient.MessageListener {
         }
     }
 
-    /// Method này thực hiện khi thao tác click vào nút chuyển sang màn notification.fxml.
+    /// Các hàm trống này để chống lỗi khi bạn bấm vào các nút Filter trên giao diện
     @FXML
-    public void onNotificationClick(javafx.event.ActionEvent event) {
-        try {
-            NetworkClient.getInstance().removeListener(this);
+    public void filterAll(ActionEvent event) { }
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/notification.fxml"));
-
-            Parent root = loader.load();                ///Thay đổi màn home thành màn notification.
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-            javafx.scene.Scene currentScene = source.getScene();
-            currentScene.setRoot(root);
-
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow();
-            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
-
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-            System.err.println("Lỗi: Không tìm thấy file notification.fxml");
-        }
-    }
-
-    /// Method này thực hiện khi thao tác click vào Phiên đấu giá
     @FXML
-    public void onAuctionSessionClick(javafx.event.ActionEvent event) {
-        try {
-            NetworkClient.getInstance().removeListener(this);
+    public void filterRunning(ActionEvent event) { }
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/phiendaugia.fxml")); //Tải file phiendaugia.fxml
-            Parent root = loader.load();
+    @FXML
+    public void filterUpcoming(ActionEvent event) { }
 
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
-            javafx.scene.Scene currentScene = source.getScene();
-            currentScene.setRoot(root);
-
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
-            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
-
-        } catch (java.io.IOException e) {
-            e.printStackTrace();
-            System.err.println("Lỗi: Không tìm thấy file phiendaugia.fxml! Hãy kiểm tra lại đường dẫn.");
-        }
-    }
+    @FXML
+    public void filterFinished(ActionEvent event) { }
 
     /// Method này thực hiện khi thao tác click vào Trang chủ
     @FXML
     public void onBackToHomeClick(javafx.event.ActionEvent event) {
         try {
-            NetworkClient.getInstance().removeListener(this);
+            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
             Parent root = loader.load();
@@ -103,29 +70,25 @@ public class SettingController implements NetworkClient.MessageListener {
         }
     }
 
-    /// Hàm thực hiện khi bấm nút Đăng xuất
+    /// Method này thực hiện khi thao tác click vào nút chuyển sang màn notification.fxml.
     @FXML
-    public void onLogoutClick(ActionEvent event) {
-
-        UserSession.getInstance().cleanloginUser();   //Xoá đối tượng được lưu trong UserSession
-
-        // Chuyển về maàn đăng nhập
+    public void onNotificationClick(javafx.event.ActionEvent event) {
         try {
-            NetworkClient.getInstance().removeListener(this);
+            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/sample.fxml"));  // Tải file màn hình
-            Parent root = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/notification.fxml"));
 
-            Node source = (Node) event.getSource();
-            Stage currentStage = (Stage) source.getScene().getWindow();     // Lấy cửa sổ hiện tại
+            Parent root = loader.load();                ///Thay đổi màn home thành màn notification.
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+            javafx.scene.Scene currentScene = source.getScene();
+            currentScene.setRoot(root);
 
-            currentStage.getScene().setRoot(root);          // Thay của sổ thành màn đăng nhập
-
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow();
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
-        } catch (IOException e) {
+        } catch (java.io.IOException e) {
             e.printStackTrace();
-            System.err.println("Lỗi: Không tìm thấy file màn hình đăng nhập!");
+            System.err.println("Lỗi: Không tìm thấy file notification.fxml");
         }
     }
 
@@ -206,6 +169,30 @@ public class SettingController implements NetworkClient.MessageListener {
         }
     }
 
+    /// Method này thực hiện khi click vào nút CÀI ĐẶT
+    @FXML
+    public void onSettingClick(javafx.event.ActionEvent event) {
+        try {
+            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
+
+            // 1. Tìm bản vẽ setting.fxml
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/setting.fxml"));
+            Parent root = loader.load();
+
+            // 2. Lấy Scene hiện tại và thay "ruột" bằng trang Cài đặt
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+            source.getScene().setRoot(root);
+
+            // 3. Đổi tiêu đề cửa sổ
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
+
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi: Không tìm thấy file setting.fxml!");
+        }
+    }
+
     // ================= PHẦN XỬ LÝ REALTIME =================
     @Override
     public void onMessageReceived(Message msg) {
@@ -241,5 +228,5 @@ public class SettingController implements NetworkClient.MessageListener {
             }
         });
     }
-
 }
+

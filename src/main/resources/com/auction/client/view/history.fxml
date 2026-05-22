@@ -5,15 +5,18 @@
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Pagination?>
-<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.layout.TilePane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="800" prefWidth="1400" style="-fx-background-color: #f1f5f9;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.AuctionController">
+<BorderPane prefHeight="800" prefWidth="1400" style="-fx-background-color: #f1f5f9;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.AuctionHistoryController">
 
     <top>
         <HBox alignment="CENTER_LEFT" minHeight="90.0" prefHeight="90.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 5);" BorderPane.alignment="CENTER">
@@ -25,10 +28,10 @@
             </BorderPane.margin>
             <children>
                 <VBox alignment="CENTER_LEFT" spacing="5">
-                    <Label style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #0B1F3A; -fx-letter-spacing: 1;" text="PHIÊN ĐẤU GIÁ" />
+                    <Label style="-fx-font-size: 24; -fx-font-weight: bold; -fx-text-fill: #0B1F3A; -fx-letter-spacing: 1;" text="LỊCH SỬ ĐẤU GIÁ" />
                     <HBox alignment="CENTER_LEFT" spacing="5">
-                        <Label style="-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-font-size: 13;" text="SÀN GIAO DỊCH" />
-                        <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 13;" text=" | Khám phá và tham gia trả giá tài sản" />
+                        <Label style="-fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-font-size: 13;" text="HOẠT ĐỘNG" />
+                        <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 13;" text=" | Theo dõi chi tiết các phiên bạn đã tham gia" />
                     </HBox>
                 </VBox>
 
@@ -73,13 +76,13 @@
                 <Button onAction="#onBackToHomeClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ">
                     <VBox.margin><Insets left="8" right="8"/></VBox.margin>
                 </Button>
-                <Button mnemonicParsing="false" style="-fx-background-color: #1e293b; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 8;" text="Phiên đấu giá">
+                <Button onAction="#onAuctionSessionClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Phiên đấu giá">
                     <VBox.margin><Insets left="8" right="8"/></VBox.margin>
                 </Button>
                 <Button onAction="#onProductManagementClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lý tài sản">
                     <VBox.margin><Insets left="8" right="8"/></VBox.margin>
                 </Button>
-                <Button onAction="#onHistoryClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Lịch sử đấu giá">
+                <Button mnemonicParsing="false" style="-fx-background-color: #1e293b; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 8;" text="Lịch sử đấu giá">
                     <VBox.margin><Insets left="8" right="8"/></VBox.margin>
                 </Button>
                 <Button onAction="#onNotificationClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Thông báo">
@@ -101,36 +104,44 @@
     <center>
         <VBox spacing="25" style="-fx-background-color: linear-gradient(to bottom right, #ffffff 0%, #f1f5f9 40%, #e2e8f0 100%);">
             <padding>
-                <Insets bottom="25" left="35" right="35" top="35" />
+                <Insets bottom="30" left="35" right="35" top="35" />
             </padding>
 
             <HBox alignment="CENTER_LEFT" spacing="15" style="-fx-background-color: white; -fx-padding: 15 25; -fx-background-radius: 16; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 10, 0, 0, 3);">
-                <Label style="-fx-font-weight: bold; -fx-font-size: 15; -fx-text-fill: #475569;" text="Trạng thái:" />
 
-                <HBox spacing="10">
-                    <Button onAction="#filterAll" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="Tất cả" />
-                    <Button onAction="#filterRunning" style="-fx-background-color: transparent; -fx-border-color: #cbd5e1; -fx-border-radius: 20; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-padding: 8 20; -fx-cursor: hand;" text="Đang diễn ra" />
-                    <Button onAction="#filterUpcoming" style="-fx-background-color: transparent; -fx-border-color: #cbd5e1; -fx-border-radius: 20; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-padding: 8 20; -fx-cursor: hand;" text="Sắp diễn ra" />
-                    <Button onAction="#filterFinished" style="-fx-background-color: transparent; -fx-border-color: #cbd5e1; -fx-border-radius: 20; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-padding: 8 20; -fx-cursor: hand;" text="Đã kết thúc" />
-                </HBox>
+                <TextField prefHeight="40" prefWidth="300" promptText="🔍 Tìm kiếm tên tài sản..."
+                           style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8;" />
+
+                <ComboBox prefHeight="40" prefWidth="160" promptText="Trạng thái"
+                          style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-background-radius: 8;" />
+
+                <Button prefHeight="40" style="-fx-background-color: #0f172a; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 0 20; -fx-cursor: hand;" text="Lọc Dữ Liệu" />
 
                 <Region HBox.hgrow="ALWAYS" />
 
-                <Label style="-fx-font-weight: bold; -fx-font-size: 14; -fx-text-fill: #475569;" text="Sắp xếp:" />
-                <ComboBox promptText="Mới nhất" style="-fx-background-color: #f8fafc; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-background-radius: 8;" prefHeight="38" prefWidth="150" />
+                <Button prefHeight="40" style="-fx-background-color: #10b981; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 0 20; -fx-cursor: hand;" text="⬇ Xuất Excel" />
             </HBox>
 
-            <ScrollPane fitToWidth="true" style="-fx-background-color: transparent; -fx-background: transparent;" VBox.vgrow="ALWAYS">
-                <content>
-                    <TilePane fx:id="cardContainer" hgap="30" vgap="30" prefColumns="4" style="-fx-background-color: transparent;">
-                        <padding>
-                            <Insets bottom="20" left="10" right="10" top="10" />
-                        </padding>
-                    </TilePane>
-                </content>
-            </ScrollPane>
+            <VBox VBox.vgrow="ALWAYS" style="-fx-background-color: white; -fx-background-radius: 16; -fx-padding: 15; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.05), 15, 0, 0, 5);">
+                <children>
+                    <TableView fx:id="historyTable" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-color: transparent;">
+                        <columns>
+                            <TableColumn prefWidth="90" style="-fx-alignment: CENTER;" text="Mã Phiên" />
+                            <TableColumn prefWidth="280" style="-fx-alignment: CENTER_LEFT; -fx-font-weight: bold;" text="Tên tài sản đấu giá" />
+                            <TableColumn prefWidth="160" style="-fx-alignment: CENTER_RIGHT; -fx-text-fill: #0f172a;" text="Mức giá bạn đặt" />
+                            <TableColumn prefWidth="160" style="-fx-alignment: CENTER_RIGHT; -fx-text-fill: #059669; -fx-font-weight: bold;" text="Giá chốt cuối cùng" />
+                            <TableColumn prefWidth="180" style="-fx-alignment: CENTER;" text="Thời gian tham gia" />
+                            <TableColumn prefWidth="150" style="-fx-alignment: CENTER;" text="Kết quả" />
+                            <TableColumn prefWidth="120" style="-fx-alignment: CENTER;" text="Thao tác" />
+                        </columns>
+                        <columnResizePolicy>
+                            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                        </columnResizePolicy>
+                    </TableView>
+                </children>
+            </VBox>
 
-            <HBox alignment="CENTER" prefHeight="50">
+            <HBox alignment="CENTER" prefHeight="40">
                 <Pagination fx:id="pagination" maxPageIndicatorCount="5" prefWidth="400" />
             </HBox>
 

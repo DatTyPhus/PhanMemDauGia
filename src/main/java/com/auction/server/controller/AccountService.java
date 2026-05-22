@@ -5,40 +5,51 @@ không để xảy ra tình trạng 1 món đồ bán cho 2 người.
 */
 package com.auction.server.controller;
 
-import com.auction.server.dao.SellerDAO;
-import com.auction.server.dao.BidderDAO;
-import com.auction.shared.model.Bidder;
-import com.auction.shared.model.Seller;
-import com.auction.shared.network.Message;;
+import com.auction.server.dao.*;
+import com.auction.shared.model.*;
+import com.auction.shared.network.Message;
 
 public class AccountService {
+
+  // 3 DÒNG NÀY LÀ CỰC KỲ QUAN TRỌNG ĐỂ JAVA NHẬN DIỆN ĐƯỢC DAO (BẠN ĐÃ LỠ XÓA MẤT NÓ)
   private final BidderDAO bidderDAO = new BidderDAO();
   private final SellerDAO sellerDAO = new SellerDAO();
+  private final AdminDAO adminDAO = new AdminDAO();
 
   public Message login(String username, String password) {
-    Bidder bidder = bidderDAO.selectByUsername(username);
-    Seller seller = sellerDAO.selectByUsername(username);
 
-    // 1. Nếu tìm thấy trong bảng Bidder
+    // 1. Kiểm tra bên kho Bidder
+    Bidder bidder = bidderDAO.selectByUsername(username);
     if (bidder != null) {
       if (bidder.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", bidder);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu Bidder.");
       }
     }
-    // 2. Nếu tìm thấy trong bảng Seller
-    else if (seller != null) {
+
+    // 2. Kiểm tra bên kho Seller
+    Seller seller = sellerDAO.selectByUsername(username);
+    if (seller != null) {
       if (seller.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", seller);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu Seller.");
       }
     }
-    // 3. Nếu không tìm thấy ở cả 2 bảng
-    else {
-      return new Message("LOGIN_FAIL", "Tài khoản không tồn tại.");
+
+    // 3. Kiểm tra bên kho Admin
+    Admin admin = adminDAO.selectByUsername(username);
+    if (admin != null) {
+      if (admin.getPassword().equals(password)) {
+        return new Message("LOGIN_SUCCESS", admin);
+      } else {
+        return new Message("LOGIN_FAIL", "Sai mật khẩu Admin.");
+      }
     }
+
+    // 4. Nếu tìm cả 3 kho đều không thấy
+    return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc tài khoản không tồn tại.");
   }
 
   public Message register(String username, String password, String fullName , String role) {

@@ -42,7 +42,7 @@ public class RegisterController {
 
         // Khi NetworkClient có tín hiệu phản hồi từ server sẽ được đi vào hàm handleServerResponse.
         try{
-            NetworkClient.getInstance().setListener(new NetworkClient.MessageListener() {
+            NetworkClient.getInstance().addListener(new NetworkClient.MessageListener() {
                 @Override
                 public void onMessageReceived(Message msg) {            /// Thực hiện các xử lý phản hồi từ server phải thực hiện trên luồng JavaFX Application Thread cho bất kì tác vụ nào liên quan đến JavaFX.
                     Platform.runLater(() -> handleServerResponse(msg));

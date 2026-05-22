@@ -14,41 +14,47 @@ public class ItemDAO  {
     }
 
     public void create(Item obj) {
-        String sql = "INSERT INTO items (item_id, seller_id, item_name, description, category, starting_price, image_url, created_at) VALUES ('"
-                + obj.getId() + "', '"
-                + obj.getSellerId() + "', '"
-                + obj.getName() + "', '"
-                + obj.getDescription() + "', "
-                + obj.getCategory() + ", "
-                + obj.getStartingPrice() + ", "
-                + obj.getImageUrl() + ", '"
-                + obj.getCreatedAt().toString() + "')";
-        Connection connection = null;
-        try{
-            connection = JDBCUtil.getConnection();
-            Statement st= connection.createStatement();
+        // ĐÃ SỬA: Bổ sung special_info vào cuối danh sách cột và thêm 1 dấu ? vào cuối VALUES (tổng 9 dấu ?)
+        String sql = "INSERT INTO items (seller_id, item_name, description, item_type, start_price, image_url, duration_minutes, status, special_info) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-            int kq = st.executeUpdate(sql);
+        try (Connection connection = JDBCUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+
+            // Bơm dữ liệu từ Object vào các dấu hỏi chấm (?)
+            ps.setInt(1, obj.getSellerId());
+            ps.setString(2, obj.getName());
+            ps.setString(3, obj.getDescription());
+            ps.setString(4, obj.getItemType());
+            ps.setBigDecimal(5, obj.getStartingPrice());
+            ps.setString(6, obj.getImageUrl() != null ? obj.getImageUrl() : "");
+            ps.setInt(7, obj.getDurationMinutes());
+            ps.setString(8, obj.getStatus());
+
+            // ĐÃ SỬA: Bơm dữ liệu Thông tin đặc biệt vào dấu ? thứ 9
+            ps.setString(9, obj.getSpecialInfo() != null ? obj.getSpecialInfo() : "");
+
+            // Thực thi lệnh chèn xuống CSDL
+            int kq = ps.executeUpdate();
+
             if (kq > 0) {
-                System.out.println("Them san pham thanh cong!");
+                System.out.println("[DATABASE] Đã lưu sản phẩm '" + obj.getName() + "' vào kho CHỜ DUYỆT thành công!");
             } else {
-                System.out.println("Them that bai, vui long kiem tra lai du lieu.");
+                System.out.println("[DATABASE] Thêm thất bại, vui lòng kiểm tra lại dữ liệu.");
             }
-            JDBCUtil.closeConnection(connection);
-        } catch(Exception e){
+
+        } catch (Exception e) {
+            System.err.println("[DATABASE ERROR] Lỗi khi lưu sản phẩm: " + e.getMessage());
             e.printStackTrace();
+        }
     }
-  }
 
   
   public void update(Item obj) {
       String sql = "UPDATE items SET seller_id = '" + obj.getSellerId() + "', "
               + "item_name = '" + obj.getName() + "', "
               + "description = '" + obj.getDescription() + "', "
-              + "category = '" + obj.getCategory() + "', "
               + "starting_price = " + obj.getStartingPrice() + ", "
               + "image_url = '" + obj.getImageUrl() + "', "
-              + "created_at = '" + obj.getCreatedAt().toString() + "' "
               + "WHERE item_id = " + obj.getId();
       Connection connection = null;
       try{
@@ -104,16 +110,14 @@ public class ItemDAO  {
         if (rs.next()) {
             Item item=null;
             String type= rs.getString("item_type");
-            if (type.equals("ARTS")){ item = new Art(); }
-            else if (type.equals("ELECTRONICS")) { item = new Electronics(); }
-            else if (type.equals("VEHICLES")) { item = new Vehicle(); }
-            
+            item = Item.createFromType(type);
             item.setId(rs.getInt("item_id"));
             item.setSellerId(rs.getInt("seller_id"));
             item.setName(rs.getString("item_name"));
             item.setDescription(rs.getString("description"));
-            item.setCategory(rs.getString("category"));
             item.setStartingPrice(rs.getBigDecimal("starting_price"));
+            item.setImageUrl(rs.getString("image_url"));
+            item.setDurationMinutes(rs.getInt("duration_minutes"));
             return item;
         }
     } catch (SQLException e) {
