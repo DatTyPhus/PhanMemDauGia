@@ -7,6 +7,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;     
+import java.util.ArrayList;
 
 public class ItemDAO  {
     public static ItemDAO instance() {
@@ -95,7 +97,64 @@ public class ItemDAO  {
       }
 
 
+    public static List<Item> findPendingItems() {
+        String sql = "SELECT * FROM items WHERE status = 'PENDING'";
+        
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
 
+            List<Item> pendingItems = new ArrayList<>();
+            while (rs.next()) {
+                Item item = null;
+                String type = rs.getString("item_type");
+                item = Item.createFromType(type);
+                item.setId(rs.getInt("item_id"));
+                item.setSellerId(rs.getInt("seller_id"));
+                item.setName(rs.getString("item_name"));
+                item.setDescription(rs.getString("description"));
+                item.setStartingPrice(rs.getBigDecimal("starting_price"));
+                item.setImageUrl(rs.getString("image_url"));
+                item.setDurationMinutes(rs.getInt("duration_minutes"));
+                pendingItems.add(item);
+            }
+            return pendingItems;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Trả về null nếu không tìm thấy người dùng
+      }
+
+    
+    public static List<Item> findItemsBySellerId(int sellerId) {
+        String sql = "SELECT * FROM items WHERE seller_id = ?";
+        
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, sellerId); // Gán giá trị sellerId vào dấu chấm hỏi
+            ResultSet rs = stmt.executeQuery();
+
+            List<Item> sellerItems = new ArrayList<>();
+            while (rs.next()) {
+                Item item = null;
+                String type = rs.getString("item_type");
+                item = Item.createFromType(type);
+                item.setId(rs.getInt("item_id"));
+                item.setSellerId(rs.getInt("seller_id"));
+                item.setName(rs.getString("item_name"));
+                item.setDescription(rs.getString("description"));
+                item.setStartingPrice(rs.getBigDecimal("starting_price"));
+                item.setImageUrl(rs.getString("image_url"));
+                item.setDurationMinutes(rs.getInt("duration_minutes"));
+                sellerItems.add(item);
+            }
+            return sellerItems;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Trả về null nếu không tìm thấy người dùng
+    }
 
 
     public Item selectByName(String name) {

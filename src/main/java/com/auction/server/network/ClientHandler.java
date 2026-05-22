@@ -8,6 +8,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.List;
+import java.util.ArrayList;
+
 import com.auction.shared.model.*;
 
 //
@@ -118,11 +121,22 @@ public class ClientHandler implements Runnable {
                         Message errorResponse = new Message("ADD_ITEM_THATBAI", errorMsg);
                         out.println(errorResponse.toJson());
                         break;
-                    case "GET_MY_ITEMS":
-                        // Xử lý khi Seller muốn xem kho đồ của mình. payload : null.
+                    case "PENDING_PRODUCTS":
+                        List<Item> pendingItems = ItemDAO.findPendingItems();
+                        Message pendingItemsResponse = new Message("PENDING_PRODUCTS", pendingItems);
+                        out.println(pendingItemsResponse.toJson());
                         break;
-                    case "PLACE_BID":
-                        System.out.println("Có người đặt giá: " + msg.getPayload());
+                    case "MY_PRODUCTS":
+                        String jsonStr = msg.getPayload().toString();
+
+                            // 2. Dùng JsonParser đọc trước JSON để lấy "itemType"
+                            com.google.gson.JsonObject jsonObj = com.google.gson.JsonParser.parseString(jsonStr).getAsJsonObject();
+
+                            // LƯU Ý: Phải get đúng chữ "itemType" vì class Item.java khai báo biến này
+                            int id = jsonObj.get("id").getAsInt();
+
+                        List<Item> sellerItems = ItemDAO.findItemsBySellerId(id); // Thay 1 bằng ID người bán thực tế
+                        out.println(new Message("MY_PRODUCTS", sellerItems).toJson());
                         break;
                     
                     default:
