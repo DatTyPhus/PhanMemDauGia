@@ -20,7 +20,11 @@
             <Image url="@../image/background.png" />
          </image>
       </ImageView>
-      <VBox layoutX="741.0" layoutY="273.0" prefHeight="407.0" prefWidth="332.0" style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 30; -fx-padding: 30; -fx-spacing: 15; -fx-alignment: center; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25),20,0,0,8);">
+<<<<<<<<< Temporary merge branch 1
+      <VBox layoutX="692.0" layoutY="236.0" prefHeight="407.0" prefWidth="332.0" style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 30; -fx-padding: 30; -fx-spacing: 15; -fx-alignment: center; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25),20,0,0,8);">
+=========
+      <VBox layoutX="889.0" layoutY="252.0" prefHeight="407.0" prefWidth="332.0" style="-fx-background-color: rgba(255,255,255,0.92); -fx-background-radius: 30; -fx-padding: 30; -fx-spacing: 15; -fx-alignment: center; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25),20,0,0,8);">
+>>>>>>>>> Temporary merge branch 2
          <children>
             <Label style="-fx-font-size: 32; -fx-background-color: #1976D2; -fx-alignment: center; -fx-text-fill: white; -fx-background-radius: 50; -fx-pref-width: 60; -fx-pref-height: 60;" text="👤" />
             <Label style="-fx-font-weight: bold; -fx-font-size: 24;" text="ĐĂNG NHẬP">
