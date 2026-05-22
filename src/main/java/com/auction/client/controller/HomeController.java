@@ -105,16 +105,18 @@ public class HomeController implements NetworkClient.MessageListener {
     @FXML
     public void onBackToHomeClick(javafx.event.ActionEvent event) {
         try {
-            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
+            NetworkClient.getInstance().removeListener(this);
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
             Parent root = loader.load();
 
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn hình phiendaugia thành màn home.
-            source.getScene().setRoot(root);
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
 
-            //Đặt lại tiêu đề cho window.
+            // ĐÃ SỬA: Lấy Cửa sổ (Stage) TRƯỚC
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
+
+            // Mới thay ruột
+            source.getScene().setRoot(root);
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
@@ -125,28 +127,32 @@ public class HomeController implements NetworkClient.MessageListener {
 
     @FXML
     public void onProductManagementClick(javafx.event.ActionEvent event) {
-        //  Lấy thông tin người dùng hiện tại từ Session
+        // Lấy thông tin người dùng hiện tại từ Session
         com.auction.shared.model.User currentUser = com.auction.client.session.UserSession.getInstance().getLoginUser();
 
         // KIỂM TRA ROLE ĐỂ VÀO MÀN HÌNH
-        if (currentUser != null && "Seller".equalsIgnoreCase(currentUser.getRole())) {         // Nếu đủ điều kiện thfi chuyển màn hiình sang màn quản lý tài sản.
+        if (currentUser != null && "Seller".equalsIgnoreCase(currentUser.getRole())) {
             try {
-                NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
+                NetworkClient.getInstance().removeListener(this);
 
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/product_management.fxml"));
                 Parent root = loader.load();
 
                 javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-                source.getScene().setRoot(root);
 
+                // ĐÃ SỬA: Lấy Cửa sổ (Stage) TRƯỚC KHI thay ruột giao diện
                 javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
+
+                // Bây giờ mới được phép thay ruột
+                source.getScene().setRoot(root);
                 currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
+
             } catch (java.io.IOException e) {
                 e.printStackTrace();
                 System.err.println("Lỗi: Không tìm thấy file product_management.fxml!");
             }
         } else {
-            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);    //Nếu không đủ điều kiện , hiện lên thông báo để chuyển hướng.
+            javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
             alert.setTitle("Từ chối truy cập");
             alert.setHeaderText(null);
             alert.setContentText("Xin lỗi, tính năng TÀI SẢN ĐẤU GIÁ chỉ dành riêng cho Người Bán (Seller)!");
