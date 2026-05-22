@@ -163,7 +163,6 @@
                     <Button prefHeight="35" prefWidth="35" style="-fx-background-color: white; -fx-border-color: #cbd5e1; -fx-border-radius: 6; -fx-background-radius: 6; -fx-cursor: hand;" text="&gt;" />
                 </children>
             </HBox>
-
         </VBox>
     </center>
 
