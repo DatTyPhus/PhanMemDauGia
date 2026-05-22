@@ -29,7 +29,7 @@ public class Setting {
         // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
         if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
             lblUserName.setText(currentUser.getFullName());
-            lblUserRole.setText(currentUser.getRole());
+            lblUserRole.setText(currentUser.getRole().toUpperCase());
         }
     }
 

@@ -6,6 +6,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 
 /// class ProductsManagement dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình ,và xử lý các yêu cầu từ server.
 
@@ -14,6 +16,15 @@ public class ProductsManagement {
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
+
+    @FXML private TableView<?> reviewTable;
+    @FXML private TableColumn<?, ?> idColumn;
+    @FXML private TableColumn<?, ?> productColumn;
+    @FXML private TableColumn<?, ?> sellerColumn;
+    @FXML private TableColumn<?, ?> descriptionColumn;
+    @FXML private TableColumn<?, ?> specialColumn;
+    @FXML private TableColumn<?, ?> priceColumn;
+    @FXML private TableColumn<?, ?> statusColumn;
 
     /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
     @FXML
@@ -24,7 +35,7 @@ public class ProductsManagement {
         // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
         if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
             lblUserName.setText(currentUser.getFullName());
-            lblUserRole.setText(currentUser.getRole());
+            lblUserRole.setText(currentUser.getRole().toUpperCase());
         }
     }
 

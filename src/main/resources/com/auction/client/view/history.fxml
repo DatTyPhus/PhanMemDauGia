@@ -41,7 +41,10 @@
                     <children>
                         <VBox alignment="CENTER_RIGHT">
                             <Label fx:id="lblUserName" style="-fx-font-size: 15; -fx-font-weight: bold; -fx-text-fill: #1e293b;" text="Tên Người Dùng" />
-                            <Label fx:id="lblUserRole" style="-fx-font-size: 11; -fx-font-weight: 800; -fx-text-fill: #3b82f6; -fx-background-color: #dbeafe; -fx-padding: 2 8; -fx-background-radius: 4;" text="ROLE" />
+                            <Label fx:id="lblUserRole" style="-fx-font-size: 11; -fx-font-weight: 800; -fx-text-fill: #3b82f6; -fx-background-color: #dbeafe; -fx-padding: 2 8; -fx-background-radius: 4;" text="ROLE">
+                        <VBox.margin>
+                           <Insets right="45.0" />
+                        </VBox.margin></Label>
                         </VBox>
                         <StackPane prefHeight="45" prefWidth="45" style="-fx-background-color: #3b82f6; -fx-background-radius: 10;">
                             <children>

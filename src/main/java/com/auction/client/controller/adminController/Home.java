@@ -15,6 +15,10 @@ public class Home {
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
 
+    @FXML private Label lblTotalProducts;
+    @FXML private Label lblTotalAuctions;
+    @FXML private Label lblTotalUsers;
+
     /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
     @FXML
     public void initialize() {
@@ -24,28 +28,26 @@ public class Home {
         // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
         if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
             lblUserName.setText(currentUser.getFullName());
-            lblUserRole.setText(currentUser.getRole());
+            lblUserRole.setText(currentUser.getRole().toUpperCase());
         }
+        if (lblTotalProducts != null) lblTotalProducts.setText("156");
+        if (lblTotalAuctions != null) lblTotalAuctions.setText("24");
+        if (lblTotalUsers != null) lblTotalUsers.setText("3,102");
     }
 
     /// Method này thực hiện khi admin click vào TRANG CHỦ
     @FXML
     public void onBackHomeClick(javafx.event.ActionEvent event) {
         try {
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/admin/admin_home.fxml")); //Tải file màn hình
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/admin/admin_home.fxml"));
             Parent root = loader.load();
-
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  // Thay đổi màn hình
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
             javafx.scene.Scene currentScene = source.getScene();
             currentScene.setRoot(root);
-
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow();
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
-
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            System.err.println("Lỗi: Hãy kiểm tra lại đường dẫn.");
         }
     }
 
