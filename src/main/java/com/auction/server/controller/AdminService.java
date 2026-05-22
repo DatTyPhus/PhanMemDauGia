@@ -27,13 +27,14 @@ public class AdminService {
     // Thêm một phiên đấu giá mới vào hệ thống
     public void addAuction(Auction auction) {
         runningAuctions.put(auction.getId(), auction);
+        AuctionService.waitingAuctions.remove(auction.getId()); // Loại bỏ khỏi danh sách chờ nếu đã tồn tại
+        
     }
     
     // Kết thúc một phiên đấu giá và loại bỏ nó khỏi hệ thống
     public Message deleteAuction(int id) {  
         runningAuctions.remove(id);
-        AuctionDAO auctionDAO = new AuctionDAO();
-        Auction auction = auctionDAO.selectById(id); // Cập nhật trạng thái đấu giá trong database nếu cần
+        Auction auction = AuctionDAO.selectById(id); // Cập nhật trạng thái đấu giá trong database nếu cần
         return new Message ("DELETE_AUCTION_SUCCESS", auction);
     }
 

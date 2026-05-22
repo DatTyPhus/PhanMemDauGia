@@ -16,7 +16,8 @@ import javafx.stage.Stage;
 
 /// Class LoginController này dùng để thực hiện các yêu cầu của người dùng qua các thao tác trên màn hình ,và xử lý các phản hồi từ server.
 
-public class LoginController {
+// SỬA 1: Khai báo implements NetworkClient.MessageListener
+public class LoginController implements NetworkClient.MessageListener {
 
     @FXML private TextField ten_dang_nhap;
     @FXML private PasswordField mat_khau;
@@ -25,11 +26,9 @@ public class LoginController {
     @FXML
     public void initialize() {          /// Khởi tạo,chạy ngay khi chuyển qua màn Login
         try {
-            // Lắng nghe phản hồi đăng nhập từ Server
-            NetworkClient.getInstance().setListener(msg -> {
-                Platform.runLater(() -> handleServerResponse(msg));
-            });
-        } catch (IOException e) {
+            // SỬA 2: Lắng nghe phản hồi đăng nhập từ Server bằng chính class này (this)
+            NetworkClient.getInstance().addListener(this);
+        } catch (Exception e) {
             lblMessage.setText("Lỗi kết nối mạng!");
         }
 
@@ -38,7 +37,13 @@ public class LoginController {
         mat_khau.textProperty().addListener((obs, oldVal, newVal) -> lblMessage.setText(""));
     }
 
-    /// Hàm này thực hiện khi người dùng click vào nút "Đăng nhập" ->Kiểm tra về việc nhập thông tin,và gửi yêu cầu muốn đăng nhập vào hệ thống xuống server xử lý.
+    // SỬA 3: Đưa hàm nhận thông điệp ra ngoài theo chuẩn Interface
+    @Override
+    public void onMessageReceived(Message msg) {
+        Platform.runLater(() -> handleServerResponse(msg));
+    }
+
+    /// Hàm này thực hiện khi người dùng click vào nút "Đăng nhập"
     @FXML
     public void onLoginClick() {
         String user = ten_dang_nhap.getText();
@@ -70,7 +75,7 @@ public class LoginController {
             return;
         }
 
-        Message loginMsg = new Message("LOGIN", user + "," + pass);  // Đóng gói Message chứa thông tin về username,password đẩy xuống server để xử lý.
+        Message loginMsg = new Message("LOGIN", user + "," + pass);
         try {
             NetworkClient.getInstance().send(loginMsg);
         } catch (Exception e) {
@@ -82,7 +87,10 @@ public class LoginController {
     @FXML
     public void onRegisterLinkClick() {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/registe.fxml"));  // Tải file registe.fxml để chuyển màn.
+            // SỬA 4: Ngắt kết nối lắng nghe trước khi sang màn hình Đăng ký
+            NetworkClient.getInstance().removeListener(this);
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/registe.fxml"));
             Parent root = loader.load();
 
             //Thay thế màn hình đăng nhập sang màn hình đăng ký.
@@ -132,13 +140,29 @@ public class LoginController {
                     loggedInUser = gson.fromJson(jsonString, com.auction.shared.model.Bidder.class);
                 } else if ("Seller".equalsIgnoreCase(role)) {
                     loggedInUser = gson.fromJson(jsonString, com.auction.shared.model.Seller.class);
+                } else if ("Admin".equalsIgnoreCase(role)) {
+                    loggedInUser = gson.fromJson(jsonString, com.auction.shared.model.Admin.class);
                 }
 
                 // Nếu tạo thành công thì lưu đối tượng vào kho (UserSession).
-                if (loggedInUser != null) {
+                if ("Bidder".equalsIgnoreCase(role) || "Seller".equalsIgnoreCase(role)) {
                     com.auction.client.session.UserSession.getInstance().setLoginUser(loggedInUser);
 
+                    // SỬA 5: Ngắt kết nối lắng nghe trước khi sang màn hình Home
+                    NetworkClient.getInstance().removeListener(this);
+
                     FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
+                    Parent root = loader.load();
+                    Stage currentStage = (Stage) ten_dang_nhap.getScene().getWindow();
+                    ten_dang_nhap.getScene().setRoot(root);
+                    currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
+                } else if ("Admin".equalsIgnoreCase(role)) {
+                    com.auction.client.session.UserSession.getInstance().setLoginUser(loggedInUser);
+
+                    // SỬA 6: Ngắt kết nối lắng nghe trước khi sang màn hình Admin Home
+                    NetworkClient.getInstance().removeListener(this);
+
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/admin/admin_home.fxml"));
                     Parent root = loader.load();
                     Stage currentStage = (Stage) ten_dang_nhap.getScene().getWindow();
                     ten_dang_nhap.getScene().setRoot(root);
@@ -152,9 +176,11 @@ public class LoginController {
                 lblMessage.setText("Lỗi không tìm thấy file home.fxml!");
             }
         } else if (msg.getAction().equals("LOGIN_FAIL")) {
-            lblMessage.setText(msg.getPayload().toString());
-            mat_khau.clear();          // Xoá mật khẩu để người dùng nhập lại
-            mat_khau.requestFocus();   // Focus vào ô mật khẩu luôn
+            mat_khau.clear();          // 1. Phải xóa mật khẩu trước (sự kiện xóa chữ sẽ chạy ở đây)
+
+            lblMessage.setText(msg.getPayload().toString()); // 2. Sau đó mới in lỗi (đè lên chữ rỗng)
+
+            mat_khau.requestFocus();   // 3. Đưa con trỏ chuột vào ô mật khẩu
         }
     }
 }

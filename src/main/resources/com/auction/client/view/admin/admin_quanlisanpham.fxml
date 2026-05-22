@@ -15,9 +15,9 @@
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="850" prefWidth="1500" style="-fx-background-color: #f5f7fb;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.ProductReviewController">
+<BorderPane prefHeight="850" prefWidth="1500" style="-fx-background-color: #f5f7fb;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.adminController.ProductsManagement">
 
-      <top>
+    <top>
         <HBox alignment="CENTER_LEFT" minHeight="75.0" prefHeight="75.0" spacing="15" style="-fx-background-color: white; -fx-border-color: #E5EAF2; -fx-border-width: 0 0 1 0;">
             <padding>
                 <Insets left="30" right="30" />
@@ -25,20 +25,19 @@
             <TextField prefHeight="38.0" prefWidth="350.0" promptText="Tìm kiếm tài sản, phiên đấu giá..." style="-fx-border-color: #DDE3EC; -fx-padding: 8 15; -fx-background-radius: 8; -fx-border-radius: 8;" />
 
             <Region HBox.hgrow="ALWAYS" />
-            <Button onAction="#onNotificationClick" style="-fx-font-size: 18; -fx-background-color: transparent; -fx-cursor: hand;" text="✉" />
-         <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
-            <image>
-               <Image url="@../../image/avatar.jpg" />
-            </image>
-         </ImageView>
+            <ImageView fitHeight="45.0" fitWidth="45.0" pickOnBounds="true" preserveRatio="true">
+                <image>
+                    <Image url="@../../image/avatar.jpg" />
+                </image>
+            </ImageView>
             <VBox alignment="CENTER_LEFT" prefHeight="75.0">
                 <Label fx:id="lblUserName" style="-fx-font-weight: bold; -fx-font-size: 14;" text="Nguyễn Văn A" />
 
-                <Label fx:id="lblUserRole" style="-fx-text-fill: gray; -fx-font-size: 12;" text="Admin" />
+                <Label fx:id="lblUserRole" style="-fx-text-fill: gray; -fx-font-size: 12;" text="Bidder" />
             </VBox>
 
             <BorderPane.margin>
-            <Insets left="200.0" /> </BorderPane.margin>
+                <Insets left="196.0" /> </BorderPane.margin>
         </HBox>
     </top>
     <!-- ================= SIDEBAR ================= -->
@@ -67,18 +66,16 @@
                     </VBox.margin>
                 </HBox>
 
-                <Button mnemonicParsing="false" onAction="#onBackToHomeClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ" />
+                <Button mnemonicParsing="false" onAction="#onBackHomeClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ" />
                 <Button mnemonicParsing="false" onAction="#onAuctionSessionClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Phiên đấu giá" />
-                <Button mnemonicParsing="false" onAction="#onNotificationClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Thông báo" />
-            <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20;" text="Lịch sử đấu giá" />
-                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lí người dùng" />
-                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lí sản phẩm" />
-                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Hồ sơ của tôi" />
-                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt" />
+                <Button mnemonicParsing="false" onAction="#onHistoryClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 14; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20;" text="Lịch sử đấu giá" />
+                <Button mnemonicParsing="false" onAction="#onUsersManagementClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lý người dùng" />
+                <Button mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lý sản phẩm" />
+                <Button mnemonicParsing="false" onAction="#onSettingClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt" />
             </children>
 
             <BorderPane.margin>
-                <Insets top="-75.0" />
+                <Insets top="-76.0" />
             </BorderPane.margin>
         </VBox>
     </left>

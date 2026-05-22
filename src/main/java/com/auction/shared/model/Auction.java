@@ -10,8 +10,9 @@ public class Auction extends Entity {
     private String itemName;
     private BigDecimal StartingPrice = BigDecimal.ZERO;
     private BigDecimal currentPrice = BigDecimal.ZERO;
-    private Integer highestBidderId = null;
-    private String startTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+    private String highestBidderName = null;
+    private String startTime = null;
+    private String endTime = null;
     private int durationMinutes;
     private String status = "OPEN";
     private final ReentrantLock lock = new ReentrantLock();
@@ -54,8 +55,8 @@ public class Auction extends Entity {
     public BigDecimal getCurrentPrice() { return currentPrice; }
     public void setCurrentPrice(BigDecimal currentPrice) { this.currentPrice = currentPrice; }
 
-    public Integer getHighestBidderId() { return highestBidderId; }
-    public void setHighestBidderId(Integer highestBidderId) { this.highestBidderId = highestBidderId; }
+    public String getHighestBidderName() { return highestBidderName; }
+    public void setHighestBidderName(String highestBidderName) { this.highestBidderName = highestBidderName; }
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
@@ -65,4 +66,7 @@ public class Auction extends Entity {
 
     public int getDurationMinutes() { return durationMinutes; }
     public void setDurationMinutes(int durationMinutes) { this.durationMinutes = durationMinutes; }
+
+    public String getEndTime() { return endTime; }
+    public void setEndTime(String endTime) { this.endTime = endTime; }
 }
