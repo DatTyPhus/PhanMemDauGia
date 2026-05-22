@@ -12,7 +12,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane prefHeight="800" prefWidth="1400" style="-fx-background-color: #f1f5f9;" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.ProfileController">
+<BorderPane prefHeight="800" prefWidth="1400" style="-fx-background-color: #f1f5f9;" stylesheets="@sidebar.css" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.ProfileController">
 
     <top>
         <HBox alignment="CENTER_LEFT" minHeight="90.0" prefHeight="90.0" style="-fx-background-color: white; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.08), 15, 0, 0, 5);" BorderPane.alignment="CENTER">
@@ -55,9 +55,11 @@
             <children>
                 <HBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="196.0">
                     <children>
-                        <Label style="-fx-text-fill: white; -fx-font-size: 20; -fx-font-weight: bold;" text="🔨">
-                            <HBox.margin><Insets left="15.0" /></HBox.margin>
-                        </Label>
+                  <ImageView fitHeight="50.0" fitWidth="50.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../image/54699acc-6fba-4ff0-b214-6edb30950a28.png" />
+                     </image>
+                  </ImageView>
                         <VBox alignment="CENTER_LEFT" prefHeight="100.0" prefWidth="120.0">
                             <children>
                                 <Label style="-fx-text-fill: white; -fx-font-size: 16; -fx-font-weight: bold;" text="ĐẤU GIÁ" />
@@ -69,28 +71,28 @@
                     <VBox.margin><Insets bottom="20.0" top="15.0" /></VBox.margin>
                 </HBox>
 
-                <Button onAction="#onBackToHomeClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Trang chủ">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button mnemonicParsing="false" onAction="#onBackToHomeClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Trang chủ">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
-                <Button onAction="#onAuctionSessionClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Phiên đấu giá">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button mnemonicParsing="false" onAction="#onAuctionSessionClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Phiên đấu giá">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
-                <Button onAction="#onProductManagementClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Quản lý tài sản">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button mnemonicParsing="false" onAction="#onProductManagementClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Quản lý tài sản">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
-                <Button onAction="#onHistoryClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Lịch sử đấu giá">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button mnemonicParsing="false" onAction="#onHistoryClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Lịch sử đấu giá">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
-                <Button onAction="#onNotificationClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Thông báo">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
-                </Button>
-
-                <Button mnemonicParsing="false" style="-fx-background-color: #1e293b; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 8;" text="Hồ sơ của tôi">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button mnemonicParsing="false" onAction="#onNotificationClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Thông báo">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
 
-                <Button onAction="#onSettingClick" mnemonicParsing="false" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" text="Cài đặt">
-                    <VBox.margin><Insets left="8" right="8"/></VBox.margin>
+                <Button maxWidth="250.0" mnemonicParsing="false" styleClass="nav-btn-active" text="Hồ sơ của tôi">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
+                </Button>
+
+                <Button mnemonicParsing="false" onAction="#onSettingClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Cài đặt">
+                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
             </children>
             <BorderPane.margin>
@@ -127,27 +129,27 @@
                     </Button>
                 </VBox>
 
-                <VBox HBox.hgrow="ALWAYS" spacing="25" style="-fx-background-color: white; -fx-padding: 40; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 20, 0, 0, 8);">
+                <VBox spacing="25" style="-fx-background-color: white; -fx-padding: 40; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 20, 0, 0, 8);" HBox.hgrow="ALWAYS">
 
                     <Label style="-fx-font-size: 22; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="📝 Thông tin chi tiết" />
 
                     <HBox spacing="25">
-                        <VBox HBox.hgrow="ALWAYS" spacing="8">
+                        <VBox spacing="8" HBox.hgrow="ALWAYS">
                             <Label style="-fx-text-fill: #64748b; -fx-font-weight: bold;" text="Họ và tên" />
                             <TextField prefHeight="45" promptText="Nguyễn Văn A" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-padding: 10;" />
                         </VBox>
-                        <VBox HBox.hgrow="ALWAYS" spacing="8">
+                        <VBox spacing="8" HBox.hgrow="ALWAYS">
                             <Label style="-fx-text-fill: #64748b; -fx-font-weight: bold;" text="Tên đăng nhập (Chỉ đọc)" />
-                            <TextField editable="false" prefHeight="45" text="username123" style="-fx-background-color: #f1f5f9; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-padding: 10; -fx-text-fill: #64748b;" />
+                            <TextField editable="false" prefHeight="45" style="-fx-background-color: #f1f5f9; -fx-background-radius: 8; -fx-border-color: #e2e8f0; -fx-border-radius: 8; -fx-padding: 10; -fx-text-fill: #64748b;" text="username123" />
                         </VBox>
                     </HBox>
 
                     <HBox spacing="25">
-                        <VBox HBox.hgrow="ALWAYS" spacing="8">
+                        <VBox spacing="8" HBox.hgrow="ALWAYS">
                             <Label style="-fx-text-fill: #64748b; -fx-font-weight: bold;" text="Địa chỉ Email" />
                             <TextField prefHeight="45" promptText="email@gmail.com" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-padding: 10;" />
                         </VBox>
-                        <VBox HBox.hgrow="ALWAYS" spacing="8">
+                        <VBox spacing="8" HBox.hgrow="ALWAYS">
                             <Label style="-fx-text-fill: #64748b; -fx-font-weight: bold;" text="Số điện thoại" />
                             <TextField prefHeight="45" promptText="0123456789" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-padding: 10;" />
                         </VBox>
