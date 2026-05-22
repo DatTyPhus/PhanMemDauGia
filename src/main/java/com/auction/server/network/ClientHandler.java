@@ -126,19 +126,19 @@ public class ClientHandler implements Runnable {
                         Message pendingItemsResponse = new Message("PENDING_PRODUCTS", pendingItems);
                         out.println(pendingItemsResponse.toJson());
                         break;
-                    case "MY_PRODUCTS":
+                    case "MY_PRODUCTS": {
                         String jsonStr = msg.getPayload().toString();
 
-                            // 2. Dùng JsonParser đọc trước JSON để lấy "itemType"
-                            com.google.gson.JsonObject jsonObj = com.google.gson.JsonParser.parseString(jsonStr).getAsJsonObject();
+                        // 2. Dùng JsonParser đọc trước JSON để lấy "itemType"
+                        com.google.gson.JsonObject jsonObj = com.google.gson.JsonParser.parseString(jsonStr).getAsJsonObject();
 
-                            // LƯU Ý: Phải get đúng chữ "itemType" vì class Item.java khai báo biến này
-                            int id = jsonObj.get("id").getAsInt();
+                        // LƯU Ý: Phải get đúng chữ "itemType" vì class Item.java khai báo biến này
+                        int id = jsonObj.get("id").getAsInt();
 
                         List<Item> sellerItems = ItemDAO.findItemsBySellerId(id); // Thay 1 bằng ID người bán thực tế
-                        out.println(new Message("MY_PRODUCTS", sellerItems).toJson());
+                        out.println(new Message("MY_PRODUCTS_SUCCESS", sellerItems).toJson());
                         break;
-                    
+                    }
                     default:
                         System.out.println("Không hiểu lệnh này: " + msg.getAction());
                 }

@@ -125,35 +125,49 @@ public class ItemDAO  {
         return null; // Trả về null nếu không tìm thấy người dùng
       }
 
-    
+
+    // Lấy danh sách sản phẩm theo ID người bán, sắp xếp mới nhất lên đầu
     public static List<Item> findItemsBySellerId(int sellerId) {
-        String sql = "SELECT * FROM items WHERE seller_id = ?";
-        
+        // ĐÃ SỬA: Thêm "ORDER BY item_id DESC" để sản phẩm mới nhất hiện lên trên cùng
+        String sql = "SELECT * FROM items WHERE seller_id = ? ORDER BY item_id DESC";
+
         try (Connection conn = JDBCUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
+
             stmt.setInt(1, sellerId); // Gán giá trị sellerId vào dấu chấm hỏi
             ResultSet rs = stmt.executeQuery();
 
             List<Item> sellerItems = new ArrayList<>();
             while (rs.next()) {
-                Item item = null;
                 String type = rs.getString("item_type");
-                item = Item.createFromType(type);
+                Item item = Item.createFromType(type);
+                item.setItemType(type);
+
                 item.setId(rs.getInt("item_id"));
                 item.setSellerId(rs.getInt("seller_id"));
                 item.setName(rs.getString("item_name"));
                 item.setDescription(rs.getString("description"));
-                item.setStartingPrice(rs.getBigDecimal("starting_price"));
+
+                // ĐÃ SỬA NGHIÊM TRỌNG: Sửa "starting_price" thành "start_price" cho khớp DB
+                item.setStartingPrice(rs.getBigDecimal("start_price"));
                 item.setImageUrl(rs.getString("image_url"));
                 item.setDurationMinutes(rs.getInt("duration_minutes"));
+
+                // ĐÃ BỔ SUNG: Lấy thêm Trạng thái và Thông tin đặc biệt từ CSDL lên
+                item.setStatus(rs.getString("status"));
+                item.setSpecialInfo(rs.getString("special_info"));
+
                 sellerItems.add(item);
             }
             return sellerItems;
         } catch (SQLException e) {
+            System.err.println("[DAO ERROR] Lỗi lấy sản phẩm của Seller: " + e.getMessage());
             e.printStackTrace();
         }
-        return null; // Trả về null nếu không tìm thấy người dùng
+
+        // ĐÃ SỬA: Nếu lỗi thì trả về danh sách rỗng (ArrayList) thay vì trả về null,
+        // để tránh lỗi sập phần mềm (NullPointerException) bên phía Client.
+        return new ArrayList<>();
     }
 
 

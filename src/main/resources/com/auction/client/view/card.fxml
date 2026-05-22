@@ -35,10 +35,11 @@
     <!-- TIME -->
     <HBox alignment="CENTER_LEFT" spacing="5">
         <Label text="⏱" />
-        <Label fx:id="timeLabel" style="-fx-text-fill:#64748b; -fx-font-size:12;" text="Kết thúc sau: 02:15:30">
+        <Label fx:id="timeLabel" style="-fx-text-fill:#64748b; -fx-font-size:12;" text="Kết thúc sau: ">
          <HBox.margin>
             <Insets />
          </HBox.margin></Label>
+      <Label style="-fx-text-fill: red; -fx-font-size: 14; -fx-font-weight: bold;" text="02:15:30" />
     </HBox>
 
     <!-- CURRENT PRICE -->
@@ -46,6 +47,9 @@
         <Label text="💰" />
         <Label style="-fx-text-fill:#64748b; -fx-font-size:12;" text="Giá hiện tại:" />
         <Label fx:id="priceLabel" style="-fx-text-fill:#16a34a;                       -fx-font-size:14;                       -fx-font-weight:bold;" text="850.000.000 đ" />
+      <VBox.margin>
+         <Insets top="3.0" />
+      </VBox.margin>
     </HBox>
 
     <!-- START PRICE -->
@@ -53,12 +57,15 @@
         <Label text="🏷" />
         <Label style="-fx-text-fill:#64748b; -fx-font-size:12;" text="Giá khởi điểm:" />
         <Label fx:id="startPriceLabel" style="-fx-text-fill:#334155; -fx-font-size:12;" text="700.000.000 đ" />
+      <VBox.margin>
+         <Insets top="3.0" />
+      </VBox.margin>
     </HBox>
 
     <!-- BUTTON -->
     <Button maxWidth="Infinity" prefHeight="36" style="-fx-background-color:#3b82f6;                    -fx-text-fill:white;                    -fx-font-weight:bold;                    -fx-background-radius:8;                    -fx-cursor:hand;" text="Xem chi tiết">
       <VBox.margin>
-         <Insets top="13.0" />
+         <Insets top="16.0" />
       </VBox.margin></Button>
 
 </VBox>
