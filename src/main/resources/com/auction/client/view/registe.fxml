@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1400.0" style="-fx-background-color: linear-gradient(to bottom right, #e6ecf5, #c9d6e8);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.RegisterController">   <children>
+      <ImageView layoutY="-169.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../image/background.png" />
+         </image>
+      </ImageView>
+      <VBox layoutX="788.0" layoutY="78.0" prefHeight="500.0" prefWidth="370.0" style="-fx-background-color: white; -fx-background-radius: 20; -fx-padding: 25; -fx-spacing: 12; -fx-alignment: center;">
+         <children>
+            <Label style="-fx-background-color: #1976D2; -fx-alignment: center; -fx-font-size: 32; -fx-text-fill: white; -fx-background-radius: 50; -fx-pref-height: 60; -fx-pref-width: 60;" text="👤">
+               <VBox.margin>
+                  <Insets left="-1.0" />
+               </VBox.margin>
+            </Label>
+            <Label prefHeight="35.0" prefWidth="300.0" style="-fx-font-size: 24; -fx-font-weight: bold;" text="ĐĂNG KÝ TÀI KHOẢN">
+               <VBox.margin>
+                  <Insets left="47.0" />
+               </VBox.margin>
+            </Label>
+            <Label prefHeight="35.0" prefWidth="300.0" text="Tạo tài khoản mới để tiếp tục" />
+            <TextField fx:id="fullName" prefHeight="35.0" prefWidth="300.0" promptText="Nhập họ và tên" />
+            <TextField fx:id="userName" prefHeight="35.0" prefWidth="300.0" promptText="Nhập tên đăng nhập" />
+            <TextField fx:id="email" prefHeight="35.0" prefWidth="300.0" promptText="Nhập email của bạn" />
+            <PasswordField fx:id="password" prefHeight="35.0" prefWidth="300.0" promptText="Mật khẩu" />
+            <PasswordField fx:id="re_password" prefHeight="35.0" prefWidth="300.0" promptText="Nhập lại mật khẩu" />
+            <Label text="Bạn muốn trở thành ?">
+               <VBox.margin>
+                  <Insets left="-193.0" />
+               </VBox.margin>
+            </Label>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Circle fx:id="role_bidder" fill="DODGERBLUE" onMouseClicked="#onBidderSelected" radius="10.0" stroke="BLACK" strokeType="INSIDE" style="-fx-fill: white;">
+                     <HBox.margin>
+                        <Insets left="8.0" />
+                     </HBox.margin>
+                  </Circle>
+                  <Label text="Bidder">
+                     <HBox.margin>
+                        <Insets left="6.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Circle fx:id="role_seller" fill="DODGERBLUE" onMouseClicked="#onSellerSelected" radius="10.0" stroke="BLACK" strokeType="INSIDE" style="-fx-fill: white;">
+                     <HBox.margin>
+                        <Insets left="72.0" />
+                     </HBox.margin>
+                  </Circle>
+                  <Label text="Seller">
+                     <HBox.margin>
+                        <Insets left="9.0" />
+                     </HBox.margin>
+                  </Label>
+               </children>
+            </HBox>
+            <Label fx:id="lblMessage" text="" />
+
+            <Button fx:id="tao_tai_khoan" mnemonicParsing="false" onAction="#onRegisterClick" style="-fx-background-color: #2563eb; -fx-text-fill: white; -fx-font-size: 14; -fx-font-weight: bold; -fx-background-radius: 10;" text="Tạo tài khoản">
+               <VBox.margin>
+                  <Insets left="-2.0" />
+               </VBox.margin>
+            </Button>
+            <HBox prefHeight="100.0" prefWidth="200.0">
+               <children>
+                  <Label text="Đã có tài khoản ?">
+                     <HBox.margin>
+                        <Insets left="56.0" top="3.0" />
+                     </HBox.margin>
+                  </Label>
+                  <Hyperlink fx:id="quay_lai_login" onAction="#onBackToLoginClick" style="-fx-text-fill: #1976D2; -fx-underline: false;" text="Quay lại đăng nhập">                     <HBox.margin>
+                        <Insets />
+                     </HBox.margin>
+                  </Hyperlink>
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+         </padding>
+      </VBox>
+   </children>
+</AnchorPane>
