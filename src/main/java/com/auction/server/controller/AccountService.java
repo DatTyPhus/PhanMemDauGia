@@ -61,7 +61,7 @@ public class AccountService {
     // ở cả Bidder lẫn Seller, khiến login không biết trả về ai.
     boolean usernameExists = BidderDAO.selectByUsername(username) != null
             || SellerDAO.selectByUsername(username) != null
-            || AdminDAO.selectByUsername(username) != null;
+            || AdminDAO.selectByUsername(username) != null;           
 
     if (usernameExists) {
       System.out.println("-> Username [" + username + "] đã tồn tại trong hệ thống.");

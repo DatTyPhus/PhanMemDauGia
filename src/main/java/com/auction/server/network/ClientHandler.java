@@ -109,7 +109,9 @@ public class ClientHandler implements Runnable {
                         Item item = (Item) msg.getPayload();
                         ; // Tạo 1 auto bid mặc định cho mỗi sản phẩm mới (giá = giá khởi điểm)
                         Auction auction = AuctionService.createAuction(item);
+                        // Tạo 1 hàng toàn giá trị mặc định có Auction id giống với auction id của auction để nếu cần thì dùng k cần thì tôi
                         AutobidDAO.createAutobid(auction.getId());
+                        //lên sẵn lịch cho cuộc đấu giá đấy(kể cả khi chx thực hiện vẫn bắt đâì đếm ngc tg bắt đầu và kết thúc)
                         AuctionSchedular.timer(auction);
                         Message addItemSuccessResponse = new Message("ADD_ITEM_THANHCONG", auction);
                         out.println(addItemSuccessResponse.toJson());
@@ -146,7 +148,9 @@ public class ClientHandler implements Runnable {
                         String bidderName = jsonObj.get("bidderName").getAsString();
                         BigDecimal autoBidAmount = jsonObj.get("autoBidAmount").getAsBigDecimal();
                         BigDecimal autoBidStep = jsonObj.get("autoBidStep").getAsBigDecimal();
+                        // Tạo 1 kiểu đặt bid cho auto bid(nếu mà bidtransaction có 3 tham số là đặt bid bth, nếu 4 tham số là autobid)
                         BidTransaction autoBidTransaction = new BidTransaction(auctionId, bidderName, autoBidAmount, autoBidStep);
+                        // coi tiếp trong file Auction service
                         Message message = AuctionService.processAutoBid(autoBidTransaction);
                         out.println(message.toJson());
                         break;

@@ -15,9 +15,12 @@ import com.auction.shared.model.*;
 import com.auction.shared.network.Message;
 
 public class AuctionService {
+    //các biến lưu thông số của Autobid hiện tại để xử lí cần xài k thì th
     private static BigDecimal autoBidAmount = BigDecimal.ZERO;
     private static String autoBidderName = null;
     private static BigDecimal autoBiddStep = BigDecimal.ZERO;
+
+
     private static int auctionIdCounter = 0; 
     private static Auction currentAuction; // Biến tĩnh để lưu phiên đấu giá hiện tại
     protected static Map<Integer, Auction> waitingAuctions; // Giả sử có một map để quản lý các đấu giá đang chờ xử lý
@@ -63,6 +66,7 @@ public class AuctionService {
 
 public static Message processAutoBid(BidTransaction bidTransaction) {
     Auction auction = AuctionDAO.selectById(bidTransaction.getAuctionId());
+    // Xem xét các trg hợp ngoại lệ và không đạt tiêu chuẩn
     if (auction == null) {
         return new Message("AUTO_BID_FAIL", "Đấu giá không tồn tại.");
     }
@@ -79,12 +83,13 @@ public static Message processAutoBid(BidTransaction bidTransaction) {
     if (bidTransaction.getBidAmount().compareTo(AuctionService.getAutoBidAmount()) <= 0) {
         return new Message("AUTO_BID_FAIL", "Giá đặt phải vượt quá mức đặt tự động đã thiết lập (" + AuctionService.getAutoBidAmount() + ").");
     }
+    //coi như lần đầu đặt autobid là 1 cuộc đấu giá bth
 
-    BidTransaction bidTransaction2 = new BidTransaction(bidTransaction.getAuctionId(), bidTransaction.getBiddername(), auction.getCurrentPrice().add(bidTransaction.getStep()));
-    processBid(bidTransaction2);
     autoBidAmount = bidTransaction.getBidAmount();
     autoBidderName = bidTransaction.getBiddername();
     autoBiddStep = bidTransaction.getStep();
+    BidTransaction bidTransaction2 = new BidTransaction(bidTransaction.getAuctionId(), bidTransaction.getBiddername(), auction.getCurrentPrice().add(bidTransaction.getStep()));
+    processBid(bidTransaction2);
 
     return new Message("AUTO_BID_SUCCESS", bidTransaction);
 }
@@ -110,16 +115,21 @@ public static Message processAutoBid(BidTransaction bidTransaction) {
           if (bidder.getBalance().compareTo(bidTransaction.getBidAmount()) < 0) {
             return new Message("BID_FAIL", "Số dư không đủ.");
           }
+          // So sánh dữ liệu với các biến dùng để ám chỉ đến các thông số của Autobid này như là autobidAmount
+          // trong trg hợp có người khác đặt bid nhỏ hơn autobid hiện tại
           if (bidTransaction.getBidAmount().compareTo(autoBidAmount)<=0){
+            // nếu mà bược nhảy nhỏ hơn khoảng cách giữa đặt bid à auto bid thì lấy giá trị lơn nhất của autobid
             if (autoBidAmount.compareTo(bidTransaction.getBidAmount().add(autoBiddStep)) <=0){
                auction.setCurrentPrice(autoBidAmount);           
                 return new Message("BID_FAILED", "Có người đặt giá tự động cao hơn bạn, giá tự dộng cập nhật là: "+ autoBidAmount);
             }
+            //nếu mà bược nhảy lớn hơnd ...
             else{
                 auction.setCurrentPrice(bidTransaction.getBidAmount().add(autoBiddStep));
                 return new Message("BID_FAILED", "Có người đặt giá tự động cao hơn bạn, giá tự dộng cập nhật là: "+ bidTransaction.getBidAmount().add(autoBiddStep));
             }
           }
+          //đặt bid bth
           Bidder previousHighestBidder = BidderDAO.selectByUsername(auction.getHighestBidderName());
           auction.setCurrentPrice(bidTransaction.getBidAmount());
           auction.setHighestBidderName(bidTransaction.getBiddername());
