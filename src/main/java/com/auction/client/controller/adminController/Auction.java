@@ -6,14 +6,24 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 
 /// class Auction dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình ,và xử lý các yêu cầu từ server.
-
 public class Auction {
 
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
+
+    // Chuẩn bị sẵn các biến cho Bảng
+    @FXML private TableView<?> auctionTable;
+    @FXML private TableColumn<?, ?> idColumn;
+    @FXML private TableColumn<?, ?> nameColumn;
+    @FXML private TableColumn<?, ?> priceColumn;
+    @FXML private TableColumn<?, ?> statusColumn;
+    @FXML private TableColumn<?, ?> timeColumn;
+    @FXML private TableColumn<?, ?> actionColumn;
 
     /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
     @FXML
@@ -24,11 +34,11 @@ public class Auction {
         // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
         if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
             lblUserName.setText(currentUser.getFullName());
-            lblUserRole.setText(currentUser.getRole());
+            if (lblUserRole != null) lblUserRole.setText(currentUser.getRole().toUpperCase());
         }
     }
 
-    /// Method này thc hiện khi admin click vào TRANG CHỦ
+    /// Method này thực hiện khi admin click vào TRANG CHỦ
     @FXML
     public void onBackHomeClick(javafx.event.ActionEvent event) {
         try {
@@ -49,7 +59,7 @@ public class Auction {
         }
     }
 
-    /// Method này thực hiện khi click vào nút LỊCH SỬ ĐẤU GIÁ.
+    /// Method này thực hiện khi admin click vào LỊCH SỬ ĐẤU GIÁ
     @FXML
     public void onHistoryClick(javafx.event.ActionEvent event) {
         try {
@@ -70,7 +80,7 @@ public class Auction {
         }
     }
 
-    /// Method này thực hiện khi admin click vào nút QUẢN LÝ SẢN PHẨM.
+    /// Method này thực hiện khi admin click vào QUẢN LÝ NGƯỜI DÙNG
     @FXML
     public void onUsersManagementClick(javafx.event.ActionEvent event) {
         try {
@@ -91,7 +101,7 @@ public class Auction {
         }
     }
 
-    /// Method này thực hiện khi admin click vào nút QUẢN LÝ SẢN PHẨM.
+    /// Method này thực hiện khi admin click vào QUẢN LÝ SẢN PHẨM
     @FXML
     public void onProductManagementClick(javafx.event.ActionEvent event) {
         try {
@@ -115,22 +125,32 @@ public class Auction {
     /// Method này thực hiện khi admin click vào nút CÀI ĐẶT.
     @FXML
     public void onSettingClick(javafx.event.ActionEvent event) {
-        try {
+        navigate(event, "/com/auction/client/view/admin/admin_setting.fxml");
+    }
 
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/admin/admin_setting.fxml")); //Tải file màn hình
+    /**
+     * Hàm tiện ích dùng chung để chuyển trang an toàn, tránh lỗi NullPointerException
+     * khi cố gắng lấy Stage từ một Scene đã bị huỷ.
+     */
+    private void navigate(javafx.event.ActionEvent event, String fxmlPath) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath)); //Tải file màn hình
             Parent root = loader.load();
 
             javafx.scene.Node source = (javafx.scene.Node) event.getSource();  // Thay đổi màn hình
-            javafx.scene.Scene currentScene = source.getScene();
-            currentScene.setRoot(root);
 
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
+            // BẮT BUỘC: Lấy Stage TRƯỚC KHI thay đổi Root
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
+
+            // Thay đổi giao diện
+            source.getScene().setRoot(root);
+
+            // Đặt tiêu đề cho window
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            System.err.println("Lỗi: Hãy kiểm tra lại đường dẫn.");
+            System.err.println("Lỗi: Hãy kiểm tra lại đường dẫn: " + fxmlPath);
         }
     }
-
 }

@@ -27,6 +27,8 @@ public class ServerCore {
 
                 activeClients.add(handler);                 // Ghi tên khách hàng vào sổ ngay khi họ kết nối
 
+                broadcastMessage(new Message("UPDATE_ONLINE_COUNT", String.valueOf(activeClients.size()))); //số lượng người online mới nhất cho toàn bộ các Client đang mở màn hình Home
+
                 Thread clientThread = new Thread(handler);
                 clientThread.start();
             }
@@ -44,10 +46,17 @@ public class ServerCore {
         }
     }
 
+    /// Hàm lấy số lượng người đang online hiện tại để ClientHandler có thể gọi
+    public static int getOnlineCount() {
+        return activeClients.size();
+    }
+
     // TỐI ƯU : Dọn dẹp danh sách người đấu giá khi có khách rời đi (Được gọi từ khối finally của ClientHandler)
     public static void removeClient(ClientHandler handler) {
         activeClients.remove(handler);
         System.out.println("Đã xoá 1 client ngắt kết nối. Số người đang online: " + activeClients.size());
+
+        broadcastMessage(new Message("UPDATE_ONLINE_COUNT", String.valueOf(activeClients.size()))); //số lượng khi có người vừa thoát app
     }
 }
 

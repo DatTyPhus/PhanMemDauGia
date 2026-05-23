@@ -17,9 +17,9 @@ public abstract class Item extends Entity {
 
     public static Item createFromType(String type) {
         return switch (type) {
-            case "ART"         -> new Art();
-            case "ELECTRONIC"  -> new Electronics();
-            case "VEHICLE"     -> new Vehicle();
+            case "ART" -> new Art();
+            case "ELECTRONIC" -> new Electronics();
+            case "VEHICLE" -> new Vehicle();
             default -> throw new IllegalArgumentException("Loại item không hợp lệ: " + type);
         };
     }

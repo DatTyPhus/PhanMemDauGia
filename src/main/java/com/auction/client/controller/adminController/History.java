@@ -7,17 +7,14 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
 
-/// class History dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình ,và xử lý các yêu cầu từ server.
-
+/// class History dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình, và xử lý các yêu cầu từ server.
 public class History {
 
     // Các biến dùng để link các nút từ màn hình.
-    @FXML
-    private Label lblUserName;
-    @FXML
-    private Label lblUserRole;
+    @FXML private Label lblUserName;
+    @FXML private Label lblUserRole;
 
-    /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
+    /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Lịch sử được load lên.
     @FXML
     public void initialize() {
 
@@ -26,7 +23,7 @@ public class History {
         // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
         if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
             lblUserName.setText(currentUser.getFullName());
-            lblUserRole.setText(currentUser.getRole());
+            lblUserRole.setText(currentUser.getRole().toUpperCase());
         }
     }
 

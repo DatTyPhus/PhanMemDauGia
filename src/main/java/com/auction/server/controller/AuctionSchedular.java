@@ -1,6 +1,7 @@
 package com.auction.server.controller;
 
 import java.time.LocalDateTime;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,9 @@ public class AuctionSchedular {
     AuctionDAO.update(auction);
     ItemService.changeItemStatus(auction); // Cập nhật trạng thái của Item tương ứng khi kết thúc đấu giá
     Auction nextAuction = AuctionDAO.selectStartTime(auction.getEndTime());
+    AuctionService.setAutoBidAmount(BigDecimal.ZERO);
+    AuctionService.setAutoBidStep(BigDecimal.ZERO);
+    AuctionService.setAutoBidderName(null);
     if (nextAuction != null) {
         start(nextAuction);
     }

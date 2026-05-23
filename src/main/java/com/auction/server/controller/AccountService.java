@@ -56,6 +56,18 @@ public class AccountService {
       return new Message("REGISTER_FAIL", "Lỗi: Role gửi lên bị trống!");
     }
 
+    // [SỬA] Check username trùng trên CẢ 3 KHO trước khi tạo bất kỳ role nào.
+    // Lý do: nếu chỉ check riêng từng kho, username "Lan" có thể tồn tại đồng thời
+    // ở cả Bidder lẫn Seller, khiến login không biết trả về ai.
+    boolean usernameExists = BidderDAO.selectByUsername(username) != null
+            || SellerDAO.selectByUsername(username) != null
+            || AdminDAO.selectByUsername(username) != null;
+
+    if (usernameExists) {
+      System.out.println("-> Username [" + username + "] đã tồn tại trong hệ thống.");
+      return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
+    }
+
     // Xóa khoảng trắng thừa và không phân biệt hoa thường
     if (role.trim().equalsIgnoreCase("BIDDER")) {
       System.out.println("-> Đang nhảy vào luồng BIDDER...");

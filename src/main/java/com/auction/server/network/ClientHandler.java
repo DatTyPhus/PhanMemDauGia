@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
-import java.util.ArrayList;
 import java.math.BigDecimal;
 
 import com.auction.shared.model.*;
@@ -127,7 +126,7 @@ public class ClientHandler implements Runnable {
                         Message pendingItemsResponse = new Message("PENDING_PRODUCTS_SUCCESS", pendingItems);
                         out.println(pendingItemsResponse.toJson());
                         break;
-                    case "MY_PRODUCTS":{
+                    case "MY_PRODUCTS": {
                         String jsonStr = msg.getPayload().toString();
 
                         // 2. Dùng JsonParser đọc trước JSON để lấy "itemType"
@@ -152,6 +151,110 @@ public class ClientHandler implements Runnable {
                         out.println(message.toJson());
                         break;
                     }
+                    case "DEPOSIT":
+                        try {
+                            // Dữ liệu Client gửi lên có dạng: "ID,Role,Amount"
+                            String depositStr = msg.getPayload().toString();
+                            String[] depositData = depositStr.split(",");
+
+                            int userId = Integer.parseInt(depositData[0]);
+                            String role = depositData[1];
+                            java.math.BigDecimal amountToAdd = new java.math.BigDecimal(depositData[2]);
+
+                            boolean isSuccess = false;
+
+                            /// Kiểm tra Role để gọi đúng kho (DAO) cập nhật tiền
+                            if (role.equalsIgnoreCase("BIDDER")) {
+                                isSuccess = com.auction.server.dao.BidderDAO.updateBalance(userId, amountToAdd);
+                            } else if (role.equalsIgnoreCase("SELLER")) {
+                                /// ĐÃ MỞ KHÓA: Gọi xuống kho Seller để cộng tiền
+                                isSuccess = com.auction.server.dao.SellerDAO.updateBalance(userId, amountToAdd);
+                            }
+
+                            if (isSuccess) {
+                                /// Lấy số dư MỚI NHẤT từ database tương ứng gửi ngược về cho Client
+                                java.math.BigDecimal newBalance = java.math.BigDecimal.ZERO;
+
+                                if (role.equalsIgnoreCase("BIDDER")) {
+                                    newBalance = com.auction.server.dao.BidderDAO.getUserByUserid(userId).getBalance();
+                                } else if (role.equalsIgnoreCase("SELLER")) {
+                                    /// ĐÃ MỞ KHÓA: Lấy số dư mới của Seller
+                                    newBalance = com.auction.server.dao.SellerDAO.getSellersByUserid(userId).getBalance();
+                                }
+
+                                out.println(new Message("DEPOSIT_SUCCESS", newBalance.toString()).toJson());
+                            } else {
+                                out.println(new Message("DEPOSIT_FAIL", "Không tìm thấy tài khoản hoặc nạp thất bại.").toJson());
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            out.println(new Message("DEPOSIT_FAIL", "Lỗi xử lý nạp tiền trên Server.").toJson());
+                        }
+                        break;
+                    case "DELETE_ITEM":
+                        try {
+                            /// Lấy ID sản phẩm mà Client (Seller) gửi lên
+                            int itemIdToDelete = Integer.parseInt(msg.getPayload().toString());
+
+                            /// Gọi xuống kho ItemDAO để thực thi lệnh xóa
+                            boolean isDeleted = com.auction.server.dao.ItemDAO.deleteItem(itemIdToDelete);
+
+                            /// Phản hồi lại cho Client biết kết quả
+                            if (isDeleted) {
+                                out.println(new Message("DELETE_ITEM_SUCCESS", "Sản phẩm đã được xóa khỏi hệ thống!").toJson());
+                            } else {
+                                out.println(new Message("DELETE_ITEM_FAIL", "Không tìm thấy sản phẩm để xóa.").toJson());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            out.println(new Message("DELETE_ITEM_FAIL", "Lỗi Server khi xóa sản phẩm.").toJson());
+                        }
+                        break;
+                    case "GET_ONLINE_COUNT":
+                        /// Trả về số lượng người dùng đang kết nối hiện tại cho Client vừa bật màn hình Home
+                        out.println(new Message("UPDATE_ONLINE_COUNT", String.valueOf(ServerCore.getOnlineCount())).toJson());
+                        break;
+                    case "GET_ALL_USERS":
+                        try {
+                            /// Lấy danh sách từ cả 2 kho database và gộp lại thành 1 list chung
+                            java.util.List<com.auction.shared.model.User> allUsers = new java.util.ArrayList<>();
+                            allUsers.addAll(com.auction.server.dao.BidderDAO.getAllBidders());
+                            allUsers.addAll(com.auction.server.dao.SellerDAO.getAllSellers());
+
+                            /// Đóng gói gửi mảng JSON về cho Client
+                            out.println(new Message("RECEIVE_ALL_USERS_SUCCESS", new com.google.gson.Gson().toJson(allUsers)).toJson());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            out.println(new Message("RECEIVE_ALL_USERS_FAIL", "Lỗi Server không thể tải danh sách thành viên.").toJson());
+                        }
+                        break;
+
+                    case "DELETE_USER":
+                        try {
+                            /// Bóc payload chứa chuỗi ghép: "ID,ROLE" từ client gửi xuống
+                            String[] data = msg.getPayload().toString().split(",");
+                            int userId = Integer.parseInt(data[0]);
+                            String role = data[1];
+
+                            boolean deletedResult = false;
+                            /// Kiểm tra vai trò để gọi lệnh xóa xuống đúng bảng tương ứng
+                            if ("BIDDER".equalsIgnoreCase(role)) {
+                                deletedResult = com.auction.server.dao.BidderDAO.deleteBidder(userId);
+                            } else if ("SELLER".equalsIgnoreCase(role)) {
+                                deletedResult = com.auction.server.dao.SellerDAO.deleteSeller(userId);
+                            }
+
+                            if (deletedResult) {
+                                out.println(new Message("DELETE_USER_SUCCESS", "Đã xóa tài khoản thành công khỏi hệ thống!").toJson());
+                            } else {
+                                out.println(new Message("DELETE_USER_FAIL", "Xóa tài khoản thất bại hoặc không tìm thấy.").toJson());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            out.println(new Message("DELETE_USER_FAIL", "Lỗi Server khi thực hiện xóa người dùng.").toJson());
+                        }
+                        break;
                     default:
                         System.out.println("Không hiểu lệnh này: " + msg.getAction());
                 }
