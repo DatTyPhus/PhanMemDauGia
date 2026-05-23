@@ -203,6 +203,46 @@ public class ClientHandler implements Runnable {
                         /// Trả về số lượng người dùng đang kết nối hiện tại cho Client vừa bật màn hình Home
                         out.println(new Message("UPDATE_ONLINE_COUNT", String.valueOf(ServerCore.getOnlineCount())).toJson());
                         break;
+                    case "GET_ALL_USERS":
+                        try {
+                            /// Lấy danh sách từ cả 2 kho database và gộp lại thành 1 list chung
+                            java.util.List<com.auction.shared.model.User> allUsers = new java.util.ArrayList<>();
+                            allUsers.addAll(com.auction.server.dao.BidderDAO.getAllBidders());
+                            allUsers.addAll(com.auction.server.dao.SellerDAO.getAllSellers());
+
+                            /// Đóng gói gửi mảng JSON về cho Client
+                            out.println(new Message("RECEIVE_ALL_USERS_SUCCESS", new com.google.gson.Gson().toJson(allUsers)).toJson());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            out.println(new Message("RECEIVE_ALL_USERS_FAIL", "Lỗi Server không thể tải danh sách thành viên.").toJson());
+                        }
+                        break;
+
+                    case "DELETE_USER":
+                        try {
+                            /// Bóc payload chứa chuỗi ghép: "ID,ROLE" từ client gửi xuống
+                            String[] data = msg.getPayload().toString().split(",");
+                            int userId = Integer.parseInt(data[0]);
+                            String role = data[1];
+
+                            boolean deletedResult = false;
+                            /// Kiểm tra vai trò để gọi lệnh xóa xuống đúng bảng tương ứng
+                            if ("BIDDER".equalsIgnoreCase(role)) {
+                                deletedResult = com.auction.server.dao.BidderDAO.deleteBidder(userId);
+                            } else if ("SELLER".equalsIgnoreCase(role)) {
+                                deletedResult = com.auction.server.dao.SellerDAO.deleteSeller(userId);
+                            }
+
+                            if (deletedResult) {
+                                out.println(new Message("DELETE_USER_SUCCESS", "Đã xóa tài khoản thành công khỏi hệ thống!").toJson());
+                            } else {
+                                out.println(new Message("DELETE_USER_FAIL", "Xóa tài khoản thất bại hoặc không tìm thấy.").toJson());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            out.println(new Message("DELETE_USER_FAIL", "Lỗi Server khi thực hiện xóa người dùng.").toJson());
+                        }
+                        break;
                     default:
                         System.out.println("Không hiểu lệnh này: " + msg.getAction());
                 }

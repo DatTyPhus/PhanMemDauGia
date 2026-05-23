@@ -105,4 +105,39 @@ public static void create(User obj) {
         }
     }
 
+    /// Hàm lấy toàn bộ danh sách Bidder từ database phục vụ màn hình Admin
+    public static java.util.List<com.auction.shared.model.Bidder> getAllBidders() {
+        java.util.List<com.auction.shared.model.Bidder> list = new java.util.ArrayList<>();
+        String sql = "SELECT user_id, username, full_name, balance FROM bidders";
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                com.auction.shared.model.Bidder user = new com.auction.shared.model.Bidder();
+                user.setId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setBalance(rs.getBigDecimal("balance"));
+                user.setRole("BIDDER");
+                list.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /// Hàm thực hiện xóa vĩnh viễn tài khoản Bidder khỏi database dựa vào ID
+    public static boolean deleteBidder(int userId) {
+        String sql = "DELETE FROM bidders WHERE user_id = ?";
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }
