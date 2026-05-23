@@ -52,40 +52,50 @@ public class AccountService {
     return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc tài khoản không tồn tại.");
   }
 
-  public Message register(String username, String password, String fullName , String role) {
-    System.out.println("\n=== SERVER ĐANG XỬ LÝ ĐĂNG KÝ ===");
-    System.out.println("Role nhận được từ Client: [" + role + "]");
-    if (role == null) {
-      return new Message("REGISTER_FAIL", "Lỗi: Role gửi lên bị trống!");
+  /// Hàm xử lý logic đăng ký tài khoản từ Client gửi lên
+  public Message register(String username, String password, String fullName, String role) {
+    System.out.println("-> Bắt đầu xử lý đăng ký cho username: [" + username + "] với vai trò: [" + role + "]");
+
+    if (role == null || role.trim().isEmpty()) {
+      return new Message("REGISTER_FAIL", "Lỗi: Vai trò (Role) không được để trống!");
     }
 
-    // [SỬA] Check username trùng trên CẢ 3 KHO trước khi tạo bất kỳ role nào.
-    // Lý do: nếu chỉ check riêng từng kho, username "Lan" có thể tồn tại đồng thời
-    // ở cả Bidder lẫn Seller, khiến login không biết trả về ai.
-    boolean usernameExists = bidderDAO.selectByUsername(username) != null
-            || sellerDAO.selectByUsername(username) != null
-            || adminDAO.selectByUsername(username) != null;
+    /// [FIX BUG BẢO MẬT QUAN TRỌNG]: Quét kiểm tra username trên TOÀN BỘ CÁC KHO (Bidder, Seller, Admin)
+    /// Phải đảm bảo tên đăng nhập này là DUY NHẤT trên toàn hệ thống, không phân biệt vai trò.
+    boolean isUsernameExist = (bidderDAO.selectByUsername(username) != null)
+            || (sellerDAO.selectByUsername(username) != null)
+            || (adminDAO.selectByUsername(username) != null);
 
-    if (usernameExists) {
-      System.out.println("-> Username [" + username + "] đã tồn tại trong hệ thống.");
-      return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
+    if (isUsernameExist) {
+      System.out.println("-> CẢNH BÁO TỪ CHỐI: Username [" + username + "] đã bị người khác sử dụng trong hệ thống.");
+      return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại trong hệ thống. Vui lòng chọn tên khác!");
     }
 
-    // Xóa khoảng trắng thừa và không phân biệt hoa thường
+    /// Nếu vượt qua bài kiểm tra trùng lặp (Cả 3 kho đều null), tiến hành phân luồng tạo tài khoản
     if (role.trim().equalsIgnoreCase("BIDDER")) {
-      System.out.println("-> Đang nhảy vào luồng BIDDER...");
-      Bidder newUser = new Bidder(username, password, fullName, "BIDDER");
+      System.out.println("-> Tiến hành khởi tạo tài khoản vào kho BIDDER...");
+      Bidder newUser = new Bidder();
+      newUser.setUsername(username);
+      newUser.setPassword(password);
+      newUser.setFullName(fullName);
+      newUser.setRole("BIDDER");
+
       bidderDAO.create(newUser);
-      return new Message("REGISTER_SUCCESS", newUser);
+      return new Message("REGISTER_SUCCESS", "Đăng ký tài khoản Người mua (Bidder) thành công!");
 
     } else if (role.trim().equalsIgnoreCase("SELLER")) {
-      System.out.println("-> Đang nhảy vào luồng SELLER...");
-      Seller newUser = new Seller(username, password, fullName, "SELLER");
+      System.out.println("-> Tiến hành khởi tạo tài khoản vào kho SELLER...");
+      Seller newUser = new Seller();
+      newUser.setUsername(username);
+      newUser.setPassword(password);
+      newUser.setFullName(fullName);
+      newUser.setRole("SELLER");
+
       sellerDAO.create(newUser);
-      return new Message("REGISTER_SUCCESS", newUser);
+      return new Message("REGISTER_SUCCESS", "Đăng ký tài khoản Người bán (Seller) thành công!");
 
     } else {
-      return new Message("REGISTER_FAIL", "Lỗi gửi sai vai trò: " + role);
+      return new Message("REGISTER_FAIL", "Lỗi Server: Nhận diện vai trò không hợp lệ!");
     }
   }
 }

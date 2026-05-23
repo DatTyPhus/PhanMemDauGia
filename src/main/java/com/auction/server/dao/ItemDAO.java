@@ -197,4 +197,21 @@ public class ItemDAO  {
     }
     return null; // Trả về null nếu không tìm thấy người dùng
 }
+    /// Hàm thống kê tổng số lượng tài sản (sản phẩm) hiện có trong database phục vụ trang Dashboard Admin
+    public static int getTotalItemsCount() {
+        String sql = "SELECT COUNT(*) AS total FROM items";
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+
+            if (rs.next()) {
+                return rs.getInt("total"); // Trả về con số đếm được
+            }
+
+        } catch (SQLException e) {
+            System.err.println("[DAO ERROR] Lỗi tính tổng tài sản: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return 0; /// Trả về 0 nếu hệ thống trống hoặc gặp lỗi kết nối
+    }
 }

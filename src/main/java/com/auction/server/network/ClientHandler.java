@@ -203,6 +203,17 @@ public class ClientHandler implements Runnable {
                         /// Trả về số lượng người dùng đang kết nối hiện tại cho Client vừa bật màn hình Home
                         out.println(new Message("UPDATE_ONLINE_COUNT", String.valueOf(ServerCore.getOnlineCount())).toJson());
                         break;
+                    case "GET_TOTAL_PRODUCTS":
+                        try {
+                            /// Gọi xuống kho ItemDAO để lấy con số tổng tài sản mới nhất trong database
+                            int totalCount = com.auction.server.dao.ItemDAO.getTotalItemsCount();
+
+                            /// Đóng gói con số và gửi phản hồi ngược lại cho Admin qua nhãn UPDATE_TOTAL_PRODUCTS
+                            out.println(new Message("UPDATE_TOTAL_PRODUCTS", String.valueOf(totalCount)).toJson());
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                        break;
                     case "GET_ALL_USERS":
                         try {
                             /// Lấy danh sách từ cả 2 kho database và gộp lại thành 1 list chung

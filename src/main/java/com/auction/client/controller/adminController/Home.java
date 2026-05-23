@@ -38,6 +38,9 @@ public class Home implements NetworkClient.MessageListener {
             ///  Gửi lệnh yêu cầu Server báo cáo số lượng người kết nối ngay khi vừa mở màn hình lên
             NetworkClient.getInstance().send(new Message("GET_ONLINE_COUNT", ""));
 
+            ///Gửi lệnh yêu cầu Server thống kê tổng số tài sản hiện có tại thời điểm này ở database
+            NetworkClient.getInstance().send(new Message("GET_TOTAL_PRODUCTS", ""));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -149,6 +152,12 @@ public class Home implements NetworkClient.MessageListener {
                     /// Server gửi về con số người dùng đang online, ta đắp nó lên giao diện
                     if (lblTotalUsers != null) {
                         lblTotalUsers.setText(msg.getPayload().toString());
+                    }
+                    break;
+                case "UPDATE_TOTAL_PRODUCTS":
+                    /// Server trả về tổng số lượng sản phẩm, tiến hành cập nhật lên khung thông số tương ứng
+                    if (lblTotalProducts != null) {
+                        lblTotalProducts.setText(msg.getPayload().toString());
                     }
                     break;
                 default:
