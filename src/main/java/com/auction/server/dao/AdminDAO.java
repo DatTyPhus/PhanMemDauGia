@@ -8,7 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class AdminDAO {
-    public Admin selectByUsername(String username) {
+    public static Admin selectByUsername(String username) {
         // SỬA: Đổi "admins" thành "admin"
         String sql = "SELECT * FROM admin WHERE username = ?";
 

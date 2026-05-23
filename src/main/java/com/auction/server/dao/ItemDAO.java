@@ -51,12 +51,13 @@ public class ItemDAO  {
     }
 
   
-  public void update(Item obj) {
+  public static void update(Item obj) {
       String sql = "UPDATE items SET seller_id = '" + obj.getSellerId() + "', "
               + "item_name = '" + obj.getName() + "', "
               + "description = '" + obj.getDescription() + "', "
               + "starting_price = " + obj.getStartingPrice() + ", "
               + "image_url = '" + obj.getImageUrl() + "', "
+              + "status = '" + obj.getStatus() + "' "
               + "WHERE item_id = " + obj.getId();
       Connection connection = null;
       try{
@@ -115,6 +116,7 @@ public class ItemDAO  {
                 item.setStartingPrice(rs.getBigDecimal("starting_price"));
                 item.setImageUrl(rs.getString("image_url"));
                 item.setDurationMinutes(rs.getInt("duration_minutes"));
+                item.setStatus(rs.getString("status"));
                 pendingItems.add(item);
             }
             return pendingItems;
@@ -190,11 +192,42 @@ public class ItemDAO  {
             item.setStartingPrice(rs.getBigDecimal("starting_price"));
             item.setImageUrl(rs.getString("image_url"));
             item.setDurationMinutes(rs.getInt("duration_minutes"));
+            item.setStatus(rs.getString("status"));
             return item;
         }
     } catch (SQLException e) {
         e.printStackTrace();
     }
     return null; // Trả về null nếu không tìm thấy người dùng
-}
+    }
+
+
+    public static Item selectById(int id) {
+        String sql = "SELECT * FROM items WHERE item_id = ?";
+        
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, id); // Gán giá trị id vào dấu chấm hỏi
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Item item=null;
+                String type= rs.getString("item_type");
+                item = Item.createFromType(type);
+                item.setId(rs.getInt("item_id"));
+                item.setSellerId(rs.getInt("seller_id"));
+                item.setName(rs.getString("item_name"));
+                item.setDescription(rs.getString("description"));
+                item.setStartingPrice(rs.getBigDecimal("starting_price"));
+                item.setImageUrl(rs.getString("image_url"));
+                item.setDurationMinutes(rs.getInt("duration_minutes"));
+                item.setStatus(rs.getString("status"));
+                return item;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null; // Trả về null nếu không tìm thấy người dùng
+    }
 }

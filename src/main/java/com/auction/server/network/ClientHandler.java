@@ -9,7 +9,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
-import java.util.ArrayList;
+import java.math.BigDecimal;
 
 import com.auction.shared.model.*;
 
@@ -77,14 +77,11 @@ public class ClientHandler implements Runnable {
 
                             // 2. Dùng JsonParser đọc trước JSON để lấy "itemType"
                             com.google.gson.JsonObject jsonObj = com.google.gson.JsonParser.parseString(jsonStr).getAsJsonObject();
-
                             // LƯU Ý: Phải get đúng chữ "itemType" vì class Item.java khai báo biến này
                             String itemType = jsonObj.get("itemType").getAsString();
-
                             // 3. Dịch ngược JSON thành đối tượng Java (Factory)
                             com.google.gson.Gson gson = new com.google.gson.Gson();
                             com.auction.shared.model.Item itemObj = null;
-
                             // Chú ý: Value giờ là "ART", "ELECTRONIC", "VEHICLE" (Không có S)
                             if ("ART".equals(itemType)) {
                                 itemObj = gson.fromJson(jsonStr, com.auction.shared.model.Art.class);
@@ -110,20 +107,25 @@ public class ClientHandler implements Runnable {
 
                     case "ADD_ITEM_SUCCESS":// đây sẽ là chỗ tạo ra các auction mới, sau đó gọi hàm timer để bắt đầu đếm ngược thời gian đấu giá
                         Item item = (Item) msg.getPayload();
-
+                        ; // Tạo 1 auto bid mặc định cho mỗi sản phẩm mới (giá = giá khởi điểm)
                         Auction auction = AuctionService.createAuction(item);
+                        // Tạo 1 hàng toàn giá trị mặc định có Auction id giống với auction id của auction để nếu cần thì dùng k cần thì tôi
+                        AutobidDAO.createAutobid(auction.getId());
+                        //lên sẵn lịch cho cuộc đấu giá đấy(kể cả khi chx thực hiện vẫn bắt đâì đếm ngc tg bắt đầu và kết thúc)
                         AuctionSchedular.timer(auction);
                         Message addItemSuccessResponse = new Message("ADD_ITEM_THANHCONG", auction);
                         out.println(addItemSuccessResponse.toJson());
                         break; 
+                        
                     case "ADD_ITEM_FAIL":
                         String errorMsg = (String) msg.getPayload();
                         Message errorResponse = new Message("ADD_ITEM_THATBAI", errorMsg);
                         out.println(errorResponse.toJson());
                         break;
+
                     case "PENDING_PRODUCTS":
                         List<Item> pendingItems = ItemDAO.findPendingItems();
-                        Message pendingItemsResponse = new Message("PENDING_PRODUCTS", pendingItems);
+                        Message pendingItemsResponse = new Message("PENDING_PRODUCTS_SUCCESS", pendingItems);
                         out.println(pendingItemsResponse.toJson());
                         break;
                     case "MY_PRODUCTS": {
@@ -137,6 +139,20 @@ public class ClientHandler implements Runnable {
 
                         List<Item> sellerItems = ItemDAO.findItemsBySellerId(id); // Thay 1 bằng ID người bán thực tế
                         out.println(new Message("MY_PRODUCTS_SUCCESS", sellerItems).toJson());
+                        break;
+                    }
+                    case "AUTO_BID":{
+                        String jsonStr = msg.getPayload().toString();
+                        com.google.gson.JsonObject jsonObj = com.google.gson.JsonParser.parseString(jsonStr).getAsJsonObject();
+                        int auctionId = jsonObj.get("auctionId").getAsInt();
+                        String bidderName = jsonObj.get("bidderName").getAsString();
+                        BigDecimal autoBidAmount = jsonObj.get("autoBidAmount").getAsBigDecimal();
+                        BigDecimal autoBidStep = jsonObj.get("autoBidStep").getAsBigDecimal();
+                        // Tạo 1 kiểu đặt bid cho auto bid(nếu mà bidtransaction có 3 tham số là đặt bid bth, nếu 4 tham số là autobid)
+                        BidTransaction autoBidTransaction = new BidTransaction(auctionId, bidderName, autoBidAmount, autoBidStep);
+                        // coi tiếp trong file Auction service
+                        Message message = AuctionService.processAutoBid(autoBidTransaction);
+                        out.println(message.toJson());
                         break;
                     }
                     case "DEPOSIT":

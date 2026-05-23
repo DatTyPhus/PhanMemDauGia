@@ -4,7 +4,6 @@ import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
 import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
-import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

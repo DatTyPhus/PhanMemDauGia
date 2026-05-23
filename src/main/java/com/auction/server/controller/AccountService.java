@@ -12,14 +12,11 @@ import com.auction.shared.network.Message;
 public class AccountService {
 
   // 3 DÒNG NÀY LÀ CỰC KỲ QUAN TRỌNG ĐỂ JAVA NHẬN DIỆN ĐƯỢC DAO (BẠN ĐÃ LỠ XÓA MẤT NÓ)
-  private final BidderDAO bidderDAO = new BidderDAO();
-  private final SellerDAO sellerDAO = new SellerDAO();
-  private final AdminDAO adminDAO = new AdminDAO();
 
   public Message login(String username, String password) {
 
     // 1. Kiểm tra bên kho Bidder
-    Bidder bidder = bidderDAO.selectByUsername(username);
+    Bidder bidder = BidderDAO.selectByUsername(username);
     if (bidder != null) {
       if (bidder.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", bidder);
@@ -29,7 +26,7 @@ public class AccountService {
     }
 
     // 2. Kiểm tra bên kho Seller
-    Seller seller = sellerDAO.selectByUsername(username);
+    Seller seller = SellerDAO.selectByUsername(username);
     if (seller != null) {
       if (seller.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", seller);
@@ -39,7 +36,7 @@ public class AccountService {
     }
 
     // 3. Kiểm tra bên kho Admin
-    Admin admin = adminDAO.selectByUsername(username);
+    Admin admin = AdminDAO.selectByUsername(username);
     if (admin != null) {
       if (admin.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", admin);
@@ -62,9 +59,9 @@ public class AccountService {
     // [SỬA] Check username trùng trên CẢ 3 KHO trước khi tạo bất kỳ role nào.
     // Lý do: nếu chỉ check riêng từng kho, username "Lan" có thể tồn tại đồng thời
     // ở cả Bidder lẫn Seller, khiến login không biết trả về ai.
-    boolean usernameExists = bidderDAO.selectByUsername(username) != null
-            || sellerDAO.selectByUsername(username) != null
-            || adminDAO.selectByUsername(username) != null;
+    boolean usernameExists = BidderDAO.selectByUsername(username) != null
+            || SellerDAO.selectByUsername(username) != null
+            || AdminDAO.selectByUsername(username) != null;           
 
     if (usernameExists) {
       System.out.println("-> Username [" + username + "] đã tồn tại trong hệ thống.");
@@ -74,14 +71,20 @@ public class AccountService {
     // Xóa khoảng trắng thừa và không phân biệt hoa thường
     if (role.trim().equalsIgnoreCase("BIDDER")) {
       System.out.println("-> Đang nhảy vào luồng BIDDER...");
+      if (BidderDAO.selectByUsername(username) != null) {
+        return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
+      }
       Bidder newUser = new Bidder(username, password, fullName, "BIDDER");
-      bidderDAO.create(newUser);
+      BidderDAO.create(newUser);
       return new Message("REGISTER_SUCCESS", newUser);
 
     } else if (role.trim().equalsIgnoreCase("SELLER")) {
       System.out.println("-> Đang nhảy vào luồng SELLER...");
+      if (SellerDAO.selectByUsername(username) != null) {
+        return new Message("REGISTER_FAIL", "Tên đăng nhập đã tồn tại.");
+      }
       Seller newUser = new Seller(username, password, fullName, "SELLER");
-      sellerDAO.create(newUser);
+      SellerDAO.create(newUser);
       return new Message("REGISTER_SUCCESS", newUser);
 
     } else {
