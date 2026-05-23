@@ -16,6 +16,8 @@ public class HomeController implements NetworkClient.MessageListener {
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
+    @FXML private Label lblTopBalance;
+    @FXML private Label lblTotalUsers;
 
     /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
     @FXML
@@ -28,6 +30,15 @@ public class HomeController implements NetworkClient.MessageListener {
             if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
                 lblUserName.setText(currentUser.getFullName());
                 lblUserRole.setText(currentUser.getRole());
+
+                String formattedBalance = String.format("%,.0f VNĐ", currentUser.getBalance());      /// Hiển thị số dư.
+                lblTopBalance.setText("Số dư: " + formattedBalance);
+
+                try {
+                    NetworkClient.getInstance().send(new Message("GET_ONLINE_COUNT", ""));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
             }
         }catch (Exception e){
             e.printStackTrace();
@@ -232,6 +243,12 @@ public class HomeController implements NetworkClient.MessageListener {
                         // 2. TẠI ĐÂY LÀ LOGIC ĐỔI GIAO DIỆN CỦA BẠN:
                         // (Ví dụ: Bạn dùng vòng lặp tìm cái Card sản phẩm có ID khớp với productId,
                         // sau đó gọi lệnh set text để cập nhật lại label giá tiền trên cái Card đó)
+                    }
+                    break;
+                case "UPDATE_ONLINE_COUNT":
+                    /// Server gửi về con số người dùng đang online, ta đắp nó lên giao diện
+                    if (lblTotalUsers != null) {
+                        lblTotalUsers.setText(msg.getPayload().toString());
                     }
                     break;
 

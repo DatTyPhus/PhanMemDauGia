@@ -38,21 +38,22 @@ public class SellerDAO {
       }
     }
 
+    /// Hàm lấy thông tin seller bằng ID (Đã sửa lại tên cột cho khớp với database)
     public static Seller getSellersByUserid(int id) {
+        // Chỉ lấy user_id, username, balance
         String sql = "SELECT user_id, username, balance FROM sellers WHERE user_id = ?";
-        
+
         try (Connection conn = JDBCUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setInt(1, id); // gán giá triu id vào dấu chấn hỏi
+
+            stmt.setInt(1, id);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 Seller user = new Seller();
-                user.setId(rs.getInt("id"));
+                // BẮT BUỘC: Lấy đúng tên cột là user_id từ database
+                user.setId(rs.getInt("user_id"));
                 user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password"));
-                user.setFullName(rs.getString("fullName"));
                 user.setBalance(rs.getBigDecimal("balance"));
                 return user;
             }
@@ -60,7 +61,24 @@ public class SellerDAO {
             e.printStackTrace();
         }
         return null; // Trả về null nếu không tìm thấy người dùng
-      }
+    }
+
+    /// Hàm này để cộng thêm tiền vào tài khoản Seller dưới database
+    public static boolean updateBalance(int userId, java.math.BigDecimal amountToAdd) {
+        String sql = "UPDATE sellers SET balance = balance + ? WHERE user_id = ?";
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setBigDecimal(1, amountToAdd);
+            stmt.setInt(2, userId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0; // Trả về true nếu update thành công
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
     
     public static Seller selectByUsername(String username) {
     String sql = "SELECT * FROM sellers WHERE username = ?";

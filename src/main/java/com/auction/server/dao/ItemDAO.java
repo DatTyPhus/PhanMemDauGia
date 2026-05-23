@@ -75,26 +75,25 @@ public class ItemDAO  {
       }
   }
 
-    
-    public void delete(Integer id) {
-        String sql = "DELETE FROM items WHERE item_id = " + id;
-        Connection connection = null;
-        try{
-            connection = JDBCUtil.getConnection();
-            Statement st= connection.createStatement();
 
-            int kq = st.executeUpdate(sql);
-            if (kq > 0) {
-              System.out.println("Xoa san pham thanh cong!");
-            } else {
-              System.out.println("Xoa that bai, vui long kiem tra lai du lieu.");
-            }
-            JDBCUtil.closeConnection(connection);
-        } catch(Exception e){
-          e.printStackTrace();
-        } 
+    /// Hàm xóa sản phẩm khỏi Database dựa vào ID sản phẩm
+    /// Trả về true nếu xóa thành công, false nếu thất bại
+    public static boolean deleteItem(int itemId) {
+        String sql = "DELETE FROM items WHERE item_id = ?";
 
-      }
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, itemId); // Gắn ID cần xóa vào dấu ?
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0; // Nếu có dòng bị ảnh hưởng nghĩa là đã xóa thành công
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 
 
     public static List<Item> findPendingItems() {

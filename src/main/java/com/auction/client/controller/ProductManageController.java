@@ -22,6 +22,7 @@ public class ProductManageController implements NetworkClient.MessageListener {
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
+    @FXML private Label lblTopBalance;
 
     @FXML private TableColumn<Item, String> colName;
     @FXML private TableColumn<Item, String> colType;        // Mới
@@ -51,6 +52,8 @@ public class ProductManageController implements NetworkClient.MessageListener {
                 if (lblUserRole != null) {
                     lblUserRole.setText(currentUser.getRole());
                 }
+                String formattedBalance = String.format("%,.0f VNĐ", currentUser.getBalance());      /// Hiển thị số dư.
+                lblTopBalance.setText("Số dư: " + formattedBalance);
             }
             colName.setCellValueFactory(new PropertyValueFactory<>("name"));
             colType.setCellValueFactory(new PropertyValueFactory<>("itemType"));
@@ -115,7 +118,26 @@ public class ProductManageController implements NetworkClient.MessageListener {
 
                     btnDelete.setOnAction(e -> {
                         Item item = getTableView().getItems().get(getIndex());
-                        System.out.println("Yêu cầu xóa: " + item.getName());
+
+                        /// Bật hộp thoại hỏi xác nhận trước khi xóa (UX tốt)
+                        javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
+                        alert.setTitle("Xác nhận xóa");
+                        alert.setHeaderText("Bạn có chắc chắn muốn xóa sản phẩm: " + item.getName() + "?");
+                        alert.setContentText("Hành động này không thể hoàn tác!");
+
+                        // Bắt sự kiện khi người dùng bấm nút trong hộp thoại
+                        alert.showAndWait().ifPresent(response -> {
+                            if (response == javafx.scene.control.ButtonType.OK) {
+                                /// Nếu bấm OK, đóng gói ID sản phẩm và gửi lệnh DELETE_ITEM xuống Server
+                                Message msg = new Message("DELETE_ITEM", String.valueOf(item.getId()));
+                                try {
+                                    NetworkClient.getInstance().send(msg);
+                                    System.out.println("[CLIENT] Đã gửi yêu cầu XÓA sản phẩm ID: " + item.getId());
+                                } catch (Exception ex) {
+                                    ex.printStackTrace();
+                                }
+                            }
+                        });
                     });
                 }
 
@@ -136,6 +158,7 @@ public class ProductManageController implements NetworkClient.MessageListener {
                                 "-fx-background-color: transparent;"       // Làm trong suốt nền
                 );
             }
+            onRefreshClick(null);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -381,6 +404,27 @@ public class ProductManageController implements NetworkClient.MessageListener {
                     if (productTable != null) {
                         productTable.setItems(items);
                     }
+                    break;
+                case "DELETE_ITEM_SUCCESS":
+                    /// In thông báo xóa thành công
+                    javafx.scene.control.Alert successAlert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
+                    successAlert.setTitle("Thành công");
+                    successAlert.setHeaderText(null);
+                    successAlert.setContentText(msg.getPayload().toString());
+                    successAlert.showAndWait();
+
+                    /// QUAN TRỌNG: Gọi lại lệnh LÀM MỚI danh sách.
+                    /// Bảng sẽ tự động tải lại dữ liệu từ Server, và sản phẩm vừa xóa sẽ biến mất!
+                    onRefreshClick(null);
+                    break;
+
+                case "DELETE_ITEM_FAIL":
+                    /// In thông báo lỗi nếu xóa thất bại
+                    javafx.scene.control.Alert failAlert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);
+                    failAlert.setTitle("Thất bại");
+                    failAlert.setHeaderText(null);
+                    failAlert.setContentText(msg.getPayload().toString());
+                    failAlert.showAndWait();
                     break;
 
                 // (Các thông báo như LOGIN_SUCCESS... nó sẽ rơi vào default và bị bỏ qua, không làm loạn màn hình này)
