@@ -106,4 +106,39 @@ public class SellerDAO {
     return null; // Trả về null nếu không tìm thấy người dùng
 }
 
+    /// Hàm lấy toàn bộ danh sách Seller từ database phục vụ màn hình Admin
+    public static java.util.List<com.auction.shared.model.Seller> getAllSellers() {
+        java.util.List<com.auction.shared.model.Seller> list = new java.util.ArrayList<>();
+        String sql = "SELECT user_id, username, full_name, balance FROM sellers";
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                com.auction.shared.model.Seller user = new com.auction.shared.model.Seller();
+                user.setId(rs.getInt("user_id"));
+                user.setUsername(rs.getString("username"));
+                user.setFullName(rs.getString("full_name"));
+                user.setBalance(rs.getBigDecimal("balance"));
+                user.setRole("SELLER");
+                list.add(user);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    /// Hàm thực hiện xóa vĩnh viễn tài khoản Seller khỏi database dựa vào ID
+    public static boolean deleteSeller(int userId) {
+        String sql = "DELETE FROM sellers WHERE user_id = ?";
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setInt(1, userId);
+            return stmt.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

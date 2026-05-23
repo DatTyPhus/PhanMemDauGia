@@ -119,7 +119,7 @@
 
                     <Region HBox.hgrow="ALWAYS" />
 
-                    <Label style="-fx-text-fill: #3b82f6; -fx-font-size: 14; -fx-font-weight: 900; -fx-background-color: #eff6ff; -fx-padding: 5 15; -fx-background-radius: 20;" text="3,102 Tài khoản" />
+                    <Label fx:id="lblTotalAccounts" style="-fx-text-fill: #3b82f6; -fx-font-size: 14; -fx-font-weight: 900; -fx-background-color: #eff6ff; -fx-padding: 5 15; -fx-background-radius: 20;" text="0 Tài khoản" />
 
                     <Button prefHeight="38" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 0 20; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(59,130,246,0.3), 5, 0, 0, 3);" text="+ THÊM NGƯỜI DÙNG">
                         <HBox.margin>
@@ -131,14 +131,13 @@
 
             <VBox style="-fx-background-color: white; -fx-background-radius: 0 0 15 15; -fx-padding: 10; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.03), 10, 0, 10, 0);" VBox.vgrow="ALWAYS">
                 <children>
-                    <TableView fx:id="userTable" style="-fx-background-color: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
+                    <TableView fx:id="userTable" VBox.vgrow="ALWAYS" style="-fx-background-color: transparent; -fx-border-color: transparent;">
                         <columns>
                             <TableColumn fx:id="idColumn" prefWidth="80" text="ID" />
                             <TableColumn fx:id="nameColumn" prefWidth="250" text="👤 Họ tên" />
-                            <TableColumn fx:id="emailColumn" prefWidth="300" text="✉ Email" />
+                            <TableColumn fx:id="emailColumn" prefWidth="300" text="✉ Tên đăng nhập" />
                             <TableColumn fx:id="roleColumn" prefWidth="150" text="🏷 Vai trò" />
                             <TableColumn fx:id="statusColumn" prefWidth="150" text="Trạng thái" />
-                            <TableColumn fx:id="createdColumn" prefWidth="200" text="📅 Ngày tạo" />
                             <TableColumn fx:id="actionColumn" prefWidth="150" text="Thao tác" />
                         </columns>
                         <columnResizePolicy>
