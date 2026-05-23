@@ -9,11 +9,8 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.List;
-import java.util.ArrayList;
-
 import com.auction.shared.model.*;
 
-//
 
 public class ClientHandler implements Runnable {
     private Socket socket;
