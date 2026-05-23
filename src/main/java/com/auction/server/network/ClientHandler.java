@@ -139,6 +139,70 @@ public class ClientHandler implements Runnable {
                         out.println(new Message("MY_PRODUCTS_SUCCESS", sellerItems).toJson());
                         break;
                     }
+                    case "DEPOSIT":
+                        try {
+                            // Dữ liệu Client gửi lên có dạng: "ID,Role,Amount"
+                            String depositStr = msg.getPayload().toString();
+                            String[] depositData = depositStr.split(",");
+
+                            int userId = Integer.parseInt(depositData[0]);
+                            String role = depositData[1];
+                            java.math.BigDecimal amountToAdd = new java.math.BigDecimal(depositData[2]);
+
+                            boolean isSuccess = false;
+
+                            /// Kiểm tra Role để gọi đúng kho (DAO) cập nhật tiền
+                            if (role.equalsIgnoreCase("BIDDER")) {
+                                isSuccess = com.auction.server.dao.BidderDAO.updateBalance(userId, amountToAdd);
+                            } else if (role.equalsIgnoreCase("SELLER")) {
+                                /// ĐÃ MỞ KHÓA: Gọi xuống kho Seller để cộng tiền
+                                isSuccess = com.auction.server.dao.SellerDAO.updateBalance(userId, amountToAdd);
+                            }
+
+                            if (isSuccess) {
+                                /// Lấy số dư MỚI NHẤT từ database tương ứng gửi ngược về cho Client
+                                java.math.BigDecimal newBalance = java.math.BigDecimal.ZERO;
+
+                                if (role.equalsIgnoreCase("BIDDER")) {
+                                    newBalance = com.auction.server.dao.BidderDAO.getUserByUserid(userId).getBalance();
+                                } else if (role.equalsIgnoreCase("SELLER")) {
+                                    /// ĐÃ MỞ KHÓA: Lấy số dư mới của Seller
+                                    newBalance = com.auction.server.dao.SellerDAO.getSellersByUserid(userId).getBalance();
+                                }
+
+                                out.println(new Message("DEPOSIT_SUCCESS", newBalance.toString()).toJson());
+                            } else {
+                                out.println(new Message("DEPOSIT_FAIL", "Không tìm thấy tài khoản hoặc nạp thất bại.").toJson());
+                            }
+
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            out.println(new Message("DEPOSIT_FAIL", "Lỗi xử lý nạp tiền trên Server.").toJson());
+                        }
+                        break;
+                    case "DELETE_ITEM":
+                        try {
+                            /// Lấy ID sản phẩm mà Client (Seller) gửi lên
+                            int itemIdToDelete = Integer.parseInt(msg.getPayload().toString());
+
+                            /// Gọi xuống kho ItemDAO để thực thi lệnh xóa
+                            boolean isDeleted = com.auction.server.dao.ItemDAO.deleteItem(itemIdToDelete);
+
+                            /// Phản hồi lại cho Client biết kết quả
+                            if (isDeleted) {
+                                out.println(new Message("DELETE_ITEM_SUCCESS", "Sản phẩm đã được xóa khỏi hệ thống!").toJson());
+                            } else {
+                                out.println(new Message("DELETE_ITEM_FAIL", "Không tìm thấy sản phẩm để xóa.").toJson());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            out.println(new Message("DELETE_ITEM_FAIL", "Lỗi Server khi xóa sản phẩm.").toJson());
+                        }
+                        break;
+                    case "GET_ONLINE_COUNT":
+                        /// Trả về số lượng người dùng đang kết nối hiện tại cho Client vừa bật màn hình Home
+                        out.println(new Message("UPDATE_ONLINE_COUNT", String.valueOf(ServerCore.getOnlineCount())).toJson());
+                        break;
                     default:
                         System.out.println("Không hiểu lệnh này: " + msg.getAction());
                 }

@@ -17,6 +17,7 @@ public class AuctionController implements NetworkClient.MessageListener {
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
+    @FXML private Label lblTopBalance;
 
     /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
     @FXML
@@ -29,6 +30,9 @@ public class AuctionController implements NetworkClient.MessageListener {
             if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
                 lblUserName.setText(currentUser.getFullName());
                 lblUserRole.setText(currentUser.getRole());
+
+                String formattedBalance = String.format("%,.0f VNĐ", currentUser.getBalance());      /// Hiển thị số dư.
+                lblTopBalance.setText("Số dư: " + formattedBalance);
             }
         }catch (Exception e){
             e.printStackTrace();

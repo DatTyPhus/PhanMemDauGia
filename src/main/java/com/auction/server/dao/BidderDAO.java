@@ -13,22 +13,25 @@ public class BidderDAO {
     public static BidderDAO instance() {
         return new BidderDAO();
     }
-  
+
+    /// Hàm lấy thông tin user bằng ID (Đã sửa lại tên cột cho khớp với database)
     public static Bidder getUserByUserid(int id) {
-        String sql = "SELECT id, username, balance FROM bidders WHERE id = ?";
-        
+        // Sửa chữ 'id' thành 'user_id' cho khớp với cấu trúc bảng bidders
+        String sql = "SELECT user_id, username, balance FROM bidders WHERE user_id = ?";
+
         try (Connection conn = JDBCUtil.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
-            
-            stmt.setInt(1, id); // gán giá triu id vào dấu chấn hỏi
+
+            stmt.setInt(1, id); // gán giá trị id vào dấu chấm hỏi
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
                 Bidder user = new Bidder();
-                user.setId(rs.getInt("id"));
+                // BẮT BUỘC: Lấy đúng tên cột là user_id từ database
+                user.setId(rs.getInt("user_id"));
                 user.setUsername(rs.getString("username"));
-                user.setPassword(rs.getString("password"));
-                user.setFullName(rs.getString("fullName"));
+                // Bỏ phần set password và fullName vì câu SQL trên không SELECT 2 cột này,
+                // chỉ cần lấy balance để phục vụ việc hiển thị số dư là đủ.
                 user.setBalance(rs.getBigDecimal("balance"));
                 return user;
             }
@@ -36,7 +39,7 @@ public class BidderDAO {
             e.printStackTrace();
         }
         return null; // Trả về null nếu không tìm thấy người dùng
-      }
+    }
 
     public static Bidder selectByUsername(String username) {
     String sql = "SELECT * FROM bidders WHERE username = ?";
@@ -84,6 +87,22 @@ public static void create(User obj) {
       } catch(Exception e){
         e.printStackTrace();
       }
+    }
+    /// Hàm này để cộng thêm tiền vào tài khoản dưới database
+    public static boolean updateBalance(int userId, java.math.BigDecimal amountToAdd) {
+        String sql = "UPDATE bidders SET balance = balance + ? WHERE user_id = ?";
+        try (Connection conn = JDBCUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setBigDecimal(1, amountToAdd);
+            stmt.setInt(2, userId);
+
+            int rowsAffected = stmt.executeUpdate();
+            return rowsAffected > 0; // Trả về true nếu update thành công
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
 }

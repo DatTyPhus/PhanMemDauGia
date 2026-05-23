@@ -17,7 +17,12 @@ public class ProfileController implements NetworkClient.MessageListener {
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
 
-    /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
+    /// Khai báo thêm các biến để hứng và in số dư (balance) ra giao diện.
+    @FXML private Label lblTopBalance;    // Số dư nhỏ ở góc phải trên cùng
+    @FXML private Label lblCenterBalance; // Số dư bự chà bá ở giữa màn hình dưới Avatar
+    @FXML private Label lblCenterName;    // Tên hiển thị dưới Avatar
+
+    /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Hồ sơ được load lên.
     @FXML
     public void initialize() {
         try{
@@ -25,14 +30,46 @@ public class ProfileController implements NetworkClient.MessageListener {
             User currentUser = UserSession.getInstance().getLoginUser();  /// Lấy thông tin người dùng hiện tại đang thao tác lưu vào kho để khi chuyển màn không bị mất thông tin.
 
             // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
-            if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
-                lblUserName.setText(currentUser.getFullName());
-                lblUserRole.setText(currentUser.getRole());
+            if (currentUser != null) {
+                /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin
+                if(lblUserName != null) lblUserName.setText(currentUser.getFullName());
+                if(lblUserRole != null) lblUserRole.setText(currentUser.getRole());
+                if(lblCenterName != null) lblCenterName.setText(currentUser.getFullName());
+
+                /// Định dạng số dư sang chuẩn tiền tệ VNĐ (VD: 5000000 -> 5,000,000 VNĐ)
+                /// Lưu ý: Giả định object User của bạn đã có hàm getBalance(), nếu chưa có bạn nhớ bổ sung vào model User nhé!
+                String formattedBalance = String.format("%,.0f VNĐ", currentUser.getBalance());
+                if(lblTopBalance != null) lblTopBalance.setText("Số dư: " + formattedBalance);
+                if(lblCenterBalance != null) lblCenterBalance.setText(formattedBalance);
             }
         }catch (Exception e){
             e.printStackTrace();
         }
     }
+
+    /// Method này thực hiện khi người dùng click vào nút NẠP TIỀN NGAY.
+    /// Nó sẽ gỡ luồng nghe của trang hiện tại và chuyển cảnh sang trang nạp tiền (deposit.fxml).
+    @FXML
+    public void onDepositClick(javafx.event.ActionEvent event) {
+        try {
+            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
+
+            // Giả định file tiếp theo bạn tạo sẽ tên là deposit.fxml nằm trong thư mục view
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/deposit.fxml"));
+            Parent root = loader.load();
+
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  ///Thay đổi màn hồ sơ thành màn nạp tiền.
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow(); // Bắt buộc lấy Stage trước khi thay root để tránh sập màn
+
+            source.getScene().setRoot(root);
+            currentStage.setTitle("NẠP TIỀN VÀO TÀI KHOẢN");
+
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            System.err.println("Lỗi: Không tìm thấy file deposit.fxml! Bạn nhớ tạo file này ở bước tiếp theo nhé.");
+        }
+    }
+
 
     /// Method này thực hiện khi thao tác click vào Trang chủ
     @FXML
@@ -178,6 +215,7 @@ public class ProfileController implements NetworkClient.MessageListener {
             System.err.println("Lỗi: Không tìm thấy file setting.fxml!");
         }
     }
+
     // ================= PHẦN XỬ LÝ REALTIME =================
     @Override
     public void onMessageReceived(Message msg) {
