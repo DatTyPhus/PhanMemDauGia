@@ -6,7 +6,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
-import java.io.IOException;
 
 /// class History dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình, và xử lý các yêu cầu từ server.
 public class History {

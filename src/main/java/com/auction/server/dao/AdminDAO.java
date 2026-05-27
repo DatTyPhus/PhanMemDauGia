@@ -7,9 +7,11 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/// Class lấy thông tin từ bảng Admin ở database.
 public class AdminDAO {
-    public Admin selectByUsername(String username) {
-        // SỬA: Đổi "admins" thành "admin"
+
+    /// Lấy thông tin admin theo tên đăng nhập
+    public static Admin selectByUsername(String username) {
         String sql = "SELECT * FROM admin WHERE username = ?";
 
         try (Connection conn = JDBCUtil.getConnection();
@@ -20,11 +22,11 @@ public class AdminDAO {
 
             if (rs.next()) {
                 Admin user = new Admin();
-                // SỬA: Lấy đúng tên cột "admin_id" trong bảng admin
+
                 user.setId(rs.getInt("admin_id"));
                 user.setUsername(rs.getString("username"));
                 user.setPassword(rs.getString("password"));
-                // BẮT BUỘC: Phải gán Role để Client còn biết đường mà rẽ nhánh
+
                 user.setRole("Admin");
 
                 return user;

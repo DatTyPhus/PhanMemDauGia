@@ -32,7 +32,7 @@ public class Home implements NetworkClient.MessageListener {
             // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
             if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
                 lblUserName.setText(currentUser.getFullName());
-                lblUserRole.setText(currentUser.getRole());
+                lblUserRole.setText(currentUser.getRole().toUpperCase());
             }
 
             ///  Gửi lệnh yêu cầu Server báo cáo số lượng người kết nối ngay khi vừa mở màn hình lên

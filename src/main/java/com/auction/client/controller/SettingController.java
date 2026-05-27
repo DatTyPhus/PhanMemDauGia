@@ -28,7 +28,7 @@ public class SettingController implements NetworkClient.MessageListener {
             NetworkClient.getInstance().addListener(this);
             User currentUser = UserSession.getInstance().getLoginUser();  /// Lấy thông tin người dùng hiện tại đang thao tác lưu vào kho để khi chuyển màn không bị mất thông tin.
 
-            // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
+            //Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
             if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
                 lblUserName.setText(currentUser.getFullName());
                 lblUserRole.setText(currentUser.getRole());
@@ -212,35 +212,14 @@ public class SettingController implements NetworkClient.MessageListener {
         }
     }
 
-    // ================= PHẦN XỬ LÝ REALTIME =================
+    /// Xử lý tín hiệu từ server
     @Override
     public void onMessageReceived(Message msg) {
-        // BẮT BUỘC: Phải đưa lệnh đổi giao diện vào Platform.runLater
-        // vì tin nhắn đến từ luồng mạng (Thread khác), nếu đổi trực tiếp sẽ làm sập JavaFX
+        //Phải đưa lệnh đổi giao diện vào Platform.runLater vì tin nhắn đến từ luồng mạng (Thread khác), nếu đổi trực tiếp sẽ làm sập JavaFX
         javafx.application.Platform.runLater(() -> {
 
             // Bộ lọc: Chỉ quan tâm đến tin nhắn báo "Cập nhật giá"
             switch (msg.getAction()) {
-                case "UPDATE_BID":
-                    System.out.println("Màn hình Phiên đấu giá đã nhận được tín hiệu!");
-
-                    // 1. Bóc tách dữ liệu (Giả sử Huy gửi chuỗi: "Mã_SP,Giá_Mới,Tên_Người_Đặt")
-                    String payloadStr = msg.getPayload().toString();
-                    String[] data = payloadStr.split(",");
-
-                    if(data.length == 3) {
-                        String productId = data[0];
-                        String newPrice = data[1];
-                        String bidderName = data[2];
-
-                        System.out.println("Sản phẩm ID: " + productId + " | Giá mới nhảy lên: " + newPrice + " bởi " + bidderName);
-
-                        // 2. TẠI ĐÂY LÀ LOGIC ĐỔI GIAO DIỆN CỦA BẠN:
-                        // (Ví dụ: Bạn dùng vòng lặp tìm cái Card sản phẩm có ID khớp với productId,
-                        // sau đó gọi lệnh set text để cập nhật lại label giá tiền trên cái Card đó)
-                    }
-                    break;
-
                 // (Các thông báo như LOGIN_SUCCESS... nó sẽ rơi vào default và bị bỏ qua, không làm loạn màn hình này)
                 default:
                     break;

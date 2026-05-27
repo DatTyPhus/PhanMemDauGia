@@ -11,7 +11,7 @@ public class UserSession {
     // Khoá hàm khởi tạo.
     private UserSession(){}
 
-    // Áp dụng Singleton
+    /// ========== Áp dụng Singleton ==============
     public static UserSession getInstance(){
         if(instance==null){
             instance = new UserSession();

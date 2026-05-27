@@ -2,12 +2,23 @@ package com.auction.client.controller;
 
 import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
+import com.auction.shared.model.Item;
 import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
+import com.google.gson.Gson;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
-import javafx.scene.control.Label;
+import javafx.scene.Scene;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import java.io.File;
+import java.util.Base64;
+
+import static javafx.scene.control.Alert.AlertType.ERROR;
 
 /// class HomeController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình ,và xử lý các yêu cầu từ server.
 
@@ -27,13 +38,13 @@ public class EditProduct implements NetworkClient.MessageListener {
         try{
             NetworkClient.getInstance().addListener(this);
 
-            // 1. Nạp dữ liệu cho ComboBox Danh mục đúng 3 dòng bạn cần
+            // 1 . Phân loại sản phẩm.
             if (cbCategory != null) {
                 cbCategory.getItems().addAll("ART", "ELECTRONIC", "VEHICLE");
                 cbCategory.setValue("ART"); // Lựa chọn mặc định ban đầu
             }
 
-            // 2. Nạp dữ liệu cho ComboBox Thời lượng đúng các mốc bạn cần
+            // 2. Chọn thời lượng đấu giá.
             if (cbDuration != null) {
                 cbDuration.getItems().addAll("5p", "15p", "30p", "1h", "2h");
                 cbDuration.setValue("5p"); // Lựa chọn mặc định ban đầu
@@ -49,7 +60,7 @@ public class EditProduct implements NetworkClient.MessageListener {
             // 1. Kiểm tra thông tin người bán đang đăng nhập
             User currentUser = UserSession.getInstance().getLoginUser();
             if (currentUser == null) {
-                showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi", "Không tìm thấy thông tin phiên đăng nhập. Vui lòng thử lại!");
+                showAlert(ERROR, "Lỗi", "Không tìm thấy thông tin phiên đăng nhập. Vui lòng thử lại!");
                 return;
             }
 
@@ -76,7 +87,7 @@ public class EditProduct implements NetworkClient.MessageListener {
                     return;
                 }
             } catch (NumberFormatException e) {
-                showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Sai định dạng", "Giá khởi điểm bắt buộc phải là một dãy số!");
+                showAlert(ERROR, "Sai định dạng", "Giá khởi điểm bắt buộc phải là một dãy số!");
                 return;
             }
 
@@ -91,7 +102,7 @@ public class EditProduct implements NetworkClient.MessageListener {
             }
 
             // 6. KHỞI TẠO ĐỐI TƯỢNG: Truyền đúng loại "ART", "ELECTRONIC", "VEHICLE" vào hàm createFromType
-            com.auction.shared.model.Item newItem = com.auction.shared.model.Item.createFromType(selectedCategory);
+            Item newItem = Item.createFromType(selectedCategory);
 
             // 7. ĐỔ DỮ LIỆU: Gọi chuẩn xác các hàm set tương thích hoàn toàn với lớp Item.java
             newItem.setSellerId(currentUser.getId());
@@ -100,15 +111,16 @@ public class EditProduct implements NetworkClient.MessageListener {
             newItem.setDescription(description);
             newItem.setStartingPrice(startPrice);
             newItem.setSpecialInfo(specialInfo);
-            // --- BẮT ĐẦU PHẦN NÂNG CẤP ẢNH (BƯỚC 2) ---
+
+            // Mã hóa thành chuỗi Base64
             if (selectedImagePath != null && !selectedImagePath.isEmpty()) {
                 try {
                     // Đọc file ảnh dưới dạng mảng byte
-                    java.io.File file = new java.io.File(selectedImagePath);
+                    File file = new File(selectedImagePath);
                     byte[] fileContent = java.nio.file.Files.readAllBytes(file.toPath());
 
                     // Mã hóa mảng byte thành chuỗi Base64 khổng lồ
-                    String base64String = java.util.Base64.getEncoder().encodeToString(fileContent);
+                    String base64String = Base64.getEncoder().encodeToString(fileContent);
 
                     // Gắn chuỗi Base64 vào Object để gửi lên Server
                     newItem.setImageUrl(base64String);
@@ -119,12 +131,11 @@ public class EditProduct implements NetworkClient.MessageListener {
             } else {
                 newItem.setImageUrl(""); // Không chọn ảnh thì để trống
             }
-            // --- KẾT THÚC PHẦN NÂNG CẤP ẢNH ---
             newItem.setDurationMinutes(durationMinutes); // Gán số phút quy đổi
             newItem.setStatus("PENDING"); // Gắn cờ chờ Admin duyệt theo đúng logic của nhóm
 
             // 8. CHUYỂN ĐỔI SANG JSON: Sử dụng thư viện Gson
-            com.google.gson.Gson gson = new com.google.gson.Gson();
+            Gson gson = new Gson();
             String jsonPayload = gson.toJson(newItem);
 
             // 9. BẮN GÓI TIN: Gửi mã hành động "ADD_ITEM" đồng bộ theo thiết kế xử lý của Server
@@ -132,20 +143,18 @@ public class EditProduct implements NetworkClient.MessageListener {
             NetworkClient.getInstance().send(msg);
 
             // In log kiểm tra tiến trình dưới Console
-            System.out.println("\n[CLIENT] Đã nặn đối tượng và bắn lệnh ADD_ITEM lên Server thành công!");
+            System.out.println("\n[CLIENT] Đã tạo đối tượng và bắn lệnh ADD_ITEM lên Server thành công!");
             System.out.println("Nội dung chuỗi JSON gửi đi:\n" + jsonPayload);
 
 
         } catch (Exception e) {
             System.err.println("[CLIENT ERROR] Lỗi khi thực hiện lưu sản phẩm: " + e.getMessage());
             e.printStackTrace();
-            showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi hệ thống", "Có lỗi xảy ra: " + e.getMessage());
+            showAlert(ERROR, "Lỗi hệ thống", "Có lỗi xảy ra: " + e.getMessage());
         }
     }
 
-    /**
-     * Hàm phụ trợ hiển thị nhanh hộp thoại thông báo Pop-up trên giao diện JavaFX
-     */
+    /// Hàm phụ trợ hiển thị nhanh hộp thoại thông báo Pop-up trên giao diện JavaFX
     private void showAlert(javafx.scene.control.Alert.AlertType type, String title, String content) {
         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(type);
         alert.setTitle(title);
@@ -154,9 +163,7 @@ public class EditProduct implements NetworkClient.MessageListener {
         alert.showAndWait();
     }
 
-    /**
-     * Hàm dọn sạch nội dung form sau khi hoàn tất gửi dữ liệu lên mạng
-     */
+    /// Hàm dọn sạch nội dung form sau khi hoàn tất gửi dữ liệu lên mạng
     private void clearForm() {
         if (txtProductName != null) txtProductName.clear();
         if (txtDescription != null) txtDescription.clear();
@@ -167,17 +174,16 @@ public class EditProduct implements NetworkClient.MessageListener {
     }
 
     // 1. Khai báo thêm khung ảnh và một biến chuỗi để lưu đường dẫn ảnh
-    @FXML private javafx.scene.image.ImageView imgProduct;
+    @FXML private ImageView imgProduct;
     private String selectedImagePath = ""; // Biến toàn cục lưu đường dẫn ảnh để lát nữa gửi đi
 
-    // ... (Các code cũ giữ nguyên) ...
 
     // 2. Viết hàm xử lý khi bấm nút "Chọn ảnh"
     @FXML
     public void onChooseImageClick(javafx.event.ActionEvent event) {
         try {
             // Khởi tạo cửa sổ chọn file
-            javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+            FileChooser fileChooser = new FileChooser();
             fileChooser.setTitle("Chọn hình ảnh sản phẩm");
 
             // Chỉ cho phép chọn các file định dạng hình ảnh
@@ -186,7 +192,7 @@ public class EditProduct implements NetworkClient.MessageListener {
             );
 
             // Mở cửa sổ và lấy file người dùng chọn
-            javafx.stage.Stage stage = (javafx.stage.Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
+            Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
             java.io.File selectedFile = fileChooser.showOpenDialog(stage);
 
             if (selectedFile != null) {
@@ -194,7 +200,7 @@ public class EditProduct implements NetworkClient.MessageListener {
                 selectedImagePath = selectedFile.getAbsolutePath();
 
                 // Hiển thị ảnh xem trước lên giao diện
-                javafx.scene.image.Image image = new javafx.scene.image.Image(selectedFile.toURI().toString());
+                Image image = new Image(selectedFile.toURI().toString());
                 imgProduct.setImage(image);
 
 
@@ -202,18 +208,16 @@ public class EditProduct implements NetworkClient.MessageListener {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi", "Không thể tải ảnh: " + e.getMessage());
+            showAlert(ERROR, "Lỗi", "Không thể tải ảnh: " + e.getMessage());
         }
     }
 
-    /**
-     * XỬ LÝ SỰ KIỆN KHI NGƯỜI DÙNG BẤM NÚT HỦY BỎ
-     * Quay trở lại màn hình Quản lý tài sản (product_management.fxml)
-     */
+    /// XỬ LÝ SỰ KIỆN KHI NGƯỜI DÙNG BẤM NÚT HỦY BỎ .Quay trở lại màn hình Quản lý tài sản (product_management.fxml)
+
     @FXML
     public void onCancelClick(javafx.event.ActionEvent event) {
         try {
-            // 1. Rút ống nghe của màn hình hiện tại ra khỏi NetworkClient để tránh lỗi "Bóng ma"
+            // 1. Rút ống nghe của màn hình hiện tại ra khỏi NetworkClient
             NetworkClient.getInstance().removeListener(this);
 
             // 2. Định vị và tải tệp giao diện Quản lý tài sản của bạn
@@ -221,15 +225,15 @@ public class EditProduct implements NetworkClient.MessageListener {
             Parent root = loader.load();
 
             // 3. Xác định đối tượng Node kích hoạt sự kiện bấm nút
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+            Node source = (Node) event.getSource();
 
-            // 4. CHUẨN HOÁ AN TOÀN: Lấy cửa sổ (Stage) TRƯỚC KHI thiết lập Root mới
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
+            // 4. Lấy cửa sổ (Stage) TRƯỚC KHI thiết lập Root mới
+            Stage currentStage = (Stage) source.getScene().getWindow();
 
             // 5. Tiến hành thay đổi giao diện trung tâm thành màn hình danh sách tài sản
             source.getScene().setRoot(root);
 
-            // 6. Đảm bảo giữ vững tiêu đề đồng bộ trên thanh tác vụ của hệ thống
+            // 6. Đảm bảo tiêu đề đồng bộ trên thanh tác vụ của hệ thống
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
             System.out.println("[CLIENT] Người dùng đã hủy bỏ tác vụ thêm tài sản. Đã quay về màn Quản lý.");
@@ -237,7 +241,7 @@ public class EditProduct implements NetworkClient.MessageListener {
         } catch (java.io.IOException e) {
             System.err.println("[FXML ERROR] Không tìm thấy file giao diện: product_management.fxml");
             e.printStackTrace();
-            showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi hệ thống", "Không thể quay lại màn hình quản lý: " + e.getMessage());
+            showAlert(ERROR, "Lỗi hệ thống", "Không thể quay lại màn hình quản lý: " + e.getMessage());
         }
     }
 
@@ -250,11 +254,11 @@ public class EditProduct implements NetworkClient.MessageListener {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/notification.fxml"));
 
             Parent root = loader.load();                ///Thay đổi màn home thành màn notification.
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-            javafx.scene.Scene currentScene = source.getScene();
+            Node source = (Node) event.getSource();
+            Scene currentScene = source.getScene();
             currentScene.setRoot(root);
 
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow();
+            Stage currentStage = (Stage) currentScene.getWindow();
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
@@ -272,11 +276,11 @@ public class EditProduct implements NetworkClient.MessageListener {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/phiendaugia.fxml")); //Tải file phiendaugia.fxml
             Parent root = loader.load();
 
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
-            javafx.scene.Scene currentScene = source.getScene();
+            Node source = (Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
+            Scene currentScene = source.getScene();
             currentScene.setRoot(root);
 
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
+            Stage currentStage = (Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
@@ -294,11 +298,11 @@ public class EditProduct implements NetworkClient.MessageListener {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/history.fxml")); //Tải file phiendaugia.fxml
             Parent root = loader.load();
 
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
-            javafx.scene.Scene currentScene = source.getScene();
+            Node source = (Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
+            Scene currentScene = source.getScene();
             currentScene.setRoot(root);
 
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
+            Stage currentStage = (Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
@@ -316,11 +320,11 @@ public class EditProduct implements NetworkClient.MessageListener {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
             Parent root = loader.load();
 
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn hình phiendaugia thành màn home.
+            Node source = (Node) event.getSource();  //Thay đổi màn hình phiendaugia thành màn home.
             source.getScene().setRoot(root);
 
             //Đặt lại tiêu đề cho window.
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
+            Stage currentStage = (Stage) source.getScene().getWindow();
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
         } catch (java.io.IOException e) {
@@ -411,31 +415,10 @@ public class EditProduct implements NetworkClient.MessageListener {
     // ================= PHẦN XỬ LÝ REALTIME =================
     @Override
     public void onMessageReceived(Message msg) {
-        // BẮT BUỘC: Phải đưa lệnh đổi giao diện vào Platform.runLater
-        // vì tin nhắn đến từ luồng mạng (Thread khác), nếu đổi trực tiếp sẽ làm sập JavaFX
+        // Phải đưa lệnh đổi giao diện vào Platform.runLater vì tin nhắn đến từ luồng mạng (Thread khác), nếu đổi trực tiếp sẽ làm sập JavaFX
         javafx.application.Platform.runLater(() -> {
 
-            // Bộ lọc: Chỉ quan tâm đến tin nhắn báo "Cập nhật giá"
             switch (msg.getAction()) {
-                case "UPDATE_BID":
-                    System.out.println("Màn hình Phiên đấu giá đã nhận được tín hiệu!");
-
-                    // 1. Bóc tách dữ liệu (Giả sử Huy gửi chuỗi: "Mã_SP,Giá_Mới,Tên_Người_Đặt")
-                    String payloadStr = msg.getPayload().toString();
-                    String[] data = payloadStr.split(",");
-
-                    if(data.length == 3) {
-                        String productId = data[0];
-                        String newPrice = data[1];
-                        String bidderName = data[2];
-
-                        System.out.println("Sản phẩm ID: " + productId + " | Giá mới nhảy lên: " + newPrice + " bởi " + bidderName);
-
-                        // 2. TẠI ĐÂY LÀ LOGIC ĐỔI GIAO DIỆN CỦA BẠN:
-                        // (Ví dụ: Bạn dùng vòng lặp tìm cái Card sản phẩm có ID khớp với productId,
-                        // sau đó gọi lệnh set text để cập nhật lại label giá tiền trên cái Card đó)
-                    }
-                    break;
                 case "ADD_ITEM_SUCCESS":
                     // Hiện Popup báo thành công và xóa trắng Form
                     showAlert(javafx.scene.control.Alert.AlertType.INFORMATION, "Thành công", msg.getPayload().toString());
@@ -444,7 +427,7 @@ public class EditProduct implements NetworkClient.MessageListener {
 
                 case "ADD_ITEM_FAIL":
                     // Hiện Popup báo lỗi nếu Server trục trặc
-                    showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Lỗi", msg.getPayload().toString());
+                    showAlert(ERROR, "Lỗi", msg.getPayload().toString());
                     break;
 
                 // Các tín hiệu khác tạm thời bỏ qua
@@ -454,10 +437,7 @@ public class EditProduct implements NetworkClient.MessageListener {
         });
     }
 
-    /**
-     * BƯỚC 3: Hàm tiện ích giải mã chuỗi Base64 khổng lồ từ DB thành hình ảnh JavaFX
-     * Hàm này sẽ được gọi khi bạn tải thông tin sản phẩm (có chứa chuỗi URL Base64) để Sửa.
-     */
+    /// Hàm  giải mã chuỗi Base64 khổng lồ từ DB thành hình ảnh JavaFX .Hàm này sẽ được gọi khi bạn tải thông tin sản phẩm (có chứa chuỗi URL Base64) để Sửa.
     public void displayImageFromBase64(String base64Image) {
         if (base64Image != null && !base64Image.isEmpty()) {
             try {
@@ -467,7 +447,7 @@ public class EditProduct implements NetworkClient.MessageListener {
                 // 2. Tạo một luồng đọc dữ liệu từ mảng byte đó
                 java.io.ByteArrayInputStream bis = new java.io.ByteArrayInputStream(imageBytes);
 
-                // 3. Hóa phép thành đối tượng Image của JavaFX
+                // 3. Tạo thành đối tượng Image của JavaFX
                 javafx.scene.image.Image image = new javafx.scene.image.Image(bis);
 
                 // 4. Hiển thị lên khung ImageView trên màn hình EditProduct

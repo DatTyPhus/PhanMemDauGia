@@ -58,5 +58,4 @@ public abstract class Item extends Entity {
     public void setDurationMinutes(int durationMinutes) {this.durationMinutes = durationMinutes;}
     public void setStatus(String status) { this.status = status; }
     public void setSpecialInfo(String special_info) { this.special_info = special_info; }
-
 }

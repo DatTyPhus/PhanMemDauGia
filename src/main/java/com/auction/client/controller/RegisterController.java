@@ -28,8 +28,7 @@ public class RegisterController implements NetworkClient.MessageListener {
     @FXML private PasswordField re_password;
     @FXML private Circle role_bidder;
     @FXML private Circle role_seller;
-
-    @FXML private Label lblMessage;            // Thêm 1 Label ẩn trên giao diện để hiện chữ báo lỗi
+    @FXML private Label lblMessage;            // Label ẩn trên giao diện để hiện chữ báo lỗi
 
     /// Biến lưu trữ Role hiện tại mà người dùng đang chọn (Mặc định là BIDDER)
     private String selectedRole = "BIDDER";       // Khi người dùng đăng ký không click vào bất cứ ô chọn role nào thì mặc định sẽ là BIDDER.
@@ -44,13 +43,13 @@ public class RegisterController implements NetworkClient.MessageListener {
 
         // Khi NetworkClient có tín hiệu phản hồi từ server sẽ được đi vào hàm handleServerResponse.
         try {
-            /// BẮT BUỘC: Đăng ký màn hình này vào danh sách nghe tín hiệu mạng từ server để nhận lệnh REGISTER_FAIL / REGISTER_SUCCESS
+            /// Đăng ký màn hình này vào danh sách nghe tín hiệu mạng từ server để nhận lệnh REGISTER_FAIL / REGISTER_SUCCESS
             NetworkClient.getInstance().addListener(this);
 
-            /// Đặt màu ban đầu cho 2 nút chọn Role tròn để người dùng dễ nhìn diện
+            /// Đặt màu ban đầu cho 2 nút chọn Role tròn
             role_bidder.setFill(Color.web("#2563eb"));
             role_seller.setFill(Color.TRANSPARENT);
-            role_seller.setStroke(Color.web("#cbd5e1"));
+            role_seller.setStroke(Color.web("#256eb"));
         } catch (Exception e) {
             e.printStackTrace();
         }

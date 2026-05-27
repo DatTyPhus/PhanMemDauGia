@@ -5,11 +5,14 @@ import com.auction.client.session.UserSession;
 import com.auction.shared.model.Item;
 import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
+import com.google.gson.Gson;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.cell.PropertyValueFactory;
 
@@ -19,21 +22,21 @@ import java.math.BigDecimal;
 
 public class ProductManageController implements NetworkClient.MessageListener {
 
-    // Các biến dùng để link các nút từ màn hình.
+    // Các biến dùng để link các thông số từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
     @FXML private Label lblTopBalance;
 
+    // Các biến dùng để link với các thông số cột ở bảng.
     @FXML private TableColumn<Item, String> colName;
-    @FXML private TableColumn<Item, String> colType;        // Mới
-    @FXML private TableColumn<Item, String> colDescription; // Mới
+    @FXML private TableColumn<Item, String> colType;
+    @FXML private TableColumn<Item, String> colDescription;
     @FXML private TableColumn<Item, String> colSpecialInfo;
     @FXML private TableColumn<Item, BigDecimal> colPrice;
-    @FXML private TableColumn<Item, Integer> colDuration;   // Mới
+    @FXML private TableColumn<Item, Integer> colDuration;
     @FXML private TableColumn<Item, String> colStatus;
     @FXML private TableColumn<Item, Void> colAction;
     @FXML private javafx.scene.control.Pagination pagination;
-
     @FXML private javafx.scene.control.TableView<Item> productTable;
 
     /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
@@ -43,7 +46,7 @@ public class ProductManageController implements NetworkClient.MessageListener {
             NetworkClient.getInstance().addListener(this);
             User currentUser = UserSession.getInstance().getLoginUser();  /// Lấy thông tin người dùng hiện tại đang thao tác lưu vào kho để khi chuyển màn không bị mất thông tin.
 
-            // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
+            //  Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
             if (currentUser != null) {                                         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
                 // Biến nào đã được gắn fx:id bên FXML thì mới được phép setText
                 if (lblUserName != null) {
@@ -55,6 +58,8 @@ public class ProductManageController implements NetworkClient.MessageListener {
                 String formattedBalance = String.format("%,.0f VNĐ", currentUser.getBalance());      /// Hiển thị số dư.
                 lblTopBalance.setText("Số dư: " + formattedBalance);
             }
+
+            // Định dạng các cột lưu 1 thuộc tính của sản phẩm.
             colName.setCellValueFactory(new PropertyValueFactory<>("name"));
             colType.setCellValueFactory(new PropertyValueFactory<>("itemType"));
             colDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -66,8 +71,8 @@ public class ProductManageController implements NetworkClient.MessageListener {
             colDuration.setCellValueFactory(new PropertyValueFactory<>("durationMinutes"));
             colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-            // 1. Định dạng Giá tiền (Xóa định dạng khoa học 2.5E+7)
-            colPrice.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
+            // 1. Định dạng Giá tiền
+            colPrice.setCellFactory(column -> new TableCell<>() {
                 @Override
                 protected void updateItem(BigDecimal item, boolean empty) {
                     super.updateItem(item, empty);
@@ -80,7 +85,7 @@ public class ProductManageController implements NetworkClient.MessageListener {
                 }
             });
 
-            // 2. Tạo Badge cho Trạng thái
+            // 2.Tạo Badge cho Trạng thái
             colStatus.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
                 @Override
                 protected void updateItem(String item, boolean empty) {
@@ -88,7 +93,7 @@ public class ProductManageController implements NetworkClient.MessageListener {
                     if (empty || item == null) {
                         setGraphic(null);
                     } else {
-                        javafx.scene.control.Label badge = new javafx.scene.control.Label(item);
+                        Label badge = new Label(item);
                         badge.setPadding(new javafx.geometry.Insets(3, 10, 3, 10));
                         badge.setStyle("-fx-background-radius: 12; -fx-font-weight: bold; -fx-font-size: 11;");
 
@@ -105,7 +110,7 @@ public class ProductManageController implements NetworkClient.MessageListener {
                 }
             });
 
-            // 3. Thêm nút Thao tác
+            // 3. Thêm nút Thao tác để chỉnh sửa thông tin và xóa.
             colAction.setCellFactory(column -> new javafx.scene.control.TableCell<>() {
                 private final javafx.scene.control.Button btnEdit = new javafx.scene.control.Button("📝");
                 private final javafx.scene.control.Button btnDelete = new javafx.scene.control.Button("🗑");
@@ -119,15 +124,16 @@ public class ProductManageController implements NetworkClient.MessageListener {
                     btnDelete.setOnAction(e -> {
                         Item item = getTableView().getItems().get(getIndex());
 
-                        /// Bật hộp thoại hỏi xác nhận trước khi xóa (UX tốt)
+                        /// Bật hộp thoại hỏi xác nhận trước khi xóa
                         javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.CONFIRMATION);
                         alert.setTitle("Xác nhận xóa");
                         alert.setHeaderText("Bạn có chắc chắn muốn xóa sản phẩm: " + item.getName() + "?");
                         alert.setContentText("Hành động này không thể hoàn tác!");
 
-                        // Bắt sự kiện khi người dùng bấm nút trong hộp thoại
+                        // Nhận tín hiệu khi người dùng bấm nút trong hộp thoại
                         alert.showAndWait().ifPresent(response -> {
-                            if (response == javafx.scene.control.ButtonType.OK) {
+                            if (response == ButtonType.OK) {
+
                                 /// Nếu bấm OK, đóng gói ID sản phẩm và gửi lệnh DELETE_ITEM xuống Server
                                 Message msg = new Message("DELETE_ITEM", String.valueOf(item.getId()));
                                 try {
@@ -147,7 +153,8 @@ public class ProductManageController implements NetworkClient.MessageListener {
                     setGraphic(empty ? null : container);
                 }
             });
-            // ---- "ĐỘ" PAGINATION SANG TẦM LUXURY ----
+
+            // Nâng cấp phân trang PAGINATION
             if (pagination != null) {
                 // Reset style về dạng Bullet mặc định
                 pagination.getStyleClass().add(javafx.scene.control.Pagination.STYLE_CLASS_BULLET);
@@ -347,46 +354,27 @@ public class ProductManageController implements NetworkClient.MessageListener {
     // ================= PHẦN XỬ LÝ REALTIME =================
     @Override
     public void onMessageReceived(Message msg) {
-        // BẮT BUỘC: Phải đưa lệnh đổi giao diện vào Platform.runLater
-        // vì tin nhắn đến từ luồng mạng (Thread khác), nếu đổi trực tiếp sẽ làm sập JavaFX
+        //  Phải đưa lệnh đổi giao diện vào Platform.runLater vì tin nhắn đến từ luồng mạng (Thread khác), nếu đổi trực tiếp sẽ làm sập JavaFX
         javafx.application.Platform.runLater(() -> {
 
-            // Bộ lọc: Chỉ quan tâm đến tin nhắn báo "Cập nhật giá"
             switch (msg.getAction()) {
-                case "UPDATE_BID":
-                    System.out.println("Màn hình Phiên đấu giá đã nhận được tín hiệu!");
 
-                    // 1. Bóc tách dữ liệu (Giả sử Huy gửi chuỗi: "Mã_SP,Giá_Mới,Tên_Người_Đặt")
-                    String payloadStr = msg.getPayload().toString();
-                    String[] data = payloadStr.split(",");
-
-                    if(data.length == 3) {
-                        String productId = data[0];
-                        String newPrice = data[1];
-                        String bidderName = data[2];
-
-                        System.out.println("Sản phẩm ID: " + productId + " | Giá mới nhảy lên: " + newPrice + " bởi " + bidderName);
-
-                        // 2. TẠI ĐÂY LÀ LOGIC ĐỔI GIAO DIỆN CỦA BẠN:
-                        // (Ví dụ: Bạn dùng vòng lặp tìm cái Card sản phẩm có ID khớp với productId,
-                        // sau đó gọi lệnh set text để cập nhật lại label giá tiền trên cái Card đó)
-                    }
-                    break;
+                // Xử lý khi nhận sản phẩm thành công.
                 case "MY_PRODUCTS_SUCCESS":
                     System.out.println("[CLIENT] Đã nhận được danh sách tài sản từ Server!");
 
-                    // 1. ĐÃ SỬA: Phải dùng Gson để chuyển đổi Object thành chuỗi JSON chuẩn, KHÔNG dùng .toString()
-                    com.google.gson.Gson gson = new com.google.gson.Gson();
+                    // 1. Dùng Gson để chuyển đổi Object thành chuỗi JSON chuẩn
+                    Gson gson = new Gson();
                     String jsonList = gson.toJson(msg.getPayload());
 
-                    // 2. Bây giờ JsonParser sẽ đọc ngon lành vì chuỗi đã chuẩn JSON
+                    // 2. Bây giờ JsonParser sẽ đọc  vì chuỗi đã chuẩn JSON
                     com.google.gson.JsonArray jsonArray = com.google.gson.JsonParser.parseString(jsonList).getAsJsonArray();
                     javafx.collections.ObservableList<Item> items = javafx.collections.FXCollections.observableArrayList();
 
                     for (com.google.gson.JsonElement element : jsonArray) {
                         com.google.gson.JsonObject obj = element.getAsJsonObject();
 
-                        // Kiểm tra an toàn: Đảm bảo đối tượng có thuộc tính itemType
+                        //  Đảm bảo đối tượng có thuộc tính itemType
                         if (obj.has("itemType") && !obj.get("itemType").isJsonNull()) {
                             String type = obj.get("itemType").getAsString(); // Lấy loại để khởi tạo đúng class con
 
@@ -405,6 +393,8 @@ public class ProductManageController implements NetworkClient.MessageListener {
                         productTable.setItems(items);
                     }
                     break;
+
+                // Khi xóa sản phẩm thành công
                 case "DELETE_ITEM_SUCCESS":
                     /// In thông báo xóa thành công
                     javafx.scene.control.Alert successAlert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.INFORMATION);
@@ -413,11 +403,11 @@ public class ProductManageController implements NetworkClient.MessageListener {
                     successAlert.setContentText(msg.getPayload().toString());
                     successAlert.showAndWait();
 
-                    /// QUAN TRỌNG: Gọi lại lệnh LÀM MỚI danh sách.
-                    /// Bảng sẽ tự động tải lại dữ liệu từ Server, và sản phẩm vừa xóa sẽ biến mất!
+                    // Làm mới bẳng lại
                     onRefreshClick(null);
                     break;
 
+                // Khi xóa ảnh thất bại.
                 case "DELETE_ITEM_FAIL":
                     /// In thông báo lỗi nếu xóa thất bại
                     javafx.scene.control.Alert failAlert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.ERROR);

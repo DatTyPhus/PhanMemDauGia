@@ -64,7 +64,7 @@ public class DepositController implements NetworkClient.MessageListener {
             }
 
             /// Đóng gói dữ liệu gửi xuống Server (Gồm ID người dùng, vai trò và số tiền)
-            /// Lưu ý: Format chuỗi gửi đi sẽ là: "ID,Role,Amount"
+            /// Format chuỗi gửi đi sẽ là: "ID,Role,Amount"
             String payload = currentUser.getId() + "," + currentUser.getRole() + "," + amount.toString();
             Message msg = new Message("DEPOSIT", payload);
 

@@ -16,10 +16,8 @@ public class ProfileController implements NetworkClient.MessageListener {
     // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
-
-    /// Khai báo thêm các biến để hứng và in số dư (balance) ra giao diện.
     @FXML private Label lblTopBalance;    // Số dư nhỏ ở góc phải trên cùng
-    @FXML private Label lblCenterBalance; // Số dư bự chà bá ở giữa màn hình dưới Avatar
+    @FXML private Label lblCenterBalance; // Số dư to ở giữa màn hình dưới Avatar
     @FXML private Label lblCenterName;    // Tên hiển thị dưới Avatar
 
     /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Hồ sơ được load lên.
@@ -31,13 +29,13 @@ public class ProfileController implements NetworkClient.MessageListener {
 
             // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
             if (currentUser != null) {
+
                 /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin
                 if(lblUserName != null) lblUserName.setText(currentUser.getFullName());
                 if(lblUserRole != null) lblUserRole.setText(currentUser.getRole());
                 if(lblCenterName != null) lblCenterName.setText(currentUser.getFullName());
 
-                /// Định dạng số dư sang chuẩn tiền tệ VNĐ (VD: 5000000 -> 5,000,000 VNĐ)
-                /// Lưu ý: Giả định object User của bạn đã có hàm getBalance(), nếu chưa có bạn nhớ bổ sung vào model User nhé!
+                /// Gán số số dư vào khung người dùng.
                 String formattedBalance = String.format("%,.0f VNĐ", currentUser.getBalance());
                 if(lblTopBalance != null) lblTopBalance.setText("Số dư: " + formattedBalance);
                 if(lblCenterBalance != null) lblCenterBalance.setText(formattedBalance);
@@ -48,17 +46,16 @@ public class ProfileController implements NetworkClient.MessageListener {
     }
 
     /// Method này thực hiện khi người dùng click vào nút NẠP TIỀN NGAY.
-    /// Nó sẽ gỡ luồng nghe của trang hiện tại và chuyển cảnh sang trang nạp tiền (deposit.fxml).
     @FXML
     public void onDepositClick(javafx.event.ActionEvent event) {
         try {
             NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
 
-            // Giả định file tiếp theo bạn tạo sẽ tên là deposit.fxml nằm trong thư mục view
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/deposit.fxml"));
             Parent root = loader.load();
 
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  ///Thay đổi màn hồ sơ thành màn nạp tiền.
+            // Thay đổi màn hồ sơ thành màn nạp tiền.
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow(); // Bắt buộc lấy Stage trước khi thay root để tránh sập màn
 
             source.getScene().setRoot(root);
@@ -149,8 +146,6 @@ public class ProfileController implements NetworkClient.MessageListener {
                 Parent root = loader.load();
 
                 javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-
-                // BÍ QUYẾT LÀ ĐÂY: Lấy Cửa sổ (Window) TRƯỚC KHI thay ruột
                 javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
 
                 // Sau đó mới thay giao diện mới vào
@@ -161,7 +156,7 @@ public class ProfileController implements NetworkClient.MessageListener {
                 e.printStackTrace();
                 System.err.println("Lỗi: Không tìm thấy file product_management.fxml!");
             }
-        } else {
+        } else {            /// Báo lỗi khi người dùng không phải là role seller click chuyêển màn sang QUẢN LÝ TÀI SẢN.
             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
             alert.setTitle("Từ chối truy cập");
             alert.setHeaderText(null);
@@ -219,11 +214,9 @@ public class ProfileController implements NetworkClient.MessageListener {
     // ================= PHẦN XỬ LÝ REALTIME =================
     @Override
     public void onMessageReceived(Message msg) {
-        // BẮT BUỘC: Phải đưa lệnh đổi giao diện vào Platform.runLater
-        // vì tin nhắn đến từ luồng mạng (Thread khác), nếu đổi trực tiếp sẽ làm sập JavaFX
+        // Đưa lệnh đổi giao diện vào Platform.runLater.
         javafx.application.Platform.runLater(() -> {
 
-            // Bộ lọc: Chỉ quan tâm đến tin nhắn báo "Cập nhật giá"
             switch (msg.getAction()) {
                 case "UPDATE_BID":
                     System.out.println("Màn hình Phiên đấu giá đã nhận được tín hiệu!");
@@ -239,13 +232,10 @@ public class ProfileController implements NetworkClient.MessageListener {
 
                         System.out.println("Sản phẩm ID: " + productId + " | Giá mới nhảy lên: " + newPrice + " bởi " + bidderName);
 
-                        // 2. TẠI ĐÂY LÀ LOGIC ĐỔI GIAO DIỆN CỦA BẠN:
-                        // (Ví dụ: Bạn dùng vòng lặp tìm cái Card sản phẩm có ID khớp với productId,
-                        // sau đó gọi lệnh set text để cập nhật lại label giá tiền trên cái Card đó)
                     }
                     break;
 
-                // (Các thông báo như LOGIN_SUCCESS... nó sẽ rơi vào default và bị bỏ qua, không làm loạn màn hình này)
+
                 default:
                     break;
             }

@@ -1,42 +1,39 @@
 package com.auction.shared.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 //BidTransaction: lịch sử đặt giá
 
 public class BidTransaction {
     private int auctionId;
-    private int bidderId;
+    private String biddername;
     private BigDecimal bidAmount;
-    private LocalDateTime bidTime;
-
-    public BidTransaction( int auctionId, int bidderId, BigDecimal bidAmount, LocalDateTime bidTime) {
-        this.auctionId = auctionId;
-        this.bidderId = bidderId;
-        this.bidAmount = bidAmount;
-        this.bidTime = bidTime;
-    //phần này để lưu lịch sử giao dịch
-    // khi gọi constructor 3 tham số ở dưới, hệ thống sẽ lưu vào database thành 1 hàng gồm auctionid, bidderid, bidamount và bidtime
-    //mỗi hàng nhận được sẽ gán vào constructor 4 tham số này để hiển thị ra màn hình
-    }
+    private BigDecimal step;
 
     //tạo mới một lượt đặt giá trong một phiên đấu giá
-    public BidTransaction(int auctionId, int bidderId, BigDecimal bidAmount) {
+    public BidTransaction(int auctionId, String biddername, BigDecimal bidAmount) {
         this.auctionId = auctionId;     //id phiên đấu giá
-        this.bidderId = bidderId;         //id khách hàng
+        this.biddername = biddername;         //khách hàng
         this.bidAmount = bidAmount;        //số tiền đặt
-        this.bidTime = LocalDateTime.now();
     }
 
+    public BidTransaction(int auctionId, String biddername, BigDecimal bidAmount, BigDecimal step) {
+        this.auctionId = auctionId;     //id phiên đấu giá
+        this.biddername = biddername;         //khách hàng
+        this.bidAmount = bidAmount;        //số tiền đặt
+        this.step = step;                  //bước giá
+    }
+
+    public BidTransaction() {
+        // Constructor mặc định
+    }
     // Getter và Setter
     public int getAuctionId() { return auctionId; }
-    public int getBidderId() { return bidderId; }
+    public String getBiddername() { return biddername; }
     public BigDecimal getBidAmount() { return bidAmount; }
-    public LocalDateTime getBidTime() { return bidTime; }
+    public BigDecimal getStep() { return step; }
 
-    @Override
-    public String toString() {          //in ra thông tin
-        return String.format("Bid[Auction: %d, User: %d, Amount: %s, Time: %s]",
-                auctionId, bidderId, bidAmount, bidTime);
-    }
+    public void setAuctionId(int auctionId) { this.auctionId = auctionId; }
+    public void setBiddername(String biddername) { this.biddername = biddername; }
+    public void setBidAmount(BigDecimal bidAmount) { this.bidAmount = bidAmount; }
+    public void setStep(BigDecimal step) { this.step = step; }
 }

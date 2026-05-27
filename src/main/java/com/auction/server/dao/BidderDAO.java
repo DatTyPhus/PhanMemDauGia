@@ -16,7 +16,6 @@ public class BidderDAO {
 
     /// Hàm lấy thông tin user bằng ID (Đã sửa lại tên cột cho khớp với database)
     public static Bidder getUserByUserid(int id) {
-        // Sửa chữ 'id' thành 'user_id' cho khớp với cấu trúc bảng bidders
         String sql = "SELECT user_id, username, balance FROM bidders WHERE user_id = ?";
 
         try (Connection conn = JDBCUtil.getConnection();
@@ -27,11 +26,8 @@ public class BidderDAO {
 
             if (rs.next()) {
                 Bidder user = new Bidder();
-                // BẮT BUỘC: Lấy đúng tên cột là user_id từ database
                 user.setId(rs.getInt("user_id"));
                 user.setUsername(rs.getString("username"));
-                // Bỏ phần set password và fullName vì câu SQL trên không SELECT 2 cột này,
-                // chỉ cần lấy balance để phục vụ việc hiển thị số dư là đủ.
                 user.setBalance(rs.getBigDecimal("balance"));
                 return user;
             }

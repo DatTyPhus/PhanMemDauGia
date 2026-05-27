@@ -4,7 +4,6 @@ import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
 import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
-import com.google.gson.reflect.TypeToken;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -15,8 +14,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /// class UsersManagement dùng để quản lý tài khoản người dùng, thống kê số lượng và xử lý yêu cầu xóa thành viên từ Admin.
 
@@ -45,7 +42,7 @@ public class UsersManagement implements NetworkClient.MessageListener {
 
             if (currentUser != null && lblUserName != null) {
                 lblUserName.setText(currentUser.getFullName());
-                lblUserRole.setText(currentUser.getRole());
+                lblUserRole.setText(currentUser.getRole().toUpperCase());
             }
 
             /// Ánh xạ dữ liệu từ thực thể User vào các cột tương ứng trên TableView

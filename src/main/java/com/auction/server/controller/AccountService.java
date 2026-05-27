@@ -11,7 +11,7 @@ import com.auction.shared.network.Message;
 
 public class AccountService {
 
-  // 3 DÒNG NÀY LÀ CỰC KỲ QUAN TRỌNG ĐỂ JAVA NHẬN DIỆN ĐƯỢC DAO (BẠN ĐÃ LỠ XÓA MẤT NÓ)
+  // 3 DÒNG NÀY ĐỂ JAVA NHẬN DIỆN ĐƯỢC DAO
   private final BidderDAO bidderDAO = new BidderDAO();
   private final SellerDAO sellerDAO = new SellerDAO();
   private final AdminDAO adminDAO = new AdminDAO();
@@ -24,7 +24,7 @@ public class AccountService {
       if (bidder.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", bidder);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu Bidder.");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu!");
       }
     }
 
@@ -34,7 +34,7 @@ public class AccountService {
       if (seller.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", seller);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu Seller.");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu!");
       }
     }
 
@@ -44,7 +44,7 @@ public class AccountService {
       if (admin.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", admin);
       } else {
-        return new Message("LOGIN_FAIL", "Sai mật khẩu Admin.");
+        return new Message("LOGIN_FAIL", "Sai mật khẩu!");
       }
     }
 
@@ -52,7 +52,7 @@ public class AccountService {
     return new Message("LOGIN_FAIL", "Sai tên đăng nhập hoặc tài khoản không tồn tại.");
   }
 
-  /// Hàm xử lý logic đăng ký tài khoản từ Client gửi lên
+  /// Hàm xử lý logic đăng ký tài khoản từ Client gửi xuống
   public Message register(String username, String password, String fullName, String role) {
     System.out.println("-> Bắt đầu xử lý đăng ký cho username: [" + username + "] với vai trò: [" + role + "]");
 
@@ -60,11 +60,12 @@ public class AccountService {
       return new Message("REGISTER_FAIL", "Lỗi: Vai trò (Role) không được để trống!");
     }
 
-    /// [FIX BUG BẢO MẬT QUAN TRỌNG]: Quét kiểm tra username trên TOÀN BỘ CÁC KHO (Bidder, Seller, Admin)
+    /// Quét kiểm tra username trên TOÀN BỘ CÁC KHO (Bidder, Seller, Admin)
     /// Phải đảm bảo tên đăng nhập này là DUY NHẤT trên toàn hệ thống, không phân biệt vai trò.
+
     boolean isUsernameExist = (bidderDAO.selectByUsername(username) != null)
-            || (sellerDAO.selectByUsername(username) != null)
-            || (adminDAO.selectByUsername(username) != null);
+                            || (sellerDAO.selectByUsername(username) != null)
+                            || (adminDAO.selectByUsername(username) != null);
 
     if (isUsernameExist) {
       System.out.println("-> CẢNH BÁO TỪ CHỐI: Username [" + username + "] đã bị người khác sử dụng trong hệ thống.");

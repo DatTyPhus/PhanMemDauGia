@@ -9,88 +9,235 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-
 import com.auction.server.dao.*;
 import com.auction.shared.model.*;
 import com.auction.shared.network.Message;
 
+/// Class AuctionService dùng để thực hiện các tác vụ trong phòng đấu giá , như đặt bid,.............
+
 public class AuctionService {
-  private static int auctionIdCounter = 0; 
-  protected static Auction currentAuction; // Biến để lưu trữ đấu giá hiện tại đang diễn ra
-  protected static Map<Integer, Auction> waitingAuctions; // Giả sử có một map để quản lý các đấu giá đang chờ xử lý
 
-  //đao tạo đấu giá mới
-  public static Auction createAuction(Item item) {
-    Auction auction = new Auction();
-    auction.setId(++auctionIdCounter); // Tăng counter và gán làm ID cho đấu giá mới
-    auction.setItemId(item.getId());
-    auction.setItemName(item.getName());
-    auction.setCurrentPrice(item.getStartingPrice());
-    auction.setCurrentPrice(item.getStartingPrice());
-    auction.setDurationMinutes(item.getDurationMinutes());
-    if (AuctionSchedular.getTimeline() == null || java.time.LocalDateTime.now().isAfter(AuctionSchedular.getTimeline())) {
-        AuctionSchedular.setTimeline(java.time.LocalDateTime.now().plusMinutes(item.getDurationMinutes()));
-        auction.setStartTime(auction.changeTimetoString(java.time.LocalDateTime.now()));
-        auction.setEndTime(auction.changeTimetoString(java.time.LocalDateTime.now().plusMinutes(item.getDurationMinutes())));
-    }
-    else {
-        auction.setStartTime(auction.changeTimetoString(AuctionSchedular.getTimeline()));
-        auction.setEndTime(auction.changeTimetoString(AuctionSchedular.getTimeline().plusMinutes(item.getDurationMinutes())));
-        AuctionSchedular.setTimeline(AuctionSchedular.getTimeline().plusMinutes(item.getDurationMinutes()));
-    }
-    auction.setStatus("PENDING");
-    return auction;
-  }
-// public void updateTimeLine (Auction auction) {
-//     LocalDateTime endTime = null;
-//     LocalDateTime startTime =null;
-//     if (timeline == null || LocalDateTime.now().isAfter(timeline)) {
-//         timeline = LocalDateTime.now().plusMinutes(auction.getDurationMinutes());
-//     }
-//     else{
-//         startTime = timeline;
-//         endTime = timeline.plusMinutes(auction.getDurationMinutes());
-//     } 
-//     String startTimeStr = auction.changeTimetoString(startTime);
-//     String endTimeStr = auction.changeTimetoString(endTime);
-//     auctionDAO.updateDateTime(auction, startTimeStr, endTimeStr);
-//   }
+    //Các thông số khi cấu hình auto_bid
+    private static BigDecimal autoBidAmount = BigDecimal.ZERO;
+    private static String autoBidderName = null;
+    private static BigDecimal autoBiddStep = BigDecimal.ZERO;
 
-    //đặ bit giá cho một đấu giá cụ thể
-  public static Message processBid(String bidder_name, BigDecimal bidAmount ) {
-        Auction auction =  AuctionDAO.selectByItemName(currentAuction.getItemName());
+    private static Auction currentAuction;
+    protected static Map<Integer, Auction> waitingAuctions;
+
+    /// Hàm tạo phiên đấu giá mới và tự động xếp hàng nối đuôi chính xác tuyệt đối
+    public static Auction createAuction(Item item) {
+        Auction auction = new Auction();
+        auction.setItemId(item.getId());
+        auction.setItemName(item.getName());
+        auction.setCurrentPrice(item.getStartingPrice());
+        auction.setDurationMinutes(item.getDurationMinutes());
+
+        LocalDateTime latestEndTime = AuctionDAO.getLatestEndTime();
         LocalDateTime now = LocalDateTime.now();
-        int secondsBetween = (int) ChronoUnit.SECONDS.between(now, auction.changeStringToTime(auction.getEndTime()));
-        if (auction == null) {
-            return new Message("BID_FAIL", "Đấu giá không tồn tại.");
+
+        if (latestEndTime == null || now.isAfter(latestEndTime)) {
+            auction.setStartTime(auction.changeTimetoString(now));
+            auction.setEndTime(auction.changeTimetoString(now.plusMinutes(item.getDurationMinutes())));
+        } else {
+            auction.setStartTime(auction.changeTimetoString(latestEndTime));
+            auction.setEndTime(auction.changeTimetoString(latestEndTime.plusMinutes(item.getDurationMinutes())));
         }
-        if (secondsBetween <=60){
-            AuctionSchedular.delay(auction.getId(), 5);
-            AuctionSchedular.delayFromAuction(auction.getId(), 5);
+
+        auction.setStatus("PENDING");
+        AuctionDAO.create(auction);
+        return auction;
+    }
+
+    /// Hàm xử lý khi người dùng ấn nút Cài đặt Auto-Bid
+    public static Message processAutoBid(BidTransaction newAutoBid) {
+        Auction auction = AuctionDAO.selectById(newAutoBid.getAuctionId());
+        if (auction == null || !"OPEN".equalsIgnoreCase(auction.getStatus())) return new Message("AUTO_BID_FAIL", "Phiên đấu giá chưa mở!");
+
+        User currentUser = getGenericUser(newAutoBid.getBiddername());
+
+        /// Tính số dư thực tế nếu người dùng đang giữ Top 1
+
+        BigDecimal effectiveBalance = currentUser.getBalance();
+        if (newAutoBid.getBiddername().equals(auction.getHighestBidderName())) {
+            effectiveBalance = effectiveBalance.add(auction.getCurrentPrice());
         }
+
+        if (effectiveBalance.compareTo(newAutoBid.getBidAmount()) < 0) {
+            return new Message("AUTO_BID_FAIL", "Số dư không đủ để gánh mức giá Tối đa bạn vừa nhập.");
+        }
+
+        if (newAutoBid.getBidAmount().compareTo(auction.getCurrentPrice()) <= 0) {
+            return new Message("AUTO_BID_FAIL", "Mức giá tối đa phải cao hơn giá hiện tại của tài sản.");
+        }
+
         auction.lock();
-        try{
-          if (bidAmount.compareTo(auction.getCurrentPrice()) <= 0) {
-                return new Message("BID_FAIL", "Giá đặt phải cao hơn giá hiện tại (" + auction.getCurrentPrice() + ").");
-          }
-          Bidder bidder = BidderDAO.selectByUsername(bidder_name);
-          if (bidder.getBalance().compareTo(bidAmount) < 0) {
-            return new Message("BID_FAIL", "Số dư không đủ.");
-          }
-          Bidder previousHighestBidder = BidderDAO.selectByUsername(auction.getHighestBidderName());
-          auction.setCurrentPrice(bidAmount);
-          auction.setHighestBidderName(bidder_name);
-          return new Message("BID_SUCCESS", previousHighestBidder);
+        try {
+            BidTransaction currentBot = AutobidDAO.getAutoBidsByAuctionId(auction.getId());
+
+            /// Các điều kiện theo từng tầng khi cấu hình auto-bid
+            if (currentBot != null && !currentBot.getBiddername().equals(newAutoBid.getBiddername())) {
+                if (newAutoBid.getBidAmount().compareTo(currentBot.getBidAmount()) <= 0) {
+                    BigDecimal targetPrice = newAutoBid.getBidAmount().add(currentBot.getStep());
+                    if (targetPrice.compareTo(currentBot.getBidAmount()) > 0) targetPrice = currentBot.getBidAmount();
+
+                    executeDirectBid(new BidTransaction(auction.getId(), currentBot.getBiddername(), targetPrice, BigDecimal.ZERO), auction);
+                    return new Message("AUTO_BID_FAIL", "Từ chối! Đã có người thiết lập giới hạn Auto cao hơn bạn. Hệ thống đã tự động nâng giá sàn!");
+                } else {
+                    BigDecimal targetPrice = currentBot.getBidAmount().add(newAutoBid.getStep());
+                    if (targetPrice.compareTo(newAutoBid.getBidAmount()) > 0) targetPrice = newAutoBid.getBidAmount();
+
+                    AutobidDAO.updateAutobid(auction.getId(), newAutoBid.getBidAmount(), newAutoBid.getStep(), newAutoBid.getBiddername());
+                    executeDirectBid(new BidTransaction(auction.getId(), newAutoBid.getBiddername(), targetPrice, BigDecimal.ZERO), auction);
+                    return new Message("AUTO_BID_SUCCESS", "Tuyệt vời! Bạn đã chiếm quyền Auto-Bid thành công!");
+                }
+            } else {
+                BigDecimal targetPrice = auction.getCurrentPrice().add(newAutoBid.getStep());
+                if (targetPrice.compareTo(newAutoBid.getBidAmount()) > 0) targetPrice = newAutoBid.getBidAmount();
+
+                AutobidDAO.updateAutobid(auction.getId(), newAutoBid.getBidAmount(), newAutoBid.getStep(), newAutoBid.getBiddername());
+                executeDirectBid(new BidTransaction(auction.getId(), newAutoBid.getBiddername(), targetPrice, BigDecimal.ZERO), auction);
+                return new Message("AUTO_BID_SUCCESS", "Đã thiết lập hệ thống tự động Đấu giá!");
+            }
         } finally {
             auction.unlock();
         }
     }
 
+    /// Hàm xử lý đặt giá tay hoặc đặt giá sẵn .
+    public static Message processBid(BidTransaction bidTransaction) {
+        Auction auction = AuctionDAO.selectById(bidTransaction.getAuctionId());
+        LocalDateTime now = LocalDateTime.now();
 
-    public static void setCurrentAuction(Auction auction) {
-        currentAuction = auction;
+        if (auction == null) return new Message("BID_FAIL", "Đấu giá không tồn tại.");
+        if (!"OPEN".equalsIgnoreCase(auction.getStatus())) return new Message("BID_FAIL", "Chỉ có thể đặt giá khi đang diễn ra.");
+
+        auction.lock();
+        try {
+            LocalDateTime endTimeObj = auction.changeStringToTime(auction.getEndTime());
+            if (endTimeObj != null && now.isAfter(endTimeObj)) return new Message("BID_FAIL", "Thời gian đã kết thúc.");
+            if (bidTransaction.getBidAmount().compareTo(auction.getCurrentPrice()) <= 0) return new Message("BID_FAIL", "Giá đặt phải cao hơn giá hiện tại.");
+
+            User currentUser = getGenericUser(bidTransaction.getBiddername());
+            if (currentUser == null) return new Message("BID_FAIL", "Lỗi dữ liệu người dùng.");
+
+            /// Tính số dư thực tế nếu tự Outbid chính mình
+            BigDecimal effectiveBalance = currentUser.getBalance();
+            if (bidTransaction.getBiddername().equals(auction.getHighestBidderName())) {
+                effectiveBalance = effectiveBalance.add(auction.getCurrentPrice());
+            }
+
+            if (effectiveBalance.compareTo(bidTransaction.getBidAmount()) < 0) {
+                return new Message("BID_FAIL", "Lỗi dữ liệu hoặc số dư không đủ.");
+            }
+
+            BidTransaction currentBot = AutobidDAO.getAutoBidsByAuctionId(auction.getId());
+            if (currentBot != null && !currentBot.getBiddername().equals(bidTransaction.getBiddername())) {
+                if (currentBot.getBidAmount().compareTo(auction.getCurrentPrice()) > 0) {
+                    BigDecimal botReactionPrice = auction.getCurrentPrice().add(currentBot.getStep());
+                    if (botReactionPrice.compareTo(currentBot.getBidAmount()) > 0) botReactionPrice = currentBot.getBidAmount();
+                    executeDirectBid(new BidTransaction(auction.getId(), currentBot.getBiddername(), botReactionPrice, BigDecimal.ZERO), auction);
+                } else {
+                    AutobidDAO.updateAutobid(auction.getId(), BigDecimal.ZERO, BigDecimal.ZERO, null);
+                    System.out.println("[AUTO-BID] Người chơi " + bidTransaction.getBiddername() + " đã phá vỡ giới hạn Auto-bid!");
+                }
+            }
+
+            String oldBidderName = auction.getHighestBidderName();
+            BigDecimal oldPrice = auction.getCurrentPrice();
+
+            /// Hoàn tiền TRƯỚC, Trừ tiền SAU để tránh âm số dư ảo
+            if (oldBidderName != null && !oldBidderName.trim().isEmpty()) {
+                User oldUser = getGenericUser(oldBidderName);
+                if (oldUser != null) updateGenericBalance(oldUser, oldPrice);
+            }
+            updateGenericBalance(currentUser, bidTransaction.getBidAmount().negate());
+
+            auction.setCurrentPrice(bidTransaction.getBidAmount());
+            auction.setHighestBidderName(bidTransaction.getBiddername());
+            AuctionDAO.update(auction);
+
+            String bidTime = now.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+            BidTransactionDAO.insert(bidTransaction, bidTime);
+
+            // Các điều kiện để gia hạn đấu giá
+            if (endTimeObj != null) {
+                int secondsBetween = (int) ChronoUnit.SECONDS.between(now, endTimeObj);
+                if (secondsBetween <= 30 && secondsBetween > 0) {
+                    AuctionSchedular.delay(auction, 1);
+                    AuctionSchedular.delayFromAuction(auction.getId(), 1);
+                }
+            }
+
+            com.google.gson.JsonObject responseObj = new com.google.gson.JsonObject();
+            responseObj.addProperty("auctionId", auction.getId());
+            responseObj.addProperty("newPrice", auction.getCurrentPrice());
+            responseObj.addProperty("highestBidder", auction.getHighestBidderName());
+            responseObj.addProperty("bidTime", bidTime);
+            responseObj.addProperty("newEndTime", auction.getEndTime());
+
+            com.auction.server.network.ServerCore.broadcastMessage(new Message("BID_SUCCESS", responseObj.toString()));
+            return new Message("BID_FAKE_SUCCESS", "");
+
+        } finally {
+            auction.unlock();
+        }
     }
-    public static Auction getCurrentAuction() {
-        return currentAuction;
+
+    /// Hàm giả lập thao tác của Bot y như người thật .Thực thi một lệnh đặt giá tự động ngầm dành riêng cho hệ thống Bot.
+    private static void executeDirectBid(BidTransaction botBid, Auction auction) {
+        String oldBidderName = auction.getHighestBidderName();
+        BigDecimal oldPrice = auction.getCurrentPrice();
+        User botUser = getGenericUser(botBid.getBiddername());
+
+        /// Hoàn tiền TRƯỚC, Trừ tiền SAU
+        if (oldBidderName != null && !oldBidderName.trim().isEmpty()) {
+            User oldUser = getGenericUser(oldBidderName);
+            if (oldUser != null) updateGenericBalance(oldUser, oldPrice);
+        }
+        updateGenericBalance(botUser, botBid.getBidAmount().negate());
+
+        auction.setCurrentPrice(botBid.getBidAmount());
+        auction.setHighestBidderName(botBid.getBiddername());
+        AuctionDAO.update(auction);
+
+        String bidTime = LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        BidTransactionDAO.insert(botBid, bidTime);
+
+        com.google.gson.JsonObject responseObj = new com.google.gson.JsonObject();
+        responseObj.addProperty("auctionId", auction.getId());
+        responseObj.addProperty("newPrice", auction.getCurrentPrice());
+        responseObj.addProperty("highestBidder", auction.getHighestBidderName());
+        responseObj.addProperty("bidTime", bidTime);
+        responseObj.addProperty("newEndTime", auction.getEndTime());
+
+        com.auction.server.network.ServerCore.broadcastMessage(new Message("BID_SUCCESS", responseObj.toString()));
     }
+
+
+    /// Hàm Tìm kiếm và trả về thông tin tài khoản người dùng một cách tổng quát dựa trên tên đăng nhập.
+    private static User getGenericUser(String username) {
+        User user = BidderDAO.selectByUsername(username);
+        if (user == null) user = SellerDAO.selectByUsername(username);
+        return user;
+    }
+
+    /// Hàm Cộng hoặc trừ số dư tài khoản của người dùng dựa trên vai trò (Role) của họ.
+    private static void updateGenericBalance(User user, BigDecimal amount) {
+        if (user == null) return;
+        if ("SELLER".equalsIgnoreCase(user.getRole())) {
+            SellerDAO.updateBalance(user.getId(), amount);
+        } else {
+            BidderDAO.updateBalance(user.getId(), amount);
+        }
+    }
+
+    public static void setCurrentAuction(Auction auction) {currentAuction = auction;}
+    public static Auction getCurrentAuction() {return currentAuction;}
+    public static BigDecimal getAutoBidAmount() { return autoBidAmount; }
+    public static void setAutoBidAmount(BigDecimal amount) { autoBidAmount = amount; }
+    public static String getAutoBidderName() { return autoBidderName; }
+    public static void setAutoBidderName(String name) { autoBidderName = name; }
+    public static BigDecimal getAutoBidStep() { return autoBiddStep; }
+    public static void setAutoBidStep(BigDecimal step) { autoBiddStep = step; }
 }

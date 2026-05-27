@@ -15,7 +15,7 @@ public class Auction extends Entity {
     private String endTime = null;
     private int durationMinutes;
     private String status = "OPEN";
-    private final ReentrantLock lock = new ReentrantLock();
+    private transient final ReentrantLock lock = new ReentrantLock();
 
     public Auction() {}
 

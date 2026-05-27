@@ -240,13 +240,10 @@ public class HomeController implements NetworkClient.MessageListener {
 
                         System.out.println("Sản phẩm ID: " + productId + " | Giá mới nhảy lên: " + newPrice + " bởi " + bidderName);
 
-                        // 2. TẠI ĐÂY LÀ LOGIC ĐỔI GIAO DIỆN CỦA BẠN:
-                        // (Ví dụ: Bạn dùng vòng lặp tìm cái Card sản phẩm có ID khớp với productId,
-                        // sau đó gọi lệnh set text để cập nhật lại label giá tiền trên cái Card đó)
                     }
                     break;
                 case "UPDATE_ONLINE_COUNT":
-                    /// Server gửi về con số người dùng đang online, ta đắp nó lên giao diện
+                    /// Server gửi về con số người dùng đang online, rồi hiển thị lên giao diện
                     if (lblTotalUsers != null) {
                         lblTotalUsers.setText(msg.getPayload().toString());
                     }
