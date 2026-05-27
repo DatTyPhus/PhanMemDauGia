@@ -4,38 +4,148 @@ import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
 import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import javafx.application.Platform;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 
-/// class AuctionHistoryController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình LỊCH SỬ ĐẤU GIÁ.
-
+/// class AuctionHistoryController điều khiển màn hình LỊCH SỬ ĐẤU GIÁ (Chỉ hiện các trận THẮNG)
 public class AuctionHistoryController implements NetworkClient.MessageListener {
 
-    // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
     @FXML private Label lblTopBalance;
 
-    /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
+    /// Khai báo bảng và danh sách dữ liệu
+    @FXML private TableView<HistoryRow> historyTable;
+    private ObservableList<HistoryRow> historyDataList = FXCollections.observableArrayList();
+
+    /// Lớp nội bộ để biểu diễn 1 dòng trong bảng
+    public static class HistoryRow {
+        String auctionId;
+        String itemName;
+        String endTime;
+        String highestPrice;
+        String result;
+        Button actionButton;
+
+        public HistoryRow(String auctionId, String itemName, String endTime,String highestPrice, String result, Button actionButton) {
+            this.auctionId = auctionId;
+            this.itemName = itemName;
+            this.endTime = endTime;
+            this.highestPrice = highestPrice;
+            this.result = result;
+            this.actionButton = actionButton;
+        }
+    }
+
+    /// Hàm chạy khi vào màn.
     @FXML
     public void initialize() {
-        try{
+        try {
             NetworkClient.getInstance().addListener(this);
-            User currentUser = UserSession.getInstance().getLoginUser();  /// Lấy thông tin người dùng hiện tại đang thao tác lưu vào kho để khi chuyển màn không bị mất thông tin.
+            User currentUser = UserSession.getInstance().getLoginUser();
 
-            // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
-            if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
+            if (currentUser != null && lblUserName != null) {
                 lblUserName.setText(currentUser.getFullName());
                 lblUserRole.setText(currentUser.getRole());
+                lblTopBalance.setText(String.format("Số dư: %,.0f VNĐ", currentUser.getBalance()));
 
-                String formattedBalance = String.format("%,.0f VNĐ", currentUser.getBalance());      /// Hiển thị số dư.
-                lblTopBalance.setText("Số dư: " + formattedBalance);
+                /// Thiết lập link dữ liệu cho 6 cột trong Bảng
+                if (historyTable != null && historyTable.getColumns().size() >= 6) {
+                    TableColumn<HistoryRow, String> colId = (TableColumn<HistoryRow, String>) historyTable.getColumns().get(0);
+                    TableColumn<HistoryRow, String> colName = (TableColumn<HistoryRow, String>) historyTable.getColumns().get(1);
+                    TableColumn<HistoryRow, String> colEnd = (TableColumn<HistoryRow, String>) historyTable.getColumns().get(2);
+                    TableColumn<HistoryRow, String> colPrice = (TableColumn<HistoryRow, String>) historyTable.getColumns().get(3);
+                    TableColumn<HistoryRow, String> colResult = (TableColumn<HistoryRow, String>) historyTable.getColumns().get(4);
+                    TableColumn<HistoryRow, Button> colAction = (TableColumn<HistoryRow, Button>) historyTable.getColumns().get(5);
+
+                    colId.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().auctionId));
+                    colName.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().itemName));
+                    colEnd.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().endTime));
+                    colPrice.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().highestPrice));
+                    colResult.setCellValueFactory(cell -> new SimpleStringProperty(cell.getValue().result));
+                    colAction.setCellValueFactory(cell -> new SimpleObjectProperty<>(cell.getValue().actionButton));
+
+                    historyTable.setItems(historyDataList);
+                }
+
+                /// Gửi lệnh xuống Server lấy danh sách các phiên đấu giá đã THẮNG của user này
+                NetworkClient.getInstance().send(new Message("GET_WIN_HISTORY", currentUser.getUsername()));
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    /// Nhận tín hiệu từ server.
+    @Override
+    public void onMessageReceived(Message msg) {
+        Platform.runLater(() -> {
+            switch (msg.getAction()) {
+                case "RECEIVE_WIN_HISTORY":     // Nhận dữ liệu những cuộc đấu giá mà mình thắng cuộc.
+                    try {
+                        String payloadRaw = msg.getPayload().toString();
+                        System.out.println("[CLIENT] Nhận dữ liệu lịch sử từ Server: " + payloadRaw);
+
+                        JsonArray historyArray = JsonParser.parseString(payloadRaw).getAsJsonArray();
+                        historyDataList.clear();
+
+                        for (JsonElement element : historyArray) {      // Lấy từng lịch sử để chèn theo từng dòng
+                            JsonObject row = element.getAsJsonObject();
+
+                            String aId = row.has("auctionId") && !row.get("auctionId").isJsonNull() ? row.get("auctionId").getAsString() : "N/A";
+                            String iName = row.has("itemName") && !row.get("itemName").isJsonNull() ? row.get("itemName").getAsString() : "Sản phẩm ẩn";
+                            String eTime = row.has("endTime") && !row.get("endTime").isJsonNull() ? row.get("endTime").getAsString() : "00:00:00";
+                            String mPrice = "0 VNĐ";
+                            if (row.has("currentPrice") && !row.get("currentPrice").isJsonNull()) {
+                                java.math.BigDecimal price = row.get("currentPrice").getAsBigDecimal();
+                                mPrice = String.format("%,.0f VNĐ", price);
+                            }
+
+                            String res = "🏆 Thắng";
+
+                            Button deleteBtn = new Button("🗑 Xóa");
+                            deleteBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 6;");
+                            deleteBtn.setOnAction(e -> {
+                                historyDataList.removeIf(item -> item.auctionId.equals(aId));
+                            });
+
+                            historyDataList.add(new HistoryRow(aId, iName, eTime, mPrice, res, deleteBtn));
+                        }
+
+                        historyTable.refresh();   // Bảng load lại ngay lập tức
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    break;
+
+                /// Tự động cập nhật lại bảng khi có một cuộc đấu giá kết thúc
+                case "AUCTION_ENDED":
+                    User currentUser = UserSession.getInstance().getLoginUser();
+                    if (currentUser != null) {
+                        try {
+                            NetworkClient.getInstance().send(new Message("GET_WIN_HISTORY", currentUser.getUsername()));
+                        }catch (Exception e){
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+            }
+        });
     }
 
     /// Method này thực hiện khi thao tác click vào Trang chủ
@@ -183,41 +293,5 @@ public class AuctionHistoryController implements NetworkClient.MessageListener {
             e.printStackTrace();
             System.err.println("Lỗi: Không tìm thấy file setting.fxml!");
         }
-    }
-
-    // ================= PHẦN XỬ LÝ REALTIME =================
-    @Override
-    public void onMessageReceived(Message msg) {
-        // BẮT BUỘC: Phải đưa lệnh đổi giao diện vào Platform.runLater
-        // vì tin nhắn đến từ luồng mạng (Thread khác), nếu đổi trực tiếp sẽ làm sập JavaFX
-        javafx.application.Platform.runLater(() -> {
-
-            // Bộ lọc: Chỉ quan tâm đến tin nhắn báo "Cập nhật giá"
-            switch (msg.getAction()) {
-                case "UPDATE_BID":
-                    System.out.println("Màn hình Phiên đấu giá đã nhận được tín hiệu!");
-
-                    // 1. Bóc tách dữ liệu (Giả sử Huy gửi chuỗi: "Mã_SP,Giá_Mới,Tên_Người_Đặt")
-                    String payloadStr = msg.getPayload().toString();
-                    String[] data = payloadStr.split(",");
-
-                    if(data.length == 3) {
-                        String productId = data[0];
-                        String newPrice = data[1];
-                        String bidderName = data[2];
-
-                        System.out.println("Sản phẩm ID: " + productId + " | Giá mới nhảy lên: " + newPrice + " bởi " + bidderName);
-
-                        // 2. TẠI ĐÂY LÀ LOGIC ĐỔI GIAO DIỆN CỦA BẠN:
-                        // (Ví dụ: Bạn dùng vòng lặp tìm cái Card sản phẩm có ID khớp với productId,
-                        // sau đó gọi lệnh set text để cập nhật lại label giá tiền trên cái Card đó)
-                    }
-                    break;
-
-                // (Các thông báo như LOGIN_SUCCESS... nó sẽ rơi vào default và bị bỏ qua, không làm loạn màn hình này)
-                default:
-                    break;
-            }
-        });
     }
 }

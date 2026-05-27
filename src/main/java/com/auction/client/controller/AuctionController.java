@@ -2,75 +2,121 @@ package com.auction.client.controller;
 
 import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
+import com.auction.shared.model.Auction;
 import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
+import javafx.scene.control.Pagination;
+import javafx.scene.layout.TilePane;
+import java.util.ArrayList;
+import java.util.List;
 
 /// class AuctionController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình PHIÊN ĐẤU GIÁ.
-
 public class AuctionController implements NetworkClient.MessageListener {
 
-    // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
     @FXML private Label lblTopBalance;
 
-    /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
+    /// Link với cái TilePane (bảng chứa Card) và Pagination (thanh phân trang) bên fxml
+    @FXML private TilePane cardContainer;
+    @FXML private Pagination pagination;
+
+    /// Danh sách chứa toàn bộ dữ liệu đấu giá lấy từ Server
+    private List<Auction> allAuctions = new ArrayList<>();
+
+    /// Thiết lập hằng số 4 Card cho mỗi trang
+    private final int ITEMS_PER_PAGE = 3;
+
+    /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Phiên đấu giá được load lên.
     @FXML
     public void initialize() {
         try{
             NetworkClient.getInstance().addListener(this);
-            User currentUser = UserSession.getInstance().getLoginUser();  /// Lấy thông tin người dùng hiện tại đang thao tác lưu vào kho để khi chuyển màn không bị mất thông tin.
+            User currentUser = UserSession.getInstance().getLoginUser();
 
-            // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
-            if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
+            if (currentUser != null && lblUserName != null) {
                 lblUserName.setText(currentUser.getFullName());
-                lblUserRole.setText(currentUser.getRole());
+                if (lblUserRole != null) lblUserRole.setText(currentUser.getRole());
 
-                String formattedBalance = String.format("%,.0f VNĐ", currentUser.getBalance());      /// Hiển thị số dư.
-                lblTopBalance.setText("Số dư: " + formattedBalance);
+                String formattedBalance = String.format("%,.0f VNĐ", currentUser.getBalance());
+                if (lblTopBalance != null) lblTopBalance.setText("Số dư: " + formattedBalance);
             }
+
+            // Lắng nghe sự kiện người dùng bấm chuyển trang trên thanh Pagination
+            if (pagination != null) {
+                pagination.currentPageIndexProperty().addListener((obs, oldIndex, newIndex) -> {
+                    updateCardsForPage(newIndex.intValue());
+                });
+            }
+
+            // Khi vào trang: Gửi lệnh lấy toàn bộ danh sách phiên đấu giá khi User vừa bước vào sảnh
+            NetworkClient.getInstance().send(new Message("GET_ALL_AUCTIONS", ""));
+
         }catch (Exception e){
             e.printStackTrace();
         }
     }
 
-    /// Các hàm trống này để chống lỗi khi bạn bấm vào các nút Filter trên giao diện
-    @FXML
-    public void filterAll(ActionEvent event) { }
+    ///  Hàm xử lý việc cắt nhỏ danh sách và hiển thị 3 Card mỗi trang
+    private void updateCardsForPage(int pageIndex) {
+        if (cardContainer == null) return;
 
-    @FXML
-    public void filterRunning(ActionEvent event) { }
+        /// Dọn sạch các thẻ cũ trên màn hình RAM để nạp dữ liệu mới.
+        cardContainer.getChildren().clear();
 
-    @FXML
-    public void filterUpcoming(ActionEvent event) { }
+        int startIndex = pageIndex * ITEMS_PER_PAGE;
+        int endIndex = Math.min(startIndex + ITEMS_PER_PAGE, allAuctions.size());
 
-    @FXML
-    public void filterFinished(ActionEvent event) { }
+        for (int i = startIndex; i < endIndex; i++) {
+            Auction auction = allAuctions.get(i);
+            try {
+                // 1. Tải bản vẽ FXML của tấm thẻ
+                FXMLLoader fxmlLoader = new FXMLLoader();
+                fxmlLoader.setLocation(getClass().getResource("/com/auction/client/view/card.fxml"));
+                javafx.scene.layout.VBox cardBox = fxmlLoader.load();
+
+                // 2. Lấy cái CardController đang điều khiển tấm thẻ này ra
+                CardController cardController = fxmlLoader.getController();
+
+                // 3. Lấy dữ liệu các cuộc đấu giá được duyệt ở database cho vào từng card.
+                cardController.setData(auction);
+
+                // 4. Nhét tấm thẻ vào bảng lưới trên giao diện chính
+                cardContainer.getChildren().add(cardBox);
+            } catch (Exception e) {
+                System.err.println("[CLIENT ERROR] Lỗi render Card đấu giá ID: " + auction.getId());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /// Các hàm trống này để chống lỗi khi bấm vào các nút Filter trên giao diện
+    @FXML public void filterAll(ActionEvent event) { }
+    @FXML public void filterRunning(ActionEvent event) { }
+    @FXML public void filterUpcoming(ActionEvent event) { }
+    @FXML public void filterFinished(ActionEvent event) { }
 
     /// Method này thực hiện khi thao tác click vào Trang chủ
     @FXML
     public void onBackToHomeClick(javafx.event.ActionEvent event) {
         try {
-            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
-
+            NetworkClient.getInstance().removeListener(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
             Parent root = loader.load();
 
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn hình phiendaugia thành màn home.
-            source.getScene().setRoot(root);
-
-            //Đặt lại tiêu đề cho window.
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
+            source.getScene().setRoot(root);
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            System.err.println("Lỗi: Không thể tải trang chủ!");
         }
     }
 
@@ -78,49 +124,38 @@ public class AuctionController implements NetworkClient.MessageListener {
     @FXML
     public void onNotificationClick(javafx.event.ActionEvent event) {
         try {
-            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
-
+            NetworkClient.getInstance().removeListener(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/notification.fxml"));
+            Parent root = loader.load();
 
-            Parent root = loader.load();                ///Thay đổi màn home thành màn notification.
             javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-            javafx.scene.Scene currentScene = source.getScene();
-            currentScene.setRoot(root);
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
 
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow();
+            source.getScene().setRoot(root);
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
-
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            System.err.println("Lỗi: Không tìm thấy file notification.fxml");
         }
     }
 
     @FXML
     public void onProductManagementClick(javafx.event.ActionEvent event) {
         com.auction.shared.model.User currentUser = com.auction.client.session.UserSession.getInstance().getLoginUser();
-
         if (currentUser != null && "Seller".equalsIgnoreCase(currentUser.getRole())) {
             try {
                 NetworkClient.getInstance().removeListener(this);
-
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/product_management.fxml"));
                 Parent root = loader.load();
 
                 javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-
-                // BÍ QUYẾT LÀ ĐÂY: Lấy Cửa sổ (Window) TRƯỚC KHI thay ruột
                 javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
 
-                // Sau đó mới thay giao diện mới vào
                 source.getScene().setRoot(root);
                 currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
-
             } catch (java.io.IOException e) {
                 e.printStackTrace();
-                System.err.println("Lỗi: Không tìm thấy file product_management.fxml!");
             }
-        } else {
+        } else {     // Chặn bidder khi chuyển trang sang QUẢN LÝ TÀI SẢN
             javafx.scene.control.Alert alert = new javafx.scene.control.Alert(javafx.scene.control.Alert.AlertType.WARNING);
             alert.setTitle("Từ chối truy cập");
             alert.setHeaderText(null);
@@ -133,21 +168,17 @@ public class AuctionController implements NetworkClient.MessageListener {
     @FXML
     public void onHistoryClick(javafx.event.ActionEvent event) {
         try {
-            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
-
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/history.fxml")); //Tải file phiendaugia.fxml
+            NetworkClient.getInstance().removeListener(this);
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/history.fxml"));
             Parent root = loader.load();
 
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();  //Thay đổi màn home thành màn phiendaugia
-            javafx.scene.Scene currentScene = source.getScene();
-            currentScene.setRoot(root);
+            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+            javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
 
-            javafx.stage.Stage currentStage = (javafx.stage.Stage) currentScene.getWindow(); // Đặt tiêu đề cho window
+            source.getScene().setRoot(root);
             currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
-
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            System.err.println("Lỗi: Không tìm thấy file history.fxml! Hãy kiểm tra lại đường dẫn.");
         }
     }
 
@@ -155,23 +186,17 @@ public class AuctionController implements NetworkClient.MessageListener {
     @FXML
     public void onProfileClick(javafx.event.ActionEvent event) {
         try {
-            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
-
-            // Tìm file profile.fxml
+            NetworkClient.getInstance().removeListener(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/profile.fxml"));
             Parent root = loader.load();
 
-            // Thay cửa sổ sang màn Profile
             javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-            source.getScene().setRoot(root);
-
-            // Đặt tiêu đề cửa sổ
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
+            source.getScene().setRoot(root);
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            System.err.println("Lỗi: Không tìm thấy file profile.fxml!");
         }
     }
 
@@ -179,60 +204,57 @@ public class AuctionController implements NetworkClient.MessageListener {
     @FXML
     public void onSettingClick(javafx.event.ActionEvent event) {
         try {
-            NetworkClient.getInstance().removeListener(this);    // Xoá màn hình khỏi danh sách nghe tín hiệu từ server
-
-            // 1. Tìm bản vẽ setting.fxml
+            NetworkClient.getInstance().removeListener(this);
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/setting.fxml"));
             Parent root = loader.load();
 
-            // 2. Lấy Scene hiện tại và thay "ruột" bằng trang Cài đặt
             javafx.scene.Node source = (javafx.scene.Node) event.getSource();
-            source.getScene().setRoot(root);
-
-            // 3. Đổi tiêu đề cửa sổ
             javafx.stage.Stage currentStage = (javafx.stage.Stage) source.getScene().getWindow();
-            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
 
+            source.getScene().setRoot(root);
+            currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
         } catch (java.io.IOException e) {
             e.printStackTrace();
-            System.err.println("Lỗi: Không tìm thấy file setting.fxml!");
         }
     }
 
-    // ================= PHẦN XỬ LÝ REALTIME =================
+    /// ================= PHẦN XỬ LÝ REALTIME =================
     @Override
     public void onMessageReceived(Message msg) {
-        // BẮT BUỘC: Phải đưa lệnh đổi giao diện vào Platform.runLater
-        // vì tin nhắn đến từ luồng mạng (Thread khác), nếu đổi trực tiếp sẽ làm sập JavaFX
-        javafx.application.Platform.runLater(() -> {
-
-            // Bộ lọc: Chỉ quan tâm đến tin nhắn báo "Cập nhật giá"
+        Platform.runLater(() -> {
             switch (msg.getAction()) {
-                case "UPDATE_BID":
-                    System.out.println("Màn hình Phiên đấu giá đã nhận được tín hiệu!");
+                case "RECEIVE_ALL_AUCTIONS_SUCCESS":        // Nhận tín hiệu gửi toàn bộ cuộc đấu giá cho Bidder
+                    try {
+                        String jsonArrayStr = msg.getPayload().toString();
+                        com.google.gson.JsonArray jsonArray = com.google.gson.JsonParser.parseString(jsonArrayStr).getAsJsonArray();
+                        com.google.gson.Gson gson = new com.google.gson.Gson();
 
-                    // 1. Bóc tách dữ liệu (Giả sử Huy gửi chuỗi: "Mã_SP,Giá_Mới,Tên_Người_Đặt")
-                    String payloadStr = msg.getPayload().toString();
-                    String[] data = payloadStr.split(",");
+                        /// Lưu toàn bộ dữ liệu mới nhất vào list AllAuctions
+                        allAuctions.clear();
+                        for (com.google.gson.JsonElement element : jsonArray) {
+                            Auction auction = gson.fromJson(element, Auction.class);
+                            if (auction != null) {
+                                allAuctions.add(auction);
+                            }
+                        }
 
-                    if(data.length == 3) {
-                        String productId = data[0];
-                        String newPrice = data[1];
-                        String bidderName = data[2];
+                        // Tính toán ra tổng số lượng trang (Mỗi trang 3 item)
+                        int pageCount = (int) Math.ceil((double) allAuctions.size() / ITEMS_PER_PAGE);
+                        if (pagination != null) {
+                            /// Thiết lập lại số trang cho thanh Pagination
+                            pagination.setPageCount(pageCount == 0 ? 1 : pageCount);
+                            /// Gọi hàm vẽ lại Card cho trang hiện tại
+                            updateCardsForPage(pagination.getCurrentPageIndex());
+                        } else {
+                            updateCardsForPage(0);
+                        }
 
-                        System.out.println("Sản phẩm ID: " + productId + " | Giá mới nhảy lên: " + newPrice + " bởi " + bidderName);
-
-                        // 2. TẠI ĐÂY LÀ LOGIC ĐỔI GIAO DIỆN CỦA BẠN:
-                        // (Ví dụ: Bạn dùng vòng lặp tìm cái Card sản phẩm có ID khớp với productId,
-                        // sau đó gọi lệnh set text để cập nhật lại label giá tiền trên cái Card đó)
+                    } catch (Exception e) {
+                        System.err.println("[CLIENT ERROR] Lỗi render danh sách Card đấu giá!");
+                        e.printStackTrace();
                     }
-                    break;
-
-                // (Các thông báo như LOGIN_SUCCESS... nó sẽ rơi vào default và bị bỏ qua, không làm loạn màn hình này)
-                default:
                     break;
             }
         });
     }
 }
-

@@ -5,67 +5,66 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox fx:id="root" prefHeight="364.0" prefWidth="270.0" spacing="10" style="-fx-background-color: white;              -fx-background-radius: 12;              -fx-border-radius: 12;              -fx-border-color: #e2e8f0;              -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08),10,0,0,4);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1">
+<VBox fx:id="root" prefWidth="290.0" spacing="12.0" style="-fx-background-color: #ffffff; -fx-background-radius: 16; -fx-border-radius: 16; -fx-border-color: #e2e8f0; -fx-border-width: 1; -fx-effect: dropshadow(three-pass-box, rgba(148,163,184,0.12), 12, 0, 0, 6);" xmlns="http://javafx.com/javafx/26" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.auction.client.controller.CardController">
 
     <padding>
-        <Insets bottom="10" left="10" right="10" top="10" />
+        <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
     </padding>
 
-    <!-- IMAGE + STATUS -->
-    <StackPane>
-        <ImageView fx:id="image" fitHeight="151.0" fitWidth="250.0" preserveRatio="false" style="-fx-background-radius: 8; -fx-border-radius:8;" />
+    <StackPane alignment="TOP_LEFT">
+        <children>
+            <ImageView fx:id="image" fitHeight="160.0" fitWidth="258.0" preserveRatio="false" style="-fx-background-radius: 12; -fx-clip: true;" />
 
-        <!-- STATUS BADGE -->
-        <Label fx:id="statusLabel" style="-fx-background-color:#22c55e;                       -fx-text-fill:white;                       -fx-font-size:12;                       -fx-font-weight:bold;                       -fx-padding:4 8;                       -fx-background-radius:20;" text="Đang diễn ra" StackPane.alignment="TOP_LEFT">
-            <StackPane.margin>
-                <Insets left="8" top="8" />
-            </StackPane.margin>
-        </Label>
+            <Label fx:id="statusLabel" style="-fx-background-color: rgba(15,23,42,0.75); -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; -fx-padding: 5 10; -fx-background-radius: 20;" text="ĐANG DIỄN RA">
+                <StackPane.margin>
+                    <Insets left="10.0" top="10.0" />
+                </StackPane.margin>
+            </Label>
+        </children>
     </StackPane>
 
-    <!-- TITLE -->
-    <Label fx:id="titleLabel" style="-fx-font-size:15;                   -fx-font-weight:bold;                   -fx-text-fill:#0f172a;" text="Xe ô tô Toyota Camry 2.5Q 2022" wrapText="true">
-      <VBox.margin>
-         <Insets top="3.0" />
-      </VBox.margin></Label>
+    <Label fx:id="titleLabel" style="-fx-text-fill: #0f172a; -fx-font-weight: bold; -fx-font-size: 16;" text="Tên xe hoặc máy tính" wrapText="true">
+        <VBox.margin>
+            <Insets top="2.0" />
+        </VBox.margin>
+    </Label>
 
-    <!-- TIME -->
-    <HBox alignment="CENTER_LEFT" spacing="5">
-        <Label text="⏱" />
-        <Label fx:id="timeLabel" style="-fx-text-fill: #64748b; -fx-font-size: 14;" text="Kết thúc sau: ">
-         <HBox.margin>
-            <Insets />
-         </HBox.margin></Label>
-      <Label style="-fx-text-fill: red; -fx-font-size: 14; -fx-font-weight: bold;" text="02:15:30" />
-    </HBox>
+    <VBox spacing="6.0" style="-fx-background-color: #f8fafc; -fx-background-radius: 12; -fx-padding: 10;">
+        <children>
+            <HBox alignment="CENTER_LEFT">
+                <children>
+                    <Label style="-fx-text-fill: #64748b; -fx-font-size: 13;" text="Giá hiện tại:" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="priceLabel" style="-fx-text-fill: #10b981; -fx-font-weight: bold; -fx-font-size: 16;" text="0 đ" />
+                </children>
+            </HBox>
 
-    <!-- CURRENT PRICE -->
-    <HBox alignment="CENTER_LEFT" spacing="5">
-        <Label text="💰" />
-        <Label style="-fx-text-fill: #64748b; -fx-font-size: 14;" text="Giá hiện tại:" />
-        <Label fx:id="priceLabel" style="-fx-text-fill:#16a34a;                       -fx-font-size:14;                       -fx-font-weight:bold;" text="850.000.000 đ" />
-      <VBox.margin>
-         <Insets top="3.0" />
-      </VBox.margin>
-    </HBox>
+            <Region minHeight="1.0" style="-fx-background-color: #e2e8f0;" />
 
-    <!-- START PRICE -->
-    <HBox alignment="CENTER_LEFT" spacing="5">
-        <Label text="🏷" />
-        <Label style="-fx-text-fill: #64748b; -fx-font-size: 14;" text="Giá khởi điểm:" />
-        <Label fx:id="startPriceLabel" style="-fx-text-fill: #334155; -fx-font-size: 14;" text="700.000.000 đ" />
-      <VBox.margin>
-         <Insets top="3.0" />
-      </VBox.margin>
-    </HBox>
+            <HBox alignment="CENTER_LEFT">
+                <children>
+                    <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 12;" text="Giá khởi điểm:" />
+                    <Region HBox.hgrow="ALWAYS" />
+                    <Label fx:id="startPriceLabel" style="-fx-text-fill: #64748b; -fx-font-weight: semi-bold; -fx-font-size: 13;" text="0 đ" />
+                </children>
+            </HBox>
+        </children>
+    </VBox>
 
-    <!-- BUTTON -->
-    <Button maxWidth="Infinity" prefHeight="36" style="-fx-background-color:#3b82f6;                    -fx-text-fill:white;                    -fx-font-weight:bold;                    -fx-background-radius:8;                    -fx-cursor:hand;" text="Xem chi tiết">
-      <VBox.margin>
-         <Insets top="16.0" />
-      </VBox.margin></Button>
+    <VBox alignment="CENTER_LEFT" spacing="4.0" style="-fx-background-color: #fff1f2; -fx-background-radius: 8; -fx-padding: 8 12;">
+        <children>
+            <Label fx:id="startTimeLabel" style="-fx-text-fill: #059669; -fx-font-weight: bold; -fx-font-size: 12;" text="🟢 Bắt đầu: 00:00:00" />
+            <Label fx:id="timeLabel" style="-fx-text-fill: #e11d48; -fx-font-weight: bold; -fx-font-size: 12;" text="🔴 Kết thúc: 00:00:00" />
+        </children>
+    </VBox>
 
+    <Button maxWidth="Infinity" onAction="#onDetailClick" prefHeight="38.0" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 13; -fx-background-radius: 10; -fx-cursor: hand;" text="Xem chi tiết">
+        <VBox.margin>
+            <Insets top="4.0" />
+        </VBox.margin>
+    </Button>
 </VBox>

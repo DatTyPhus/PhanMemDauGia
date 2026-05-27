@@ -1,0 +1,23 @@
+/* Làm trong suốt nền của biểu đồ để ăn nhập với màu tối của App */
+.chart-plot-background {
+    -fx-background-color: transparent;
+}
+.chart-vertical-grid-lines, .chart-horizontal-grid-lines {
+    -fx-stroke: rgba(255, 255, 255, 0.05); /* Lưới kẻ mờ cực đẹp */
+}
+
+/* ĐỘ LẠI ĐƯỜNG DÂY (LINE) - Màu xanh ngọc lục bảo + Hiệu ứng phát sáng */
+.default-color0.chart-series-line {
+    -fx-stroke: #10b981;
+    -fx-stroke-width: 3px;
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.6), 15, 0, 0, 0);
+}
+
+/* ĐỘ LẠI CÁC ĐIỂM CHẤM TRÒN (SYMBOL) */
+.default-color0.chart-line-symbol {
+    -fx-background-color: #10b981, white; /* Viền xanh, ruột trắng */
+    -fx-background-insets: 0, 2;
+    -fx-background-radius: 6px;
+    -fx-padding: 5px;
+    -fx-effect: dropshadow(three-pass-box, rgba(16, 185, 129, 0.8), 10, 0, 0, 0);
+}

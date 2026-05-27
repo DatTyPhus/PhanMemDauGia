@@ -14,8 +14,6 @@ import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.util.Callback;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /// class UsersManagement dùng để quản lý tài khoản người dùng, thống kê số lượng và xử lý yêu cầu xóa thành viên từ Admin.
 
@@ -44,7 +42,7 @@ public class UsersManagement implements NetworkClient.MessageListener {
 
             if (currentUser != null && lblUserName != null) {
                 lblUserName.setText(currentUser.getFullName());
-                lblUserRole.setText(currentUser.getRole());
+                lblUserRole.setText(currentUser.getRole().toUpperCase());
             }
 
             /// Ánh xạ dữ liệu từ thực thể User vào các cột tương ứng trên TableView

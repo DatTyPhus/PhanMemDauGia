@@ -19,7 +19,7 @@ import java.io.IOException;
 
 /// Class RegisterController này dùng để xử lý những yêu cầu của người dùng khi thao tác trên màn hình đăng ký, và xử lý các phản hồi từ server để hiển thị lên màn hình.
 
-public class RegisterController {
+public class RegisterController implements NetworkClient.MessageListener {
 
     /// Liên kết với các ô nhập thông tin hay click trên giao diện
     @FXML private TextField fullName;
@@ -28,27 +28,29 @@ public class RegisterController {
     @FXML private PasswordField re_password;
     @FXML private Circle role_bidder;
     @FXML private Circle role_seller;
-
-    @FXML private Label lblMessage;            // Thêm 1 Label ẩn trên giao diện để hiện chữ báo lỗi
+    @FXML private Label lblMessage;            // Label ẩn trên giao diện để hiện chữ báo lỗi
 
     /// Biến lưu trữ Role hiện tại mà người dùng đang chọn (Mặc định là BIDDER)
     private String selectedRole = "BIDDER";       // Khi người dùng đăng ký không click vào bất cứ ô chọn role nào thì mặc định sẽ là BIDDER.
 
     @FXML
     public void initialize() {               /// Khởi tạo đối tượng để nghe phản hồi từ mạng.
+
+
         // Tự động tô màu xanh cho vòng tròn Bidder lúc mới mở màn hình
         role_bidder.setFill(Color.DODGERBLUE);
         role_seller.setFill(Color.WHITE);
 
         // Khi NetworkClient có tín hiệu phản hồi từ server sẽ được đi vào hàm handleServerResponse.
-        try{
-            NetworkClient.getInstance().addListener(new NetworkClient.MessageListener() {
-                @Override
-                public void onMessageReceived(Message msg) {            /// Thực hiện các xử lý phản hồi từ server phải thực hiện trên luồng JavaFX Application Thread cho bất kì tác vụ nào liên quan đến JavaFX.
-                    Platform.runLater(() -> handleServerResponse(msg));
-                }
-            });
-        }catch (IOException e){
+        try {
+            /// Đăng ký màn hình này vào danh sách nghe tín hiệu mạng từ server để nhận lệnh REGISTER_FAIL / REGISTER_SUCCESS
+            NetworkClient.getInstance().addListener(this);
+
+            /// Đặt màu ban đầu cho 2 nút chọn Role tròn
+            role_bidder.setFill(Color.web("#2563eb"));
+            role_seller.setFill(Color.TRANSPARENT);
+            role_seller.setStroke(Color.web("#256eb"));
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
@@ -150,39 +152,32 @@ public class RegisterController {
     }
 
     /// XỬ LÝ PHẢN HỒI TỪ SERVER VÀ CHUYỂN MÀN HÌNH.
-    private void handleServerResponse(Message msg) {
-        // Kiểm tra nhãn của kiện hàng trả về
+    /// Lắng nghe phản hồi trả dữ liệu từ Server phát về máy Client
+    @Override
+    public void onMessageReceived(Message msg) {
         switch (msg.getAction()) {
-            case "REGISTER_SUCCESS":       //Khi Message gửi lên từ server có action là "REGISTER_SUCCESS"...
-                // Thông báo cho người dùng
-                System.out.println("Đăng ký thành công!");
+            case "REGISTER_SUCCESS":
+                Platform.runLater(() -> {
+                    /// Cập nhật chữ thông báo thành công và chuyển màu sang xanh lá trực tiếp bằng code
+                    lblMessage.setText("Đăng ký thành công! Đang quay lại trang đăng nhập...");
+                    lblMessage.setStyle("-fx-text-fill: #10b981; -fx-font-size: 13; -fx-font-weight: bold;");
 
-                Platform.runLater(() -> {       //Tạo luồng để xử lý các tác vụ liên quan đến giao dện JavaFX
+                    /// Gỡ lắng nghe an toàn trước khi chuyển màn hình để tránh rác luồng chạy ngầm
                     try {
-                        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/sample.fxml"));  //Dùng để tải file .fxml
-                        Parent root = loader.load();
-
-                        //Thay đổi giao diện giao diện
-                        userName.getScene().setRoot(root);
-
-                        // Hiển thị tiêu đề của cửa sổ window
-                        Stage currentStage = (Stage) userName.getScene().getWindow();
-                        currentStage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
-
-
-                    } catch (IOException e) {
-                        System.err.println("Không thể chuyển màn hình: " + e.getMessage());
+                        NetworkClient.getInstance().removeListener(this);
+                        onBackToLoginClick();
+                    }catch (Exception e){
+                        e.printStackTrace();
                     }
                 });
                 break;
 
-            case "REGISTER_FAIL":             // Khi Message gửi lên từ server có thông tin action là "REGISTER_FAIL"
-                // Nếu thất bại (ví dụ trùng tên user), hiển thị lỗi lên màn hình
+            case "REGISTER_FAIL":
+                /// Khi Server báo lỗi trùng tên, khối lệnh này sẽ đổ chữ trực tiếp vào nhãn FXML đã được nới rộng diện tích
                 Platform.runLater(() -> {
-                    lblMessage.setText(msg.getPayload().toString());
-                    lblMessage.setStyle("-fx-text-fill: red;");
-                    userName.clear();          // Xoá username để người dùng nhập lại
-                    userName.requestFocus();   // Focus vào ô username
+                    lblMessage.setText(msg.getPayload().toString()); /// Đổ văn bản lỗi vào nhãn hiển thị
+                    userName.clear();          // Xoá username cũ để người dùng nhập lại tên mới
+                    userName.requestFocus();   // Tự động đưa con trỏ chuột nhấp nháy vào ô username
                 });
                 break;
         }

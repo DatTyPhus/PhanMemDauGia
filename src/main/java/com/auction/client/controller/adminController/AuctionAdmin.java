@@ -1,43 +1,125 @@
 package com.auction.client.controller.adminController;
 
+import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
+import com.auction.shared.model.Auction; // BẮT BUỘC IMPORT FILE MODEL NÀY
 import com.auction.shared.model.User;
+import com.auction.shared.network.Message;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.util.Callback;
 
-/// class Auction dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình ,và xử lý các yêu cầu từ server.
-public class Auction {
+/// class AuctionAdmin dùng để hiển thị và quản lý các phiên đấu giá trên màn hình Admin.
+public class AuctionAdmin implements NetworkClient.MessageListener {
 
-    // Các biến dùng để link các nút từ màn hình.
     @FXML private Label lblUserName;
     @FXML private Label lblUserRole;
 
-    // Chuẩn bị sẵn các biến cho Bảng
-    @FXML private TableView<?> auctionTable;
-    @FXML private TableColumn<?, ?> idColumn;
-    @FXML private TableColumn<?, ?> nameColumn;
-    @FXML private TableColumn<?, ?> priceColumn;
-    @FXML private TableColumn<?, ?> statusColumn;
-    @FXML private TableColumn<?, ?> timeColumn;
-    @FXML private TableColumn<?, ?> actionColumn;
+    ///  BUG CRITICAL]: Kiểu dữ liệu trong ngoặc nhọn < > PHẢI LÀ 'Auction' (Model), tuyệt đối không dùng 'AuctionAdmin' (Controller)
+    @FXML private TableView<Auction> auctionTable;
+    @FXML private TableColumn<Auction, Integer> idColumn;
+    @FXML private TableColumn<Auction, String> nameColumn;
+    @FXML private TableColumn<Auction, java.math.BigDecimal> priceColumn;
+    @FXML private TableColumn<Auction, String> statusColumn;
+    @FXML private TableColumn<Auction, String> timeColumn;
+    @FXML private TableColumn<Auction, Void> actionColumn;
 
-    /// Hàm khởi tạo này sẽ tự động chạy ngay khi trang Thông báo được load lên.
     @FXML
     public void initialize() {
+        try {
+            NetworkClient.getInstance().addListener(this);
 
-        User currentUser = UserSession.getInstance().getLoginUser();  /// Lấy thông tin người dùng hiện tại đang thao tác lưu vào kho để khi chuyển màn không bị mất thông tin.
+            User currentUser = UserSession.getInstance().getLoginUser();
+            if (currentUser != null && lblUserName != null) {
+                lblUserName.setText(currentUser.getFullName());
+                if (lblUserRole != null) lblUserRole.setText(currentUser.getRole().toUpperCase());
+            }
 
-        // Kiểm tra an toàn: Nếu có user và đã gắn fx:id thì mới đắp dữ liệu
-        if (currentUser != null && lblUserName != null) {         /// Lấy dữ liệu người dùng hiện tại(ở kho đã lưu khi chuyển màn) để in lên thanh thông tin ở góc phải
-            lblUserName.setText(currentUser.getFullName());
-            if (lblUserRole != null) lblUserRole.setText(currentUser.getRole().toUpperCase());
+            /// Ánh xạ dữ liệu vào các cột
+            idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+            nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
+            priceColumn.setCellValueFactory(new PropertyValueFactory<>("currentPrice"));
+            statusColumn.setCellValueFactory(new PropertyValueFactory<>("status"));
+            timeColumn.setCellValueFactory(new PropertyValueFactory<>("startTime"));
+
+            /// Bổ sung hàm thiết lập nút bấm cho Cột Thao tác để fix cảnh báo vàng (unused)
+            setupActionColumn();
+
+            /// Gửi lệnh lấy dữ liệu
+            NetworkClient.getInstance().send(new Message("GET_ALL_AUCTIONS", ""));
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
+    /// Hàm dựng nút Chi tiết] lồng vào cột Thao tác (actionColumn)
+    private void setupActionColumn() {
+        actionColumn.setCellFactory(new Callback<TableColumn<Auction, Void>, TableCell<Auction, Void>>() {
+            @Override
+            public TableCell<Auction, Void> call(TableColumn<Auction, Void> param) {
+                return new TableCell<Auction, Void>() {
+                    private final Button btnDetail = new Button("Chi tiết");
+
+                    {
+                        btnDetail.setStyle("-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-cursor: hand; -fx-background-radius: 5;");
+                        btnDetail.setOnAction(event -> {
+                            Auction targetAuction = getTableView().getItems().get(getIndex());
+                            System.out.println("Admin đang xem chi tiết phiên: " + targetAuction.getItemName());
+                            // Tại đây sau này bạn có thể gài logic chuyển sang màn hình phòng đấu giá chi tiết
+                        });
+                    }
+
+                    @Override
+                    protected void updateItem(Void item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty || getIndex() >= getTableView().getItems().size() || getTableView().getItems().get(getIndex()) == null) {
+                            setGraphic(null);
+                        } else {
+                            setGraphic(btnDetail);
+                        }
+                    }
+                };
+            }
+        });
+    }
+
+    /// Lắng nghe dữ liệu đổ về từ Server
+    @Override
+    public void onMessageReceived(Message msg) {
+        Platform.runLater(() -> {
+            if ("RECEIVE_ALL_AUCTIONS_SUCCESS".equals(msg.getAction())) {
+                try {
+                    String jsonArrayStr = msg.getPayload().toString();
+                    com.google.gson.JsonArray jsonArray = com.google.gson.JsonParser.parseString(jsonArrayStr).getAsJsonArray();
+
+                    ObservableList<Auction> observableList = FXCollections.observableArrayList();
+                    com.google.gson.Gson gson = new com.google.gson.Gson();
+
+                    for (com.google.gson.JsonElement element : jsonArray) {
+                        /// [FIX BUG CRITICAL]: Phải giải mã JSON thành đối tượng MODEL 'Auction.class'
+                        Auction auction = gson.fromJson(element, Auction.class);
+                        if (auction != null) {
+                            observableList.add(auction);
+                        }
+                    }
+
+                    if (auctionTable != null) {
+                        auctionTable.setItems(observableList);
+                    }
+                } catch (Exception e) {
+                    System.err.println("[CLIENT ERROR] Lỗi giải mã danh sách phiên đấu giá!");
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
     /// Method này thực hiện khi admin click vào TRANG CHỦ
     @FXML
     public void onBackHomeClick(javafx.event.ActionEvent event) {

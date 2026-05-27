@@ -8,12 +8,15 @@ import java.sql.Statement;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-// sửa tên trên database thành seller
+
+/// Class dùng để lưu và lấy thông tin của của Seller.
+
 public class SellerDAO {
     public static SellerDAO instance() {
         return new SellerDAO();
     }
-    
+
+    /// Hàm dùng lưu thông tin seller xuống database
     public static void create(User obj) {
 
       String sql = "INSERT INTO sellers (username, password, full_name, role) VALUES ('"
@@ -79,7 +82,8 @@ public class SellerDAO {
             return false;
         }
     }
-    
+
+    /// Hàm dùng để tìm kiếm thông tin bằng tên đăng nhập
     public static Seller selectByUsername(String username) {
     String sql = "SELECT * FROM sellers WHERE username = ?";
     

@@ -17,6 +17,9 @@ public class Message {
     public String getAction() { return action;}
     public Object getPayload() {return payload;}
 
+    //Setter:
+    public void setPayload(Object object){this.payload =object;}
+
     // Chuyển Object thành JSON:
     public String toJson(){
         return  new Gson().toJson(this);

@@ -10,7 +10,7 @@ public class AdminService {
     // Singleton Instance
     private static AdminService instance;
     
-    // Sử dụng ConcurrentHashMap để xử lý đấu giá đồng thời an toàn [cite: 83, 147]
+    // Sử dụng ConcurrentHashMap để xử lý đấu giá đồng thời an toàn
     private Map<Integer, Auction> runningAuctions;
 
     private AdminService() {

@@ -128,13 +128,12 @@
                 <children>
                     <TableView fx:id="historyTable" style="-fx-background-color: transparent; -fx-border-color: transparent;" VBox.vgrow="ALWAYS">
                         <columns>
-                            <TableColumn prefWidth="90" style="-fx-alignment: CENTER;" text="Mã Phiên" />
-                            <TableColumn prefWidth="280" style="-fx-alignment: CENTER_LEFT; -fx-font-weight: bold;" text="Tên tài sản đấu giá" />
-                            <TableColumn prefWidth="160" style="-fx-alignment: CENTER_RIGHT; -fx-text-fill: #0f172a;" text="Mức giá bạn đặt" />
-                            <TableColumn prefWidth="160" style="-fx-alignment: CENTER_RIGHT; -fx-text-fill: #059669; -fx-font-weight: bold;" text="Giá chốt cuối cùng" />
-                            <TableColumn prefWidth="180" style="-fx-alignment: CENTER;" text="Thời gian tham gia" />
-                            <TableColumn prefWidth="150" style="-fx-alignment: CENTER;" text="Kết quả" />
-                            <TableColumn prefWidth="120" style="-fx-alignment: CENTER;" text="Thao tác" />
+                            <TableColumn prefWidth="120" style="-fx-alignment: CENTER;" text="Mã Phiên" />
+                            <TableColumn prefWidth="350" style="-fx-alignment: CENTER_LEFT; -fx-font-weight: bold;" text="Tên tài sản đấu giá" />
+                            <TableColumn prefWidth="250" style="-fx-alignment: CENTER;" text="Thời gian kết thúc" />
+                            <TableColumn prefWidth="180" style="-fx-alignment: CENTER; -fx-font-weight: bold; -fx-text-fill: #f59e0b;" text="Giá cao nhất" />
+                            <TableColumn prefWidth="150" style="-fx-alignment: CENTER; -fx-text-fill: #10b981; -fx-font-weight: bold;" text="Kết quả" />
+                            <TableColumn prefWidth="150" style="-fx-alignment: CENTER;" text="Thao tác" />
                         </columns>
                         <columnResizePolicy>
                             <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
