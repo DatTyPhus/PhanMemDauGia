@@ -1,5 +1,12 @@
 package com.auction.client.controller;
 
+import java.io.ByteArrayInputStream;
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Base64;
+import java.util.function.UnaryOperator;
+
 import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
 import com.auction.shared.model.Auction;
@@ -7,6 +14,7 @@ import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
@@ -16,15 +24,16 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn; 
+import javafx.scene.control.TableView;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextFormatter;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
-import java.io.ByteArrayInputStream;
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.Base64;
 
 /// class BiddingController: Đã hoàn thiện toàn bộ luồng Đặt giá (Bidding) và Lịch sử Real-time
 public class BiddingController implements NetworkClient.MessageListener {
@@ -75,6 +84,21 @@ public class BiddingController implements NetworkClient.MessageListener {
                 if (lblRole != null) lblRole.setText(currentUser.getRole().toUpperCase());
                 if (lblTopBalance != null) lblTopBalance.setText(String.format("Số dư: %,.0f VNĐ", currentUser.getBalance()));
             }
+
+            //  BẢO MẬT MỨC 1 - CHẶN GÕ CHỮ NGAY TRÊN GIAO DIỆN 
+            // Bộ lọc chỉ cho phép nhập ký tự số từ 0-9
+            UnaryOperator<TextFormatter.Change> numberFilter = change -> {
+                if (change.getText().matches("[0-9]*")) {
+                    return change;
+                }
+                return null;
+            };
+
+            // Áp dụng bộ lọc chặn gõ chữ cho cả 3 ô nhập tiền số từ bàn phím
+            if (txtBidAmount != null) txtBidAmount.setTextFormatter(new TextFormatter<>(numberFilter));
+            if (txtAutoMaxPrice != null) txtAutoMaxPrice.setTextFormatter(new TextFormatter<>(numberFilter));
+            if (txtAutoStep != null) txtAutoStep.setTextFormatter(new TextFormatter<>(numberFilter));
+            
 
             /// Khởi tạo móc nối dữ liệu cho 3 cột trong Bảng Lịch sử
             if (historyTable != null && historyTable.getColumns().size() >= 3) {
@@ -159,9 +183,38 @@ public class BiddingController implements NetworkClient.MessageListener {
             return;
         }
 
-        // Gửi đi lệnh đặt bid.
+        String amountStr = txtBidAmount.getText().trim();
+
+        // BẢO MẬT MỨC 1 - KIỂM TRA ĐẦU VÀO ĐẶT GIÁ THỦ CÔNG 
+        if (amountStr.isEmpty()) {
+            showAlert("Vui lòng nhập số tiền muốn đặt giá!");
+            txtBidAmount.requestFocus();
+            return;
+        }
+
+        BigDecimal amount;
         try {
-            BigDecimal amount = new BigDecimal(txtBidAmount.getText());
+            amount = new BigDecimal(amountStr);
+        } catch (NumberFormatException e) {
+            showAlert("Số tiền không hợp lệ! Vui lòng chỉ nhập các con số.");
+            return;
+        }
+
+        // Kiểm tra logic nghiệp vụ: Số tiền đấu giá mới phải lớn hơn giá hiện tại của sản phẩm
+        if (targetAuction != null && amount.compareTo(targetAuction.getCurrentPrice()) <= 0) {
+            showAlert("Giá đặt phải lớn hơn Giá hiện tại của sản phẩm (" + String.format("%,.0f VNĐ", targetAuction.getCurrentPrice()) + ")!");
+            txtBidAmount.requestFocus();
+            return;
+        }
+
+        // Kiểm tra chống tràn số hệ thống (Giới hạn tối đa 10 tỷ VNĐ cho 1 lần bốc lệnh)
+        if (amount.compareTo(new BigDecimal("10000000000")) > 0) {
+            showAlert("Số tiền đặt giá vượt quá hạn mức cho phép hệ thống (Tối đa 10 Tỷ VNĐ)!");
+            return;
+        }
+
+        // Gửi đi lệnh đặt bid đã qua xử lý an toàn.
+        try {
             User currentUser = UserSession.getInstance().getLoginUser();
 
             /// Gửi chuỗi ghép: "AuctionID,Amount,Username"
@@ -170,7 +223,7 @@ public class BiddingController implements NetworkClient.MessageListener {
 
             txtBidAmount.clear(); // Xóa trắng ô nhập sau khi gửi
         } catch (Exception e) {
-            showAlert("Số tiền không hợp lệ! Vui lòng chỉ nhập các con số.");
+            showAlert("Đã xảy ra lỗi trong quá trình gửi lệnh đặt giá!");
         }
     }
 
@@ -196,10 +249,48 @@ public class BiddingController implements NetworkClient.MessageListener {
             return;
         }
 
+        String maxPriceStr = txtAutoMaxPrice.getText().trim();
+        String stepStr = txtAutoStep.getText().trim();
+
+        // ================= VỊ TRÍ 3.2: BẢO MẬT MỨC 1 - KIỂM TRA ĐẦU VÀO ĐẤU GIÁ TỰ ĐỘNG =================
+        if (maxPriceStr.isEmpty() || stepStr.isEmpty()) {
+            showAlert("Vui lòng điền đầy đủ Giá tối đa và Bước giá tự động!");
+            return;
+        }
+
+        BigDecimal maxAmount;
+        BigDecimal stepAmount;
+        try {
+            maxAmount = new BigDecimal(maxPriceStr);
+            stepAmount = new BigDecimal(stepStr);
+        } catch (NumberFormatException e) {
+            showAlert("Vui lòng nhập định dạng số hợp lệ cho Mức giá tối đa và Bước nhảy!");
+            return;
+        }
+
+        // Bước giá thiết lập tự động phải là số dương lớn hơn 0
+        if (stepAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            showAlert("Bước giá đấu tự động phải lớn hơn 0!");
+            txtAutoStep.requestFocus();
+            return;
+        }
+
+        // Giá tối đa mong muốn mua tự động phải lớn hơn Giá hiện tại của phòng đấu giá
+        if (targetAuction != null && maxAmount.compareTo(targetAuction.getCurrentPrice()) <= 0) {
+            showAlert("Giá tối đa thiết lập phải lớn hơn Giá hiện tại của sản phẩm!");
+            txtAutoMaxPrice.requestFocus();
+            return;
+        }
+
+        // Kiểm tra chống tràn số phá hoại bộ nhớ
+        if (maxAmount.compareTo(new BigDecimal("10000000000")) > 0 || stepAmount.compareTo(new BigDecimal("1000000000")) > 0) {
+            showAlert("Hạn mức thiết lập quá lớn! Vui lòng điều chỉnh lại cấu hình.");
+            return;
+        }
+        // ================================================================================================
+
         // Các bước cấu hình cho tín hiệu Auto-bid được gửi đi
         try {
-            BigDecimal maxAmount = new BigDecimal(txtAutoMaxPrice.getText().trim());
-            BigDecimal stepAmount = new BigDecimal(txtAutoStep.getText().trim());
             User currentUser = UserSession.getInstance().getLoginUser();
 
             JsonObject payload = new JsonObject();
@@ -214,7 +305,7 @@ public class BiddingController implements NetworkClient.MessageListener {
             txtAutoMaxPrice.clear();
             txtAutoStep.clear();
         } catch (Exception e) {
-            showAlert("Vui lòng nhập định dạng số hợp lệ cho Mức giá tối đa và Bước nhảy!");
+            showAlert("Đã xảy ra lỗi trong quá trình thiết lập tự động!");
         }
     }
 
@@ -414,6 +505,4 @@ public class BiddingController implements NetworkClient.MessageListener {
         Alert alert = new Alert(Alert.AlertType.WARNING, msg);
         alert.show();
     }
-
-
 }

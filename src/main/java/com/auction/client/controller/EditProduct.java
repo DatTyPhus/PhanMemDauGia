@@ -1,24 +1,25 @@
 package com.auction.client.controller;
 
+import java.io.File;
+import java.util.Base64;
+
 import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
 import com.auction.shared.model.Item;
 import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
 import com.google.gson.Gson;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import static javafx.scene.control.Alert.AlertType.ERROR;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import java.io.File;
-import java.util.Base64;
-
-import static javafx.scene.control.Alert.AlertType.ERROR;
 
 /// class HomeController này dùng để thực hiện các yêu cầu của người dùng khi thao tác trên màn hình ,và xử lý các yêu cầu từ server.
 
@@ -48,6 +49,16 @@ public class EditProduct implements NetworkClient.MessageListener {
             if (cbDuration != null) {
                 cbDuration.getItems().addAll("5p", "15p", "30p", "1h", "2h");
                 cbDuration.setValue("5p"); // Lựa chọn mặc định ban đầu
+            }
+            //  BẢO VỆ MỨC 1 (CHẶN GÕ CHỮ TRÊN Ô NHẬP GIÁ TIỀN)
+            if (txtStartPrice != null) {
+                txtStartPrice.setTextFormatter(new javafx.scene.control.TextFormatter<>(change -> {
+                    // 1. Chỉ cho phép nhập số từ 0-9 (Chặn hoàn toàn chữ cái, ký tự đặc biệt, dấu cách)
+                    if (!change.getText().matches("[0-9]*")) return null;
+                    // 2. Chống tràn số (Anti-Overflow): Giới hạn độ dài ô nhập tối đa 11 chữ số (Dưới 100 Tỷ VNĐ)
+                    if (change.getControlNewText().length() > 11) return null;
+                    return change;
+                }));
             }
         }catch (Exception e){
             e.printStackTrace();

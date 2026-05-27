@@ -1,18 +1,23 @@
 package com.auction.client.controller;
 
+import java.math.BigDecimal;
+import java.util.function.UnaryOperator;
+
 import com.auction.client.network.NetworkClient;
 import com.auction.client.session.UserSession;
 import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
+
 import javafx.application.Platform;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-
-import java.math.BigDecimal;
+import javafx.scene.control.TextFormatter;
 
 /// class DepositController này dùng để xử lý màn hình nạp tiền: In số dư, lấy số tiền người dùng nhập và gửi lệnh xuống Server.
 public class DepositController implements NetworkClient.MessageListener {
@@ -36,55 +41,78 @@ public class DepositController implements NetworkClient.MessageListener {
                 lblUserRole.setText(currentUser.getRole());
 
                 /// Định dạng số dư cũ cho đẹp mắt
-                String formattedBalance = String.format("%,.0f VNĐ", currentUser.getBalance());      /// Hiển thị số dư.
+                String formattedBalance = String.format("%,.0f VNĐ", currentUser.getBalance());
                 lblTopBalance.setText("Số dư: " + formattedBalance);
             }
-        }catch (Exception e){
+
+            // BẢO MẬT MỨC 1: RÀNG BUỘC TRÊN GIAO DIỆN (CHẶN GÕ CHỮ) 
+            UnaryOperator<TextFormatter.Change> filter = change -> {
+                String text = change.getText();
+                if (text.matches("[0-9]*")) {
+                    return change;
+                }
+                return null; 
+            };
+            TextFormatter<String> textFormatter = new TextFormatter<>(filter);
+            txtAmount.setTextFormatter(textFormatter);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /// Method này thực hiện khi click nút XÁC NHẬN ĐÃ CHUYỂN KHOẢN
+    /// Sự kiện xảy ra khi người dùng bấm nút "NẠP TIỀN"
     @FXML
-    public void onConfirmDeposit(javafx.event.ActionEvent event) {
+    public void onDepositClick(ActionEvent event) {
         String amountStr = txtAmount.getText().trim();
 
+        // ================= BẢO MẬT MỨC 1: INPUT VALIDATION =================
         if (amountStr.isEmpty()) {
-            showAlert("Lỗi", "Vui lòng nhập số tiền bạn đã chuyển khoản!");
+            showAlert("Lỗi dữ liệu", "Vui lòng nhập số tiền bạn muốn nạp!");
+            txtAmount.requestFocus();
             return;
         }
 
+        BigDecimal amount;
         try {
-            /// Chuyển chuỗi chữ thành số tiền thực tế
-            BigDecimal amount = new BigDecimal(amountStr);
-
-            if (amount.compareTo(BigDecimal.ZERO) <= 0) {
-                showAlert("Lỗi", "Số tiền nạp phải lớn hơn 0!");
-                return;
-            }
-
-            /// Đóng gói dữ liệu gửi xuống Server (Gồm ID người dùng, vai trò và số tiền)
-            /// Format chuỗi gửi đi sẽ là: "ID,Role,Amount"
-            String payload = currentUser.getId() + "," + currentUser.getRole() + "," + amount.toString();
-            Message msg = new Message("DEPOSIT", payload);
-
-            NetworkClient.getInstance().send(msg);
-
+            amount = new BigDecimal(amountStr);
         } catch (NumberFormatException e) {
-            showAlert("Lỗi", "Số tiền không hợp lệ! Vui lòng chỉ nhập số.");
-        }catch (Exception e){
+            showAlert("Lỗi dữ liệu", "Số tiền nhập vào không hợp lệ! Vui lòng chỉ nhập số từ 0-9.");
+            txtAmount.requestFocus();
+            return;
+        }
+
+        BigDecimal minDeposit = new BigDecimal("10000"); // Tối thiểu 10k
+        if (amount.compareTo(minDeposit) < 0) {
+            showAlert("Lỗi dữ liệu", "Số tiền nạp tối thiểu mỗi lần phải từ 10,000 VNĐ!");
+            txtAmount.requestFocus();
+            return;
+        }
+
+        BigDecimal maxDeposit = new BigDecimal("1000000000"); // Tối đa 1 tỷ
+        if (amount.compareTo(maxDeposit) > 0) {
+            showAlert("Lỗi dữ liệu", "Số tiền nạp một lần không được vượt quá 1,000,000,000 VNĐ!");
+            txtAmount.requestFocus();
+            return;
+        }
+
+        // ĐÃ ĐỔI TÊN HÀM THÀNH send(depositMsg) CHO ĐÚNG VỚI FILE NetworkClient.java CỦA BẠN
+        try {
+            Message depositMsg = new Message("DEPOSIT", amount.toString());
+            NetworkClient.getInstance().send(depositMsg); 
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /// Method quay lại trang Hồ sơ
+    /// Sự kiện bấm nút QUAY LẠI
     @FXML
-    public void onBackClick(javafx.event.ActionEvent event) {
+    public void onBackClick(ActionEvent event) {
         try {
             NetworkClient.getInstance().removeListener(this);
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/profile.fxml"));
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/auction/client/view/home.fxml"));
             Parent root = loader.load();
-            javafx.scene.Node source = (javafx.scene.Node) event.getSource();
+            Node source = (Node) event.getSource();
             source.getScene().setRoot(root);
         } catch (Exception e) {
             e.printStackTrace();
@@ -96,11 +124,9 @@ public class DepositController implements NetworkClient.MessageListener {
     public void onMessageReceived(Message msg) {
         Platform.runLater(() -> {
             if (msg.getAction().equals("DEPOSIT_SUCCESS")) {
-                /// Nhận số dư mới từ Server và cập nhật lại kho (UserSession)
                 BigDecimal newBalance = new BigDecimal(msg.getPayload().toString());
                 currentUser.setBalance(newBalance);
 
-                /// Cập nhật lại giao diện
                 lblTopBalance.setText("Số dư: " + String.format("%,.0f VNĐ", newBalance));
                 txtAmount.clear();
 
@@ -112,10 +138,12 @@ public class DepositController implements NetworkClient.MessageListener {
     }
 
     private void showAlert(String title, String content) {
-        Alert alert = new Alert(title.equals("Lỗi") || title.equals("Thất bại") ? Alert.AlertType.ERROR : Alert.AlertType.INFORMATION);
+        Alert alert = new Alert(title.equals("Lỗi") || title.equals("Thất bại") || title.equals("Lỗi dữ liệu") 
+                ? Alert.AlertType.ERROR 
+                : Alert.AlertType.INFORMATION);
         alert.setTitle(title);
         alert.setHeaderText(null);
         alert.setContentText(content);
-        alert.showAndWait();
+        alert.show();
     }
 }
