@@ -11,15 +11,10 @@ import com.auction.shared.network.Message;
 
 public class AccountService {
 
-  // 3 DÒNG NÀY ĐỂ JAVA NHẬN DIỆN ĐƯỢC DAO
-  private final BidderDAO bidderDAO = new BidderDAO();
-  private final SellerDAO sellerDAO = new SellerDAO();
-  private final AdminDAO adminDAO = new AdminDAO();
-
   public Message login(String username, String password) {
 
     // 1. Kiểm tra bên kho Bidder
-    Bidder bidder = bidderDAO.selectByUsername(username);
+    Bidder bidder = BidderDAO.selectByUsername(username);
     if (bidder != null) {
       if (bidder.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", bidder);
@@ -29,7 +24,7 @@ public class AccountService {
     }
 
     // 2. Kiểm tra bên kho Seller
-    Seller seller = sellerDAO.selectByUsername(username);
+    Seller seller = SellerDAO.selectByUsername(username);
     if (seller != null) {
       if (seller.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", seller);
@@ -39,7 +34,7 @@ public class AccountService {
     }
 
     // 3. Kiểm tra bên kho Admin
-    Admin admin = adminDAO.selectByUsername(username);
+    Admin admin = AdminDAO.selectByUsername(username);
     if (admin != null) {
       if (admin.getPassword().equals(password)) {
         return new Message("LOGIN_SUCCESS", admin);
@@ -63,9 +58,9 @@ public class AccountService {
     /// Quét kiểm tra username trên TOÀN BỘ CÁC KHO (Bidder, Seller, Admin)
     /// Phải đảm bảo tên đăng nhập này là DUY NHẤT trên toàn hệ thống, không phân biệt vai trò.
 
-    boolean isUsernameExist = (bidderDAO.selectByUsername(username) != null)
-                            || (sellerDAO.selectByUsername(username) != null)
-                            || (adminDAO.selectByUsername(username) != null);
+    boolean isUsernameExist = (BidderDAO.selectByUsername(username) != null)
+                            || (SellerDAO.selectByUsername(username) != null)
+                            || (AdminDAO.selectByUsername(username) != null);
 
     if (isUsernameExist) {
       System.out.println("-> CẢNH BÁO TỪ CHỐI: Username [" + username + "] đã bị người khác sử dụng trong hệ thống.");
@@ -81,7 +76,7 @@ public class AccountService {
       newUser.setFullName(fullName);
       newUser.setRole("BIDDER");
 
-      bidderDAO.create(newUser);
+      BidderDAO.create(newUser);
       return new Message("REGISTER_SUCCESS", "Đăng ký tài khoản Người mua (Bidder) thành công!");
 
     } else if (role.trim().equalsIgnoreCase("SELLER")) {
@@ -92,7 +87,7 @@ public class AccountService {
       newUser.setFullName(fullName);
       newUser.setRole("SELLER");
 
-      sellerDAO.create(newUser);
+      SellerDAO.create(newUser);
       return new Message("REGISTER_SUCCESS", "Đăng ký tài khoản Người bán (Seller) thành công!");
 
     } else {
