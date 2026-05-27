@@ -1,7 +1,6 @@
 package com.auction.shared.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 
 public abstract class Item extends Entity {
     protected int sellerId; 
