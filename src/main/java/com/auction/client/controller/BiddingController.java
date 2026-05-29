@@ -274,6 +274,12 @@ public class BiddingController implements NetworkClient.MessageListener {
             txtAutoStep.requestFocus();
             return;
         }
+        // Bước giá tự động phải lớn hơn 1 triệu
+        if (stepAmount.compareTo(new BigDecimal("1000000")) <= 0) {
+            showAlert("Bước giá tự động phải lớn hơn 1 triệu (1,000,000 VNĐ)!");
+            txtAutoStep.requestFocus();
+            return;
+        }
 
         // Giá tối đa mong muốn mua tự động phải lớn hơn Giá hiện tại của phòng đấu giá
         if (targetAuction != null && maxAmount.compareTo(targetAuction.getCurrentPrice()) <= 0) {
