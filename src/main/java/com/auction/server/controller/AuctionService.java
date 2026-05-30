@@ -79,8 +79,9 @@ public class AuctionService {
             if (currentBot != null && !currentBot.getBiddername().equals(newAutoBid.getBiddername())) {
                 if (newAutoBid.getBidAmount().compareTo(currentBot.getBidAmount()) <= 0) {
                     BigDecimal targetPrice = newAutoBid.getBidAmount().add(currentBot.getStep());
-                    if (targetPrice.compareTo(currentBot.getBidAmount()) > 0) targetPrice = currentBot.getBidAmount();
-
+                    if (targetPrice.compareTo(currentBot.getBidAmount()) > 0) {
+                        targetPrice = currentBot.getBidAmount();
+                    }
                     executeDirectBid(new BidTransaction(auction.getId(), currentBot.getBiddername(), targetPrice, BigDecimal.ZERO), auction);
                     return new Message("AUTO_BID_FAIL", "Từ chối! Đã có người thiết lập giới hạn Auto cao hơn bạn. Hệ thống đã tự động nâng giá sàn!");
                 } else {
