@@ -2,6 +2,7 @@ package com.auction.shared.model;
 
 import java.math.BigDecimal;
 
+
 public abstract class Item extends Entity {
     protected int sellerId; 
     protected String itemName;  

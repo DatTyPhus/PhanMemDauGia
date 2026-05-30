@@ -12,6 +12,7 @@ import java.time.temporal.ChronoUnit;
 import com.auction.server.dao.*;
 import com.auction.shared.model.*;
 import com.auction.shared.network.Message;
+import com.google.gson.JsonObject;
 
 /// Class AuctionService dùng để thực hiện các tác vụ trong phòng đấu giá , như đặt bid,.............
 
@@ -112,6 +113,13 @@ public class AuctionService {
         if (auction == null) return new Message("BID_FAIL", "Đấu giá không tồn tại.");
         if (!"OPEN".equalsIgnoreCase(auction.getStatus())) return new Message("BID_FAIL", "Chỉ có thể đặt giá khi đang diễn ra.");
 
+        Item item = ItemDAO.selectById(auction.getItemId());
+
+        User user = SellerDAO.getSellersByUserid(item.getSellerId());
+        if (item != null && bidTransaction.getBiddername().equals(user.getUsername())) {
+            return new Message("BID_FAIL", "Bạn không thể tự đặt giá cho sản phẩm do chính mình đăng bán!");
+        }
+
         auction.lock();
         try {
             LocalDateTime endTimeObj = auction.changeStringToTime(auction.getEndTime());
@@ -131,17 +139,6 @@ public class AuctionService {
                 return new Message("BID_FAIL", "Lỗi dữ liệu hoặc số dư không đủ.");
             }
 
-            BidTransaction currentBot = AutobidDAO.getAutoBidsByAuctionId(auction.getId());
-            if (currentBot != null && !currentBot.getBiddername().equals(bidTransaction.getBiddername())) {
-                if (currentBot.getBidAmount().compareTo(auction.getCurrentPrice()) > 0) {
-                    BigDecimal botReactionPrice = auction.getCurrentPrice().add(currentBot.getStep());
-                    if (botReactionPrice.compareTo(currentBot.getBidAmount()) > 0) botReactionPrice = currentBot.getBidAmount();
-                    executeDirectBid(new BidTransaction(auction.getId(), currentBot.getBiddername(), botReactionPrice, BigDecimal.ZERO), auction);
-                } else {
-                    AutobidDAO.updateAutobid(auction.getId(), BigDecimal.ZERO, BigDecimal.ZERO, null);
-                    System.out.println("[AUTO-BID] Người chơi " + bidTransaction.getBiddername() + " đã phá vỡ giới hạn Auto-bid!");
-                }
-            }
 
             String oldBidderName = auction.getHighestBidderName();
             BigDecimal oldPrice = auction.getCurrentPrice();
@@ -176,7 +173,32 @@ public class AuctionService {
             responseObj.addProperty("bidTime", bidTime);
             responseObj.addProperty("newEndTime", auction.getEndTime());
 
+
+            /// BƯỚC 1: LƯU VÀ PHÁT THANH LƯỢT ĐÁNH CỦA NGƯỜI THẬT TRƯỚC
             com.auction.server.network.ServerCore.broadcastMessage(new Message("BID_SUCCESS", responseObj.toString()));
+            /// =========================================================================
+            /// BƯỚC 2: BOT KIỂM TRA VÀ PHẢN CÔNG
+            /// =========================================================================
+            BidTransaction currentBot = AutobidDAO.getAutoBidsByAuctionId(auction.getId());
+            if (currentBot != null && !currentBot.getBiddername().equals(bidTransaction.getBiddername())) {
+                if (currentBot.getBidAmount().compareTo(auction.getCurrentPrice()) > 0) {
+
+                    /// [FIX BUG GIAO DIỆN]: Ép Bot dừng 2 giây để Client kịp vẽ dữ liệu của người thật
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    BigDecimal botReactionPrice = auction.getCurrentPrice().add(currentBot.getStep());
+                    if (botReactionPrice.compareTo(currentBot.getBidAmount()) > 0) botReactionPrice = currentBot.getBidAmount();
+                    executeDirectBid(new BidTransaction(auction.getId(), currentBot.getBiddername(), botReactionPrice, BigDecimal.ZERO), auction);
+                } else {
+                    AutobidDAO.updateAutobid(auction.getId(), BigDecimal.ZERO, BigDecimal.ZERO, null);
+                    System.out.println("[AUTO-BID] Người chơi " + bidTransaction.getBiddername() + " đã phá vỡ giới hạn Auto-bid!");
+                }
+            }
+
             return new Message("BID_FAKE_SUCCESS", "");
 
         } finally {
@@ -201,10 +223,10 @@ public class AuctionService {
         auction.setHighestBidderName(botBid.getBiddername());
         AuctionDAO.update(auction);
 
-        String bidTime = LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-        BidTransactionDAO.insert(botBid, bidTime);
+        /// Cố tình cộng thêm 1 giây để Bot luôn là người đến sau cùng và nằm trên đỉnh Database
+        String bidTime = LocalDateTime.now().plusSeconds(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));        BidTransactionDAO.insert(botBid, bidTime);
 
-        com.google.gson.JsonObject responseObj = new com.google.gson.JsonObject();
+        JsonObject responseObj = new JsonObject();
         responseObj.addProperty("auctionId", auction.getId());
         responseObj.addProperty("newPrice", auction.getCurrentPrice());
         responseObj.addProperty("highestBidder", auction.getHighestBidderName());

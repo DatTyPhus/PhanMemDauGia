@@ -5,6 +5,8 @@ import com.auction.client.session.UserSession;
 import com.auction.shared.model.Auction;
 import com.auction.shared.model.User;
 import com.auction.shared.network.Message;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import javafx.animation.KeyFrame;
@@ -16,11 +18,13 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -242,7 +246,7 @@ public class BiddingController implements NetworkClient.MessageListener {
                                     } else if (imgUrl.startsWith("http://") || imgUrl.startsWith("https://") || imgUrl.startsWith("file:")) {
                                         img = new Image(imgUrl, true);
                                     } else {
-                                        java.io.File localFile = new java.io.File(imgUrl);
+                                        File localFile = new File(imgUrl);
                                         if (localFile.exists()) img = new Image(localFile.toURI().toString(), true);
                                         else {
                                             java.net.URL resource = getClass().getResource(imgUrl.startsWith("/") ? imgUrl : "/" + imgUrl);
@@ -259,11 +263,11 @@ public class BiddingController implements NetworkClient.MessageListener {
                 /// Nhận lịch sử cũ khi vừa vào phòng đấu giá
                 case "RECEIVE_BID_HISTORY":
                     try {
-                        com.google.gson.JsonArray historyArray = JsonParser.parseString(msg.getPayload().toString()).getAsJsonArray();
+                        JsonArray historyArray = JsonParser.parseString(msg.getPayload().toString()).getAsJsonArray();
                         historyDataList.clear();
 
-                        for (com.google.gson.JsonElement element : historyArray) {
-                            com.google.gson.JsonArray row = element.getAsJsonArray();
+                        for (JsonElement element : historyArray) {
+                            JsonArray row = element.getAsJsonArray();
                             historyDataList.add(new String[]{row.get(0).getAsString(), row.get(1).getAsString(), row.get(2).getAsString()});
                         }
 
@@ -318,7 +322,7 @@ public class BiddingController implements NetworkClient.MessageListener {
                             historyDataList.add(0, new String[]{bidTime.substring(11), highestBidder, newPrice.toPlainString()});
 
                             //Mỗi lần đấu giá sẽ là một luồng.
-                            javafx.scene.chart.XYChart.Series<String, Number> freshSeries = new javafx.scene.chart.XYChart.Series<>();
+                            XYChart.Series<String, Number> freshSeries = new XYChart.Series<>();
 
                             for (int i = historyDataList.size() - 1; i >= 0; i--) {
                                 String[] r = historyDataList.get(i);
