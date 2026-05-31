@@ -25,7 +25,7 @@ public class NetworkClient {
     private final List<MessageListener> listeners = new ArrayList<>();       /// Danh sách các đối tượng nghe dữ liệu được truyền từ server lên.
 
     private NetworkClient() throws IOException {
-        this.socket = new Socket("localhost", 8080);
+        this.socket = new Socket("192.168.2.45", 8080);
         this.in = new BufferedReader(new InputStreamReader(socket.getInputStream(), java.nio.charset.StandardCharsets.UTF_8));      //Tạo ống nghe xuống server qua cổng 8080.
         this.out = new PrintWriter(new java.io.OutputStreamWriter(socket.getOutputStream(), java.nio.charset.StandardCharsets.UTF_8), true);
 

@@ -120,7 +120,7 @@
                     </StackPane>
                     <VBox alignment="CENTER_LEFT" spacing="2">
                         <Label style="-fx-text-fill: #64748b; -fx-font-weight: bold; -fx-font-size: 14;" text="PHIÊN ĐẤU GIÁ" />
-                        <Label fx:id="lblTotalAuctions" style="-fx-font-size: 28; -fx-font-weight: 900; -fx-text-fill: #0f172a;" text="24" />
+                        <Label fx:id="lblTotalAuctions" style="-fx-font-size: 28; -fx-font-weight: 900; -fx-text-fill: #0f172a;" text="?" />
                     </VBox>
                 </HBox>
 

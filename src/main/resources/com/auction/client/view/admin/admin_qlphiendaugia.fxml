@@ -5,7 +5,6 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
-<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.BorderPane?>
@@ -111,18 +110,6 @@
                     <Label style="-fx-font-size: 16; -fx-font-weight: bold; -fx-text-fill: #475569; -fx-padding: 0 15 0 0;" text="Danh sách phiên đấu giá" />
 
                     <Button prefHeight="34" style="-fx-background-color: #1e293b; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 0 20; -fx-cursor: hand;" text="Tất cả" />
-                    <Button prefHeight="34" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 20; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 0 20; -fx-cursor: hand;" text="Đang diễn ra" />
-                    <Button prefHeight="34" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 20; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 0 20; -fx-cursor: hand;" text="Sắp diễn ra" />
-                    <Button prefHeight="34" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 20; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 0 20; -fx-cursor: hand;" text="Đã kết thúc" />
-
-                    <Region HBox.hgrow="ALWAYS" />
-
-                    <TextField prefHeight="38" prefWidth="250" promptText="🔍 Tìm ID hoặc Tên sản phẩm..." style="-fx-background-radius: 8; -fx-border-radius: 8; -fx-border-color: #e2e8f0; -fx-padding: 8 15;" />
-                    <Button prefHeight="38" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-padding: 0 20; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(59,130,246,0.3), 5, 0, 0, 3);" text="+ TẠO PHIÊN MỚI">
-                        <HBox.margin>
-                            <Insets left="5.0" />
-                        </HBox.margin>
-                    </Button>
                 </children>
             </HBox>
 

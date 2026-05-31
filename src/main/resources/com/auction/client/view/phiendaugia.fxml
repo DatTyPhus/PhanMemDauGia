@@ -89,9 +89,6 @@
                 <Button mnemonicParsing="false" onAction="#onHistoryClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Lịch sử đấu giá">
                     <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
-                <Button mnemonicParsing="false" onAction="#onNotificationClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Thông báo">
-                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
-                </Button>
                 <Button mnemonicParsing="false" onAction="#onProfileClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Hồ sơ của tôi">
                     <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
@@ -116,9 +113,6 @@
 
                 <HBox spacing="10">
                     <Button onAction="#filterAll" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 20; -fx-padding: 8 20; -fx-cursor: hand;" text="Tất cả" />
-                    <Button onAction="#filterRunning" style="-fx-background-color: transparent; -fx-border-color: #cbd5e1; -fx-border-radius: 20; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-padding: 8 20; -fx-cursor: hand;" text="Đang diễn ra" />
-                    <Button onAction="#filterUpcoming" style="-fx-background-color: transparent; -fx-border-color: #cbd5e1; -fx-border-radius: 20; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-padding: 8 20; -fx-cursor: hand;" text="Sắp diễn ra" />
-                    <Button onAction="#filterFinished" style="-fx-background-color: transparent; -fx-border-color: #cbd5e1; -fx-border-radius: 20; -fx-text-fill: #64748b; -fx-font-weight: bold; -fx-padding: 8 20; -fx-cursor: hand;" text="Đã kết thúc" />
                 </HBox>
 
                 <Region HBox.hgrow="ALWAYS" />

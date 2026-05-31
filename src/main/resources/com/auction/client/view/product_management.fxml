@@ -95,10 +95,6 @@
                     <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
 
-                <Button mnemonicParsing="false" onAction="#onNotificationClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Thông báo">
-                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
-                </Button>
-
                 <Button mnemonicParsing="false" onAction="#onProfileClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Hồ sơ của tôi">
                     <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
@@ -127,7 +123,7 @@
                     <Region HBox.hgrow="ALWAYS" />
                <ButtonBar prefHeight="40.0" prefWidth="200.0">
                  <buttons>
-                     <Button onAction="#onRefreshClick" mnemonicParsing="false" style="-fx-effect: dropshadow(three-pass-box, rgba(59,130,246,0.4), 8, 0, 0, 4); -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 8; -fx-text-fill: white; -fx-background-color: #3b82f6;" text="+ LÀM MỚI">                        <padding>
+                     <Button mnemonicParsing="false" onAction="#onRefreshClick" style="-fx-effect: dropshadow(three-pass-box, rgba(59,130,246,0.4), 8, 0, 0, 4); -fx-font-weight: bold; -fx-cursor: hand; -fx-background-radius: 8; -fx-text-fill: white; -fx-background-color: #3b82f6;" text="+ LÀM MỚI">                        <padding>
                            <Insets bottom="11.0" left="15.0" right="15.0" top="11.0" />
                         </padding></Button>
                  </buttons>
