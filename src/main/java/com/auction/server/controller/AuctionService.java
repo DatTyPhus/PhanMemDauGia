@@ -125,6 +125,9 @@ public class AuctionService {
             Auction auction = AuctionDAO.selectById(bidTransaction.getAuctionId());
             LocalDateTime now = LocalDateTime.now();
 
+            /// Kiểm tra hợp lệ: Phòng tồn tại → OPEN → chưa hết giờ → giá cao hơn
+            /// → Seller không tự bid → số dư đủ. Mỗi lớp fail trả về ngay, không tiếp tục.
+
             if (auction == null) return new Message("BID_FAIL", "Đấu giá không tồn tại.");
             if (!"OPEN".equalsIgnoreCase(auction.getStatus())) return new Message("BID_FAIL", "Chỉ có thể đặt giá khi đang diễn ra.");
 
@@ -235,7 +238,8 @@ public class AuctionService {
         AuctionDAO.update(auction);
 
         /// Cố tình cộng thêm 1 giây để Bot luôn là người đến sau cùng và nằm trên đỉnh Database
-        String bidTime = LocalDateTime.now().plusSeconds(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));        BidTransactionDAO.insert(botBid, bidTime);
+        String bidTime = LocalDateTime.now().plusSeconds(1).format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        BidTransactionDAO.insert(botBid, bidTime);
 
         JsonObject responseObj = new JsonObject();
         responseObj.addProperty("auctionId", auction.getId());
