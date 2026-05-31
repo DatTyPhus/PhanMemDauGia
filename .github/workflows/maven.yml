@@ -1,29 +1,27 @@
-name: Kiem Tra Code Tu Dong (CI)
+name: Java CI with Maven
 
-# Cấu hình "Cò súng": Kịch bản này sẽ chạy khi nào?
+# Luồng này sẽ tự động chạy mỗi khi có ai push code lên nhánh "main" hoặc tạo Pull Request
 on:
   push:
-    branches: [ "main", "dev" ]
+    branches: [ "main" ]
   pull_request:
-    branches: [ "main", "dev" ]
+    branches: [ "main" ]
 
 jobs:
-  build-and-test:
-    # Mượn một máy chủ chạy hệ điều hành Linux (Ubuntu) của GitHub
-    runs-on: ubuntu-latest
+  build:
+    runs-on: ubuntu-latest # Chạy trên máy chủ ảo Linux của GitHub
 
     steps:
-      - name: 1. Tải mã nguồn của nhóm về máy chủ
-        uses: actions/checkout@v4
+      - name: Tải mã nguồn về máy ảo
+        uses: actions/checkout@v3
 
-      - name: 2. Cài đặt môi trường Java 25
-        uses: actions/setup-java@v4
+      - name: Cài đặt Java 21 (Hoặc đổi thành phiên bản Java nhóm đang dùng)
+        uses: actions/setup-java@v3
         with:
-          java-version: '25'
-          distribution: 'oracle' # Hoặc 'temurin'
-          cache: maven
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven # Lưu cache để những lần sau chạy nhanh hơn
 
-      - name: 3. Chạy lệnh Maven để Build và Đóng gói
-        run: mvn clean package -DskipTests
-        # Lưu ý: Tạm thời thêm -DskipTests để bỏ qua khâu viết test case phức tạp lúc đầu.
-        # Sau này nhóm có code test thì xóa chữ đó đi.
+      - name: Biên dịch và Chạy Unit Test tự động
+        # BỎ HẲN -DskipTests ĐI! Chạy lệnh test chuẩn để hệ thống quét lỗi
+        run: mvn clean test
