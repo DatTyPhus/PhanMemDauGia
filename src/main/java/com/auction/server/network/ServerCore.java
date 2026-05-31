@@ -7,6 +7,8 @@ import java.util.List;
 import com.auction.server.controller.*;
 import com.auction.server.dao.*;
 import java.util.concurrent.CopyOnWriteArrayList; // Cấu trúc danh sách an toàn cho Đa luồng
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 
 public class ServerCore {
 
@@ -20,7 +22,7 @@ public class ServerCore {
             System.out.println("Trạm thu sóng Server đang mở tại cổng " + PORT + "...");
             AuctionSchedular.onServerStart(); // Gọi hàm này ngay khi Server khởi động để khởi tạo lại các đấu giá đang chờ
 
-            java.util.concurrent.ScheduledExecutorService heartbeatTimer = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
+            ScheduledExecutorService heartbeatTimer = Executors.newSingleThreadScheduledExecutor();
             heartbeatTimer.scheduleAtFixedRate(() -> {
                 try {
                     // Lấy thời gian chính xác tuyệt đối trên máy chủ và ép kiểu format

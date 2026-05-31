@@ -341,9 +341,7 @@ public class BiddingController implements NetworkClient.MessageListener {
                     break;
 
 
-                /// =========================================================
                 /// ĐỒNG BỘ GIỜ TỪ SERVER ĐỂ ĐẾM NGƯỢC
-                /// =========================================================
                 case "SERVER_TIME":
                     try {
                         if (targetAuction != null && targetAuction.getEndTime() != null) {
@@ -364,17 +362,13 @@ public class BiddingController implements NetworkClient.MessageListener {
                                     long s = remainingSecs % 60;
 
                                     timeLabel.setText(String.format("%02d:%02d:%02d", h, m, s));
+                                    timeLabel.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 50;");
 
-                                    // Hiệu ứng: Dưới 10 giây đỏ rực căng thẳng, bình thường thì đỏ tươi mặc định
-                                    if (remainingSecs <= 10) {
-                                        timeLabel.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 35;");
-                                    } else {
-                                        timeLabel.setStyle("-fx-text-fill: #e11d48; -fx-font-weight: bold;");
-                                    }
                                 } else {
                                     timeLabel.setText("00:00:00");
-                                    timeLabel.setStyle("-fx-text-fill: #64748b;");
-                                    bidButton.setDisable(true); // Khóa nút
+                                    // Và thêm vào cả lúc hết giờ!
+                                    timeLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 60;");
+                                    bidButton.setDisable(true);
                                 }
                             });
                         }

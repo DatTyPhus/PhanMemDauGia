@@ -127,11 +127,11 @@
                 <HBox spacing="15">
                     <VBox spacing="5" HBox.hgrow="ALWAYS">
                         <Label style="-fx-text-fill: #64748b; -fx-font-weight: bold;" text="Giá khởi điểm (VNĐ)" />
-                        <TextField fx:id="txtStartPrice" prefHeight="40" promptText="VD: 25.000.000" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-padding: 8;" />
+                        <TextField fx:id="txtStartPrice" prefHeight="40" promptText="VD: 25000000" style="-fx-background-radius: 8; -fx-border-color: #cbd5e1; -fx-border-radius: 8; -fx-padding: 8;" />
                     </VBox>
                     <VBox spacing="5" HBox.hgrow="ALWAYS">
                         <Label style="-fx-text-fill: #3b82f6; -fx-font-weight: bold;" text="Thông tin đặc biệt" />
-                        <TextField fx:id="txtSpecialInfo" prefHeight="40" promptText="VD: Fullbox, Có chữ ký..." style="-fx-background-radius: 8; -fx-border-color: #3b82f6; -fx-border-radius: 8; -fx-padding: 8;" />
+                        <TextField fx:id="txtSpecialInfo" prefHeight="40" promptText="VD: Xuất xứ, Bảo hành....." style="-fx-background-radius: 8; -fx-border-color: #3b82f6; -fx-border-radius: 8; -fx-padding: 8;" />
                     </VBox>
                 </HBox>
 

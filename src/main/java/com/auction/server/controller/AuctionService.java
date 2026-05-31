@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.util.Map;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.concurrent.locks.ReentrantLock;
+
 import com.auction.server.dao.*;
 import com.auction.server.network.ServerCore;
 import com.auction.shared.model.*;
@@ -113,9 +115,9 @@ public class AuctionService {
     public static Message processBid(BidTransaction bidTransaction) {
 
         // 1. LẤY ĐÚNG Ổ KHÓA CỦA PHÒNG NÀY (Nếu phòng chưa có khóa thì tạo mới 1 cái duy nhất)
-        java.util.concurrent.locks.ReentrantLock roomLock = auctionLocks.computeIfAbsent(bidTransaction.getAuctionId(), k -> new java.util.concurrent.locks.ReentrantLock());
+        ReentrantLock roomLock = auctionLocks.computeIfAbsent(bidTransaction.getAuctionId(), k -> new ReentrantLock());
 
-        // 2. CHỐT CỬA TẠI ĐÂY! (Huy, Trí, Bảo hay Đạt click cùng lúc đều phải xếp hàng 1-1 ở dòng này)
+        // 2. Xin quyền trao chìa khóa nội tại.
         roomLock.lock();
 
         try {
@@ -186,7 +188,7 @@ public class AuctionService {
 
             /// BƯỚC 1: LƯU VÀ PHÁT THANH LƯỢT ĐÁNH CỦA NGƯỜI THẬT TRƯỚC
             ServerCore.broadcastMessage(new Message("BID_SUCCESS", responseObj.toString()));
-            /// BƯỚC 2: BOT KIỂM TRA VÀ PHẢN CÔNG
+            /// BƯỚC 2: BOT KIỂM TRA VÀ PHẢN HỒI
             BidTransaction currentBot = AutobidDAO.getAutoBidsByAuctionId(auction.getId());
             if (currentBot != null && !currentBot.getBiddername().equals(bidTransaction.getBiddername())) {
                 if (currentBot.getBidAmount().compareTo(auction.getCurrentPrice()) > 0) {

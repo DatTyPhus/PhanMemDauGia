@@ -128,7 +128,7 @@ public class AuctionSchedular {
 
     /// Xử lý việc gia hạn thời gian cho phiên đấu giá hiện tại.
     public static void delay(Auction auction, int delayMinutes) {
-        /// [FIX BUG CRITICAL]: CHỈ CỘNG VÀO endTime. Tuyệt đối KHÔNG cộng vào startTime để tránh phiên đấu giá bị quay về trạng thái WAITING
+        ///  CHỈ CỘNG VÀO endTime. Tuyệt đối KHÔNG cộng vào startTime để tránh phiên đấu giá bị quay về trạng thái WAITING
         auction.setEndTime(auction.changeTimetoString(auction.changeStringToTime(auction.getEndTime()).plusMinutes(delayMinutes)));
         AuctionDAO.update(auction);
         reschedule(auction);
