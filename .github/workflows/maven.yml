@@ -24,6 +24,4 @@ jobs:
           cache: maven
 
       - name: 3. Chạy lệnh Maven để Build và Đóng gói
-        run: mvn clean package -DskipTests
-        # Lưu ý: Tạm thời thêm -DskipTests để bỏ qua khâu viết test case phức tạp lúc đầu.
-        # Sau này nhóm có code test thì xóa chữ đó đi.
+        run: mvn clean package
