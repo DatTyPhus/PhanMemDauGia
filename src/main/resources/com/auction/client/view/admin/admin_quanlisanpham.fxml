@@ -115,8 +115,6 @@
 
                     <Region HBox.hgrow="ALWAYS" />
 
-                    <Label style="-fx-text-fill: #3b82f6; -fx-font-size: 14; -fx-font-weight: 900; -fx-background-color: #eff6ff; -fx-padding: 5 15; -fx-background-radius: 20;" text="45 Sản phẩm" />
-
                     <Button prefHeight="40" style="-fx-background-color: #3b82f6; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 8; -fx-cursor: hand; -fx-effect: dropshadow(three-pass-box, rgba(59,130,246,0.4), 8, 0, 0, 4);" text="🔄 LÀM MỚI DỮ LIỆU">
                         <HBox.margin>
                             <Insets left="15.0" />

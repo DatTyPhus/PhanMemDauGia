@@ -15,15 +15,34 @@
         <Insets bottom="16.0" left="16.0" right="16.0" top="16.0" />
     </padding>
 
-    <StackPane alignment="TOP_LEFT">
+    <StackPane prefHeight="160" style="-fx-background-color: linear-gradient(to right bottom, #0f172a, #1e3a8a, #3b82f6); -fx-background-radius: 12 12 0 0; -fx-clip: null;">
         <children>
-            <ImageView fx:id="image" fitHeight="160.0" fitWidth="258.0" preserveRatio="false" style="-fx-background-radius: 12; -fx-clip: true;" />
 
-            <Label fx:id="statusLabel" style="-fx-background-color: rgba(15,23,42,0.75); -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; -fx-padding: 5 10; -fx-background-radius: 20;" text="ĐANG DIỄN RA">
+            <Region maxHeight="150" maxWidth="150" style="-fx-background-color: radial-gradient(center 50% 50%, radius 50%, rgba(255,255,255,0.15) 0%, transparent 100%); -fx-background-radius: 100;" StackPane.alignment="TOP_RIGHT">
+                <StackPane.margin>
+                    <Insets right="-40" top="-40" />
+                </StackPane.margin>
+            </Region>
+
+            <Region maxHeight="180" maxWidth="180" style="-fx-background-color: radial-gradient(center 50% 50%, radius 50%, rgba(59,130,246,0.5) 0%, transparent 100%); -fx-background-radius: 100;" StackPane.alignment="BOTTOM_LEFT">
+                <StackPane.margin>
+                    <Insets bottom="-60" left="-50" />
+                </StackPane.margin>
+            </Region>
+
+            <VBox alignment="CENTER" spacing="5" StackPane.alignment="CENTER">
+                <Label style="-fx-font-size: 38; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.4), 10, 0, 0, 5);" text="💎" />
+                <Label style="-fx-text-fill: #e2e8f0; -fx-font-weight: bold; -fx-font-size: 13;" text="TÀI SẢN CAO CẤP" />
+            </VBox>
+
+            <ImageView fx:id="image" fitHeight="160.0" fitWidth="258.0" preserveRatio="false" style="-fx-background-radius: 12 12 0 0;" StackPane.alignment="CENTER" />
+
+            <Label fx:id="statusLabel" style="-fx-background-color: rgba(15,23,42,0.8); -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 11; -fx-padding: 5 10; -fx-background-radius: 20;" text="ĐANG DIỄN RA" StackPane.alignment="TOP_LEFT">
                 <StackPane.margin>
                     <Insets left="10.0" top="10.0" />
                 </StackPane.margin>
             </Label>
+
         </children>
     </StackPane>
 

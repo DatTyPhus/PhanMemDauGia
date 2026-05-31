@@ -10,7 +10,7 @@ public class Main extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("sample.fxml"));
         Scene scene = new Scene(loader.load());
 
-        stage.setTitle("FXML Demo");
+        stage.setTitle("ĐẤU GIÁ TRỰC TUYẾN");
         stage.setScene(scene);
         stage.show();
     }

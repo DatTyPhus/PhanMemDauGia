@@ -19,6 +19,22 @@ public class ServerCore {
         try (ServerSocket serverSocket = new ServerSocket(PORT)) {
             System.out.println("Trạm thu sóng Server đang mở tại cổng " + PORT + "...");
             AuctionSchedular.onServerStart(); // Gọi hàm này ngay khi Server khởi động để khởi tạo lại các đấu giá đang chờ
+
+            java.util.concurrent.ScheduledExecutorService heartbeatTimer = java.util.concurrent.Executors.newSingleThreadScheduledExecutor();
+            heartbeatTimer.scheduleAtFixedRate(() -> {
+                try {
+                    // Lấy thời gian chính xác tuyệt đối trên máy chủ và ép kiểu format
+                    java.time.format.DateTimeFormatter dtf = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+                    String serverNow = java.time.LocalDateTime.now().format(dtf);
+
+                    // Phát loa thời gian Server cho toàn bộ các máy Client đang kết nối
+                    broadcastMessage(new com.auction.shared.network.Message("SERVER_TIME", serverNow));
+                } catch (Exception e) {
+                    System.out.println("[HEARTBEAT ERROR]: " + e.getMessage());
+                }
+            }, 0, 1, java.util.concurrent.TimeUnit.SECONDS);
+            /// =========================================================================
+
             while (true) {
                 Socket clientSocket = serverSocket.accept();
                 System.out.println("Khách hàng mới vừa kết nối: " + clientSocket.getInetAddress());

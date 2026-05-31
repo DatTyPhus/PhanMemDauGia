@@ -90,9 +90,6 @@
                 <Button mnemonicParsing="false" onAction="#onHistoryClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Lịch sử đấu giá">
                     <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
-                <Button mnemonicParsing="false" onAction="#onNotificationClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Thông báo">
-                    <VBox.margin><Insets left="8" right="8" /></VBox.margin>
-                </Button>
                 <Button mnemonicParsing="false" onAction="#onProfileClick" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-alignment: CENTER_LEFT; -fx-padding: 12 20; -fx-font-size: 14;" styleClass="nav-btn" text="Hồ sơ của tôi">
                     <VBox.margin><Insets left="8" right="8" /></VBox.margin>
                 </Button>
@@ -153,13 +150,6 @@
                     </VBox>
 
                     <VBox prefWidth="480" spacing="30">
-
-                        <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 20, 0, 0, 8);">
-                            <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="📦 Lối tắt của tôi" />
-
-                            <Button alignment="CENTER_LEFT" maxWidth="Infinity" prefHeight="45" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 20;" text="📑 Xem danh sách phiên đã tham gia" />
-                            <Button alignment="CENTER_LEFT" maxWidth="Infinity" prefHeight="45" style="-fx-background-color: #f8fafc; -fx-border-color: #e2e8f0; -fx-border-radius: 10; -fx-background-radius: 10; -fx-text-fill: #3b82f6; -fx-font-weight: bold; -fx-cursor: hand; -fx-padding: 0 20;" text="⭐ Sản phẩm đang theo dõi (Wishlist)" />
-                        </VBox>
 
                         <VBox spacing="15" style="-fx-background-color: white; -fx-padding: 30; -fx-background-radius: 20; -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.06), 20, 0, 0, 8);">
                             <Label style="-fx-font-size: 20; -fx-font-weight: bold; -fx-text-fill: #0f172a;" text="⚙ Cài đặt chung" />

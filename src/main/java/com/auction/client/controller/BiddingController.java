@@ -9,7 +9,6 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -22,7 +21,6 @@ import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.util.Duration;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.math.BigDecimal;
@@ -104,32 +102,13 @@ public class BiddingController implements NetworkClient.MessageListener {
     }
 
     /// Đếm ngược thời gian của phiên đấu giá theo thời gian thực - Cập nhật lại thời gian khi gia hạn đấu giá - Khóa phòng khi đã hết thời gian
+    /// Đếm ngược thời gian của phiên đấu giá theo thời gian thực (ĐÃ CHUYỂN QUYỀN CHO SERVER)
     private void startCountdown() {
-        if (countdownTimeline != null) countdownTimeline.stop();
-        // Chuyển định dạng thời gian từ String sang LocalDateTime
-        DateTimeFormatter dbFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-
-        // Tạo vòng lặp thời gian cho JavaFX , cứ sau 1s sẽ thực hiện các câu lệnh trong ngoặc.
-        countdownTimeline = new Timeline(new KeyFrame(Duration.seconds(1), event -> {
-
-            ///  Quét lại EndTime liên tục thay vì chỉ lấy 1 lần lúc mới vào phòng. Để nếu Server dời lịch, đồng hồ tự động nhảy thêm giờ!
-            LocalDateTime currentEndTime = LocalDateTime.parse(targetAuction.getEndTime(), dbFormatter);
-            java.time.Duration diff = java.time.Duration.between(LocalDateTime.now(), currentEndTime);   // Tính thời gian chênh lệch khi bắt đầu và kết thúc
-
-            if (diff.isNegative() || diff.isZero()) {
-                timeLabel.setText("00:00:00");
-                timeLabel.setStyle("-fx-text-fill: #64748b;");
-                bidButton.setDisable(true);
-                countdownTimeline.stop();
-            } else {
-                long h = diff.toHours();
-                long m = diff.toMinutesPart();
-                long s = diff.toSecondsPart();
-                timeLabel.setText(String.format("%02d:%02d:%02d", h, m, s));  // Định dạng chuỗi hiển thị.
-            }
-        }));
-        countdownTimeline.setCycleCount(Timeline.INDEFINITE);
-        countdownTimeline.play(); // Bắt đầu đếm ngược
+        // Đã xóa logic Timeline nội bộ.
+        // Từ nay Client chỉ ngồi im chờ Server gửi số giây về qua Socket!
+        if (countdownTimeline != null) {
+            countdownTimeline.stop();
+        }
     }
 
     /// Hàm dùng để cập nhật các thông số khi đặt giá
@@ -342,12 +321,62 @@ public class BiddingController implements NetworkClient.MessageListener {
                             if (res.has("newEndTime")) {
                                 targetAuction.setEndTime(res.get("newEndTime").getAsString());
                             }
+
+                            /// =========================================================================
+                            /// [NEW LOGIC]: HIỆN THÔNG BÁO NẾU NGƯỜI ĐẶT KHÁC VỚI TÊN CỦA MÌNH
+                            /// =========================================================================
+                            User currentUser = UserSession.getInstance().getLoginUser();
+                            if (currentUser != null && !highestBidder.equals(currentUser.getUsername())) {
+                                String formattedPrice = String.format("%,.0f VNĐ", newPrice);
+                                showBidNotification("🔥 " + highestBidder + " vừa đặt " + formattedPrice + "!");
+                            }
                         }
 
                         /// Đồng bộ số dư khi đấu giá.
                         User currentUser = UserSession.getInstance().getLoginUser();
                         if (currentUser != null) {
                             NetworkClient.getInstance().send(new Message("GET_MY_BALANCE", currentUser.getUsername() + "," + currentUser.getRole()));
+                        }
+                    } catch (Exception e) { e.printStackTrace(); }
+                    break;
+
+
+                /// =========================================================
+                /// ĐỒNG BỘ GIỜ TỪ SERVER ĐỂ ĐẾM NGƯỢC
+                /// =========================================================
+                case "SERVER_TIME":
+                    try {
+                        if (targetAuction != null && targetAuction.getEndTime() != null) {
+                            String serverTimeStr = msg.getPayload().toString();
+                            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+                            // Lấy thời gian Server và thời gian kết thúc của phòng này để so sánh
+                            LocalDateTime serverNow = LocalDateTime.parse(serverTimeStr, dtf);
+                            LocalDateTime endTime = LocalDateTime.parse(targetAuction.getEndTime(), dtf);
+
+                            // Tính ra số giây còn lại (Dùng thời gian server chuẩn, bất chấp máy Client chạy sai giờ)
+                            long remainingSecs = java.time.temporal.ChronoUnit.SECONDS.between(serverNow, endTime);
+
+                            Platform.runLater(() -> {
+                                if (remainingSecs > 0) {
+                                    long h = remainingSecs / 3600;
+                                    long m = (remainingSecs % 3600) / 60;
+                                    long s = remainingSecs % 60;
+
+                                    timeLabel.setText(String.format("%02d:%02d:%02d", h, m, s));
+
+                                    // Hiệu ứng: Dưới 10 giây đỏ rực căng thẳng, bình thường thì đỏ tươi mặc định
+                                    if (remainingSecs <= 10) {
+                                        timeLabel.setStyle("-fx-text-fill: #ef4444; -fx-font-weight: bold; -fx-font-size: 35;");
+                                    } else {
+                                        timeLabel.setStyle("-fx-text-fill: #e11d48; -fx-font-weight: bold;");
+                                    }
+                                } else {
+                                    timeLabel.setText("00:00:00");
+                                    timeLabel.setStyle("-fx-text-fill: #64748b;");
+                                    bidButton.setDisable(true); // Khóa nút
+                                }
+                            });
                         }
                     } catch (Exception e) { e.printStackTrace(); }
                     break;
@@ -417,6 +446,41 @@ public class BiddingController implements NetworkClient.MessageListener {
     private void showAlert(String msg) {
         Alert alert = new Alert(Alert.AlertType.WARNING, msg);
         alert.show();
+    }
+
+    /// Hàm tạo hiệu ứng thông báo Toast nổi lên rồi tự tắt
+    private void showBidNotification(String message) {
+        Platform.runLater(() -> {
+            javafx.stage.Popup popup = new javafx.stage.Popup();
+            popup.setAutoFix(true);
+            popup.setAutoHide(true);
+            popup.setHideOnEscape(true);
+
+            // Thiết kế giao diện cho thẻ thông báo (Nền cam, chữ trắng, bo góc, có bóng đổ)
+            Label label = new Label(message);
+            label.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; " +
+                    "-fx-padding: 10 20; -fx-background-radius: 20; " +
+                    "-fx-font-weight: bold; -fx-font-size: 14px; " +
+                    "-fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.2), 10, 0, 0, 5);");
+
+            popup.getContent().add(label);
+
+            // Lấy tọa độ cửa sổ hiện tại (Dựa vào nút bidButton đang có sẵn trên màn hình)
+            javafx.stage.Stage stage = (javafx.stage.Stage) bidButton.getScene().getWindow();
+
+            // Đặt tọa độ cho Popup xuất hiện ở GÓC TRÊN BÊN PHẢI màn hình
+            popup.show(stage, stage.getX() + (stage.getWidth() / 2) - 150, stage.getY() + 40);
+
+            // Tạo một luồng ngầm đếm ngược 3 giây rồi tắt Popup đi để không làm đơ màn hình
+            new Thread(() -> {
+                try {
+                    Thread.sleep(3000); // Thời gian hiển thị: 3 giây
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                Platform.runLater(popup::hide);
+            }).start();
+        });
     }
 
 

@@ -10,6 +10,7 @@ import java.util.Map;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import com.auction.server.dao.*;
+import com.auction.server.network.ServerCore;
 import com.auction.shared.model.*;
 import com.auction.shared.network.Message;
 import com.google.gson.JsonObject;
@@ -22,6 +23,9 @@ public class AuctionService {
     private static BigDecimal autoBidAmount = BigDecimal.ZERO;
     private static String autoBidderName = null;
     private static BigDecimal autoBiddStep = BigDecimal.ZERO;
+
+    // Kho chứa "ổ khóa" độc lập cho từng phòng đấu giá
+    private static final java.util.concurrent.ConcurrentHashMap<Integer, java.util.concurrent.locks.ReentrantLock> auctionLocks = new java.util.concurrent.ConcurrentHashMap<>();
 
     private static Auction currentAuction;
     protected static Map<Integer, Auction> waitingAuctions;
@@ -107,21 +111,28 @@ public class AuctionService {
 
     /// Hàm xử lý đặt giá tay hoặc đặt giá sẵn .
     public static Message processBid(BidTransaction bidTransaction) {
-        Auction auction = AuctionDAO.selectById(bidTransaction.getAuctionId());
-        LocalDateTime now = LocalDateTime.now();
 
-        if (auction == null) return new Message("BID_FAIL", "Đấu giá không tồn tại.");
-        if (!"OPEN".equalsIgnoreCase(auction.getStatus())) return new Message("BID_FAIL", "Chỉ có thể đặt giá khi đang diễn ra.");
+        // 1. LẤY ĐÚNG Ổ KHÓA CỦA PHÒNG NÀY (Nếu phòng chưa có khóa thì tạo mới 1 cái duy nhất)
+        java.util.concurrent.locks.ReentrantLock roomLock = auctionLocks.computeIfAbsent(bidTransaction.getAuctionId(), k -> new java.util.concurrent.locks.ReentrantLock());
 
-        Item item = ItemDAO.selectById(auction.getItemId());
+        // 2. CHỐT CỬA TẠI ĐÂY! (Huy, Trí, Bảo hay Đạt click cùng lúc đều phải xếp hàng 1-1 ở dòng này)
+        roomLock.lock();
 
-        User user = SellerDAO.getSellersByUserid(item.getSellerId());
-        if (item != null && bidTransaction.getBiddername().equals(user.getUsername())) {
-            return new Message("BID_FAIL", "Bạn không thể tự đặt giá cho sản phẩm do chính mình đăng bán!");
-        }
-
-        auction.lock();
         try {
+            // 3. SAU KHI VÀO ĐƯỢC TRONG PHÒNG, BẮT ĐẦU QUÉT DATABASE LẤY DỮ LIỆU MỚI NHẤT
+            Auction auction = AuctionDAO.selectById(bidTransaction.getAuctionId());
+            LocalDateTime now = LocalDateTime.now();
+
+            if (auction == null) return new Message("BID_FAIL", "Đấu giá không tồn tại.");
+            if (!"OPEN".equalsIgnoreCase(auction.getStatus())) return new Message("BID_FAIL", "Chỉ có thể đặt giá khi đang diễn ra.");
+
+            Item item = ItemDAO.selectById(auction.getItemId());
+            User user = SellerDAO.getSellersByUserid(item.getSellerId());
+
+            if (item != null && bidTransaction.getBiddername().equals(user.getUsername())) {
+                return new Message("BID_FAIL", "Bạn không thể tự đặt giá cho sản phẩm do chính mình đăng bán!");
+            }
+
             LocalDateTime endTimeObj = auction.changeStringToTime(auction.getEndTime());
             if (endTimeObj != null && now.isAfter(endTimeObj)) return new Message("BID_FAIL", "Thời gian đã kết thúc.");
             if (bidTransaction.getBidAmount().compareTo(auction.getCurrentPrice()) <= 0) return new Message("BID_FAIL", "Giá đặt phải cao hơn giá hiện tại.");
@@ -138,7 +149,6 @@ public class AuctionService {
             if (effectiveBalance.compareTo(bidTransaction.getBidAmount()) < 0) {
                 return new Message("BID_FAIL", "Lỗi dữ liệu hoặc số dư không đủ.");
             }
-
 
             String oldBidderName = auction.getHighestBidderName();
             BigDecimal oldPrice = auction.getCurrentPrice();
@@ -175,15 +185,13 @@ public class AuctionService {
 
 
             /// BƯỚC 1: LƯU VÀ PHÁT THANH LƯỢT ĐÁNH CỦA NGƯỜI THẬT TRƯỚC
-            com.auction.server.network.ServerCore.broadcastMessage(new Message("BID_SUCCESS", responseObj.toString()));
-            /// =========================================================================
+            ServerCore.broadcastMessage(new Message("BID_SUCCESS", responseObj.toString()));
             /// BƯỚC 2: BOT KIỂM TRA VÀ PHẢN CÔNG
-            /// =========================================================================
             BidTransaction currentBot = AutobidDAO.getAutoBidsByAuctionId(auction.getId());
             if (currentBot != null && !currentBot.getBiddername().equals(bidTransaction.getBiddername())) {
                 if (currentBot.getBidAmount().compareTo(auction.getCurrentPrice()) > 0) {
 
-                    /// [FIX BUG GIAO DIỆN]: Ép Bot dừng 2 giây để Client kịp vẽ dữ liệu của người thật
+                    // dừng 2 giây để Client kịp vẽ dữ liệu của người thật
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
@@ -202,7 +210,8 @@ public class AuctionService {
             return new Message("BID_FAKE_SUCCESS", "");
 
         } finally {
-            auction.unlock();
+            // MỞ CỬA CHO LUỒNG TIẾP THEO BƯỚC VÀO
+            roomLock.unlock();
         }
     }
 
@@ -233,7 +242,7 @@ public class AuctionService {
         responseObj.addProperty("bidTime", bidTime);
         responseObj.addProperty("newEndTime", auction.getEndTime());
 
-        com.auction.server.network.ServerCore.broadcastMessage(new Message("BID_SUCCESS", responseObj.toString()));
+        ServerCore.broadcastMessage(new Message("BID_SUCCESS", responseObj.toString()));
     }
 
 
